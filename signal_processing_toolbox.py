@@ -144,14 +144,14 @@ class SignalProcessingToolbox(Ui_SignalProcessingToolbox,QWidget):
         axis_upper = parameters[1]
         axis = parameters[2]
         steps = (axis[-1]-axis[0])/100        
-        getattr(self,axis_lower).blockSignals(not(self.outputAxisEnd_doubleSpinBox.signalsBlocked()))
+        getattr(self,axis_lower).blockSignals(True)
         getattr(self,axis_lower).setMinimum(axis[0])
         getattr(self,axis_lower).setSingleStep(steps)        
-        getattr(self,axis_lower).blockSignals(not(self.outputAxisEnd_doubleSpinBox.signalsBlocked()))        
-        getattr(self,axis_upper).blockSignals(not(self.outputAxisEnd_doubleSpinBox.signalsBlocked()))
+        getattr(self,axis_lower).blockSignals(False)        
+        getattr(self,axis_upper).blockSignals(True)
         getattr(self,axis_upper).setMaximum(axis[-1])
         getattr(self,axis_upper).setSingleStep(steps)
-        getattr(self,axis_upper).blockSignals(not(self.outputAxisEnd_doubleSpinBox.signalsBlocked()))    
+        getattr(self,axis_upper).blockSignals(False)    
 
     def exitSettings(self):
         self.hide()
