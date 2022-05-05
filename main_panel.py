@@ -61,7 +61,8 @@ class MainPanel(Ui_main_panel,QWidget):
     def setupGUI(self):
         self.calibration_toolbox = CalibrationToolBox()
         self.plotPreview_panel = PreviewPlot_Panel()
-        self.h_centralLayout.insertWidget(0,self.plotPreview_panel)
+        # self.h_centralLayout.insertWidget(0,self.plotPreview_panel)
+        self.main_layout.insertWidget(1,self.plotPreview_panel)
         self.connectSignals_widgets()
         self.updateGUI()
 

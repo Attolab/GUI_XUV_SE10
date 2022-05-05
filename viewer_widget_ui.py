@@ -25,6 +25,11 @@ class Ui_ViewerWidget(object):
         if not ViewerWidget.objectName():
             ViewerWidget.setObjectName(u"ViewerWidget")
         ViewerWidget.resize(788, 314)
+        sizePolicy = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(ViewerWidget.sizePolicy().hasHeightForWidth())
+        ViewerWidget.setSizePolicy(sizePolicy)
         self.horizontalLayout = QHBoxLayout(ViewerWidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.viewer_GraphicsLayoutWidget = GraphicsLayoutWidget(ViewerWidget)

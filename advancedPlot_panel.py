@@ -20,7 +20,7 @@
 #
 ##############################################################################
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
+    QMetaObject, QObject, QPoint, QRect,SIGNAL,Signal,
     QSize, QTime, QUrl, Qt)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,QTransform,QAction,
@@ -34,13 +34,43 @@ import numpy as np
 
 
 class AdvancedPlotPanel(Ui_advancedPlot_panel,QWidget):
+    signal_importCurrentData = Signal()
+    signal_importCustomData = Signal()
     def __init__(self,parent=None,name = 'Viewer1D'):
         super(AdvancedPlotPanel, self).__init__(parent)
         # Set up the user interface from Designer.
         self.setupUi(self)
         # self.connectSignals()
-        # self.label = pg.TextItem()
+        self.setupToolButton()
 
+
+    def setupToolButton(self):
+        tool_btn_menu= QMenu(self)
+        self.connect(tool_btn_menu.addAction("Import current data"),SIGNAL("triggered()"), self.importCurrentData_menuFunction)
+        self.connect(tool_btn_menu.addAction("Import custom data"),SIGNAL("triggered()"), self.importCustomData_menuFunction) 
+        self.makePlot_toolButton.setMenu(tool_btn_menu)
+        self.makePlot_toolButton.setDefaultAction(tool_btn_menu.actions()[0])
+        tool_btn_menu= QMenu(self)
+        self.connect(tool_btn_menu.addAction("Add ROI (horizontal)"),SIGNAL("triggered()"), self.addROIh_menuFunction)
+        self.connect(tool_btn_menu.addAction("Add ROI (vertical)"),SIGNAL("triggered()"), self.addROIv_menuFunction) 
+        self.makeROI_toolButton.setMenu(tool_btn_menu)
+        self.makeROI_toolButton.setDefaultAction(tool_btn_menu.actions()[0])
+
+    def addROIh_menuFunction(self):
+        print("Pressed")
+
+    def addROIv_menuFunction(self):        
+        print("Pressed")
+
+    def importCurrentData_menuFunction(self):
+        print("Pressed")
+        self.signal_importCurrentData.emit()
+    def importCustomData_menuFunction(self):
+        print("Pressed")
+        self.signal_importCustomData.emit()
+
+
+    
 
 def main():
     import sys

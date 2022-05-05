@@ -25,7 +25,7 @@ class Ui_advancedPlot_panel(object):
     def setupUi(self, advancedPlot_panel):
         if not advancedPlot_panel.objectName():
             advancedPlot_panel.setObjectName(u"advancedPlot_panel")
-        advancedPlot_panel.resize(812, 673)
+        advancedPlot_panel.resize(652, 560)
         self.verticalLayout_3 = QVBoxLayout(advancedPlot_panel)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.horizontalLayout = QHBoxLayout()

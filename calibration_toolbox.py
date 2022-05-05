@@ -69,7 +69,6 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.considerSBs_checkBox.stateChanged.connect(self.updateListPeaksTable)
         self.centraFrequency_doubleSpinBox.valueChanged.connect(self.updateListPeaksTable)
         self.showPeaks_checkBox.stateChanged.connect(self.showPeaksPlot)
-        self.showPeaks_checkBox.stateChanged.connect(self.showPeaksPlot)
 
     def showPeaksPlot(self):
         print("Show position of current peaks: TODO")
@@ -79,8 +78,6 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.plotRaw_view = self.plotRaw_window.addPlot(row=0,col =0,title="Raw Signal")
         self.plotRaw_view.setLabel('left', 'Signal', units='mV')
         self.plotRaw_view.setLabel('bottom', 'Time', units='ns')
-        # self.gridRaw = pg.GridItem(textPen=None)        
-        # self.plotRaw_view.addItem(self.gridRaw)
         self.plotRaw_plot = self.plotRaw_view.plot()
         self.plotRaw_fit = self.plotRaw_view.plot()
         self.plotRaw_tablePlot = self.plotRaw_view.plot()
@@ -88,8 +85,6 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.labelCalib = pg.LabelItem(justify = "right")
         self.plotCalib_window.addItem(self.labelCalib)
         self.plotCalib_view = self.plotCalib_window.addPlot(row=0,col =0,title="Transformed Signal")
-        # self.gridCalib = pg.GridItem(textPen=None)        
-        # self.plotCalib_view.addItem(self.gridCalib)
         self.plotCalib_view.setLabel('left', 'Signal', units='mV')
         self.plotCalib_view.setLabel('bottom', 'Energy', units='eV')        
         self.plotCalib_plot = self.plotCalib_view.plot()     
@@ -171,6 +166,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
     def findPeaks(self):
         param_lsq,number_of_peaks = PeakFitter.n_gaussian_fit(y=np.abs(self.y),x=self.x,prominence = 5e-2*np.max(self.y))
         amplitudes, peak_positions, peak_widths = PeakFitter.extract_gaussian_parameters(param_lsq, number_of_peaks)
+
         self.clearTable(self.listPeaks_tableWidget)
         [self.addEntry(sender= self.listPeaks_tableWidget, value = [peak,None]) for peak in peak_positions]
 
@@ -190,7 +186,6 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         table_value = np.array([[self.listPeaks_tableWidget.item(row,0).data(0),self.listPeaks_tableWidget.item(row,1).data(0)] 
                                                             for row in range(self.listPeaks_tableWidget.rowCount())]).astype(float).T  
         self.p_opt, self.pcov = opt.curve_fit(af.ToF2eV, table_value[0], table_value[1], bounds = (0,np.inf),p0 = [1e8,50,50])
-        # self.p_opt, self.pcov = opt.curve_fit(af.ToF2eV - table_value[1], p0 = [1e7,1.75,50], table_value[0], table_value[1], bounds = (0,np.inf),p0 = [1e7,1.75,50])
         self.addEntry(sender = self.coeffCalib_tableWidget,value=self.p_opt)     
         self.updateCalibration()
     def getCalibration(self):

@@ -31,11 +31,9 @@ class MainWindow(QMainWindow,Ui_MainWindow):
         # self.fileSelection_dock.setWidget(self.fileSelection_widget)
         # self.addDockWidget(Qt.LeftDockWidgetArea,self.fileSelection_dock)
         self.mainPanelwidget = MainPanel()
-        # self.connectMainPanel()
         self.setCentralWidget(self.mainPanelwidget)
+        self.showMaximized()
 
-
-        
     def transmissionReceived(self):
         print('Got data')
 
@@ -47,18 +45,7 @@ class MainWindow(QMainWindow,Ui_MainWindow):
     def connectSignal(self):
         self.menuFile_restartAction.triggered.connect(restart)
         print('Connecting signal')
-        # self._signal_processing_panel = SignalProcessingPanel()
-        # self.setCentralWidget(self._signal_processing_panel)
 
-
-    # def closeEvent(self, event):
-        # QMainWindow.closeEvent(event)  
-
-        # QCoreApplication.quit()
-
-        # settings = QSettings("MyCompany", "MyApp")
-        # settings.setValue("geometry", saveGeometry())
-        # settings.setValue("windowState", saveState())
 def restart():
     QCoreApplication.quit()
     status = QProcess.startDetached(sys.executable, sys.argv)

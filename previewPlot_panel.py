@@ -14,6 +14,7 @@ from usefulclass import FourierTransform
 from usefulclass import Filter
 import pyqtgraph.graphicsItems.NonUniformImage as NonUniformImage
 from viewer_widget import ViewerWidget
+from viewer2D_widget import Viewer2DWidget
 from scipy.interpolate import interp1d
 import numpy as np
 
@@ -61,7 +62,7 @@ class PreviewPlot_Panel(Ui_previewPlot_Panel,QWidget):
         self.signal_sendData.emit(output)
         
     def setupPlotWidget(self):        
-        self.inputViewerWidget = ViewerWidget(name = 'Signal')
+        self.inputViewerWidget = Viewer2DWidget(name = 'Signal')
         self.signalInput_groupBox.layout().addWidget(self.inputViewerWidget)
         self.outputMagnViewerWidget = ViewerWidget(name = 'FT magnitude')
         self.outputPhaseViewerWidget = ViewerWidget(name = 'FT phase')
