@@ -48,7 +48,7 @@
       <number>1</number>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="tabSpacing">
       <number>6</number>
@@ -58,7 +58,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>88</width>
+        <width>76</width>
         <height>316</height>
        </rect>
       </property>
@@ -96,17 +96,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="showIsoLine_checkBox_2">
-         <property name="text">
-          <string>Isoline</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="showIsoLine_checkBox">
+        <widget class="QCheckBox" name="showROI_checkBox">
          <property name="text">
           <string>ROI</string>
          </property>

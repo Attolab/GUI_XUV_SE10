@@ -64,8 +64,8 @@ class PreviewPlot_Panel(Ui_previewPlot_Panel,QWidget):
     def setupPlotWidget(self):        
         self.inputViewerWidget = Viewer2DWidget(name = 'Signal')
         self.signalInput_groupBox.layout().addWidget(self.inputViewerWidget)
-        self.outputMagnViewerWidget = ViewerWidget(name = 'FT magnitude')
-        self.outputPhaseViewerWidget = ViewerWidget(name = 'FT phase')
+        self.outputMagnViewerWidget = Viewer2DWidget(name = 'FT magnitude')
+        self.outputPhaseViewerWidget = Viewer2DWidget(name = 'FT phase')
         self.signalOutput_groupBox.layout().addWidget(self.outputMagnViewerWidget)
         self.signalOutput_groupBox.layout().addWidget(self.outputPhaseViewerWidget)
         self.outputMagnViewerWidget.view_2D.setYLink(self.outputPhaseViewerWidget.view_2D)

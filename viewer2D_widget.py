@@ -45,10 +45,11 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         self.plot_2D,self.view_2D,self.imageItem = self.setupImageWidget(self.viewer_GraphicsLayoutWidget,title=name,row = 0, col = 0)
         self.proxy = pg.SignalProxy(self.view_2D.scene().sigMouseMoved, rateLimit=60, slot=self.mouseMoved)     
         self.histLUT_2D = self.setupHistItem(self.viewer_GraphicsLayoutWidget,self.imageItem,row=0,col=1)
-        self.isoCurve = self.setupIsoCurveItem(self.imageItem)
-        self.isoLine = self.setupIsoLineItem(self.histLUT_2D)
+        # self.isoCurve = self.setupIsoCurveItem(self.imageItem)
+        # self.isoLine = self.setupIsoLineItem(self.histLUT_2D)
         self.data = self.imageItem.image
         self.data_shape = self.data.shape
+        self.ROI = []
         self.connectSignals()
         self.setupToolButton()
 
@@ -56,7 +57,7 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         plot = layout.addPlot(title=title,labels={'bottom': ('x axis title'), 'left': ('y axis title')},row = row, col = col)
         plot.ctrlMenu = None
         view = plot.getViewBox()
-        img = pg.ImageItem()      
+        img = pg.ImageItem()              
         data = np.random.normal(size=(200, 100))
         data[20:80, 20:80] += 2.
         data = pg.gaussianFilter(data, (3, 3))
@@ -64,23 +65,29 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         img.setImage(data,autoRange=True)
         plot.addItem(img)     
         return plot,view,img
-    def setupIsoCurveItem(self,parent):
-        # Isocurve drawing
-        iso = pg.IsocurveItem(level=0.8, pen='g')
-        iso.setParentItem(parent)
-        iso.setZValue(5)
-        iso.setData(pg.gaussianFilter(parent.image, (2, 2)))
-        return iso
 
-    def setupIsoLineItem(self,parent):
-        # Draggable line for setting isocurve level
-        isoLine = pg.InfiniteLine(angle=0, movable=True, pen='g')
-        parent.vb.addItem(isoLine)
-        parent.vb.setMouseEnabled(y=False) # makes user interaction a little easier
-        isoLine.setValue(0.8)
-        isoLine.setZValue(1000) # bring iso line above contrast controls
-        isoLine.sigDragged.connect(self.updateIsocurve)
-        return isoLine
+    # self.showIsoLine_checkBox.stateChanged.connect(self.updateGUI)
+    # self.showHideWidget([self.isoCurve],self.showIsoLine_checkBox.isChecked())
+    # def updateIsocurve(self):
+    #     self.isoCurve.setLevel(self.isoLine.value())        
+    # def setupIsoCurveItem(self,parent):
+    #     # Isocurve drawing
+    #     iso = pg.IsocurveItem(level=0.8, pen='g')
+    #     iso.setParentItem(parent)
+    #     iso.setZValue(5)
+    #     iso.setData(pg.gaussianFilter(parent.image, (2, 2)))
+    #     return iso
+
+
+    # def setupIsoLineItem(self,parent):
+    #     # Draggable line for setting isocurve level
+    #     isoLine = pg.InfiniteLine(angle=0, movable=True, pen='g')
+    #     parent.vb.addItem(isoLine)
+    #     parent.vb.setMouseEnabled(y=False) # makes user interaction a little easier
+    #     isoLine.setValue(self.isoCurve.level)
+    #     isoLine.setZValue(1000) # bring iso line above contrast controls
+    #     isoLine.sigDragged.connect(self.updateIsocurve)
+    #     return isoLine
 
     def setupHistItem(self,layout,image,row = None, col = None):
         hist = pg.HistogramLUTItem(gradientPosition="left")
@@ -105,9 +112,9 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
 
     def connectSignals(self):
         self.show2D_checkBox.stateChanged.connect(self.updateGUI)
-        self.showIsoLine_checkBox.stateChanged.connect(self.updateGUI)
         self.showHist_checkBox.stateChanged.connect(self.updateGUI)        
         self.clearAll_pushButton.pressed.connect(self.clearROI)
+        self.showROI_checkBox.pressed.connect(self.updateGUI)
     def showHideWidget(self,items,show_bool = True):
         if show_bool:        
             [item.show() for item in items]
@@ -116,16 +123,14 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
 
     def updateGUI(self):
         self.showHideWidget([self.plot_2D],self.show2D_checkBox.isChecked())
-        self.showHideWidget([self.isoCurve],self.showIsoLine_checkBox.isChecked())
         self.showHideWidget([self.histLUT_2D],self.showHist_checkBox.isChecked())
-
-
+        self.showHideWidget(self.ROI,not(self.showROI_checkBox.isChecked()))
 
 
     def setupToolButton(self):        
         tool_btn_menu= QMenu(self)
         self.connect(tool_btn_menu.addAction("Add ROI"),SIGNAL("triggered()"), self.addROIh_menuFunction)
-        self.connect(tool_btn_menu.addAction("Add ROI (horizontal)"),SIGNAL("triggered()"), self.addROIv_menuFunction) 
+        self.connect(tool_btn_menu.addAction("Add ROI (horizontal)"),SIGNAL("triggered()"), self.addROIh_menuFunction) 
         self.connect(tool_btn_menu.addAction("Add ROI (vertical)"),SIGNAL("triggered()"), self.addROIv_menuFunction) 
         self.makeROI_toolButton.setMenu(tool_btn_menu)
         self.makeROI_toolButton.setDefaultAction(tool_btn_menu.actions()[0])
@@ -156,34 +161,44 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
 
 
     def addROIh_menuFunction(self):
-        self.addROI_linearRegionItem(self.getImageShape()[1],'horizontal')
+        self.addROI_linearRegionItem(self.view_2D.viewRange()[1],'horizontal')
 
     def addROIv_menuFunction(self):        
-        self.addROI_linearRegionItem(self.getImageShape()[0],'vertical')
+        self.addROI_linearRegionItem(self.view_2D.viewRange()[0],'vertical')
 
-    def makeInitialShape(self,size):
-        lengths = size*np.array([2/5,3/5])
-        # return [int(length) for length in lengths]
+    def makeInitialShape(self,size):      
+        lengths = size*np.array([2,3])/5
         return lengths
 
-    def addROI_linearRegionItem(self,size,orientation):
-        lr = pg.LinearRegionItem(self.makeInitialShape(size),orientation=orientation,clipItem=self.imageItem)
+    def addROI_linearRegionItem(self,edges,orientation):
+        # lr = LinearRegionItem(self.makeInitialShape(np.diff(edges)),orientation=orientation,clipItem=self.imageItem)
+        lr = pg.LinearRegionItem(self.makeInitialShape(np.diff(edges)),orientation=orientation,clipItem=self.imageItem)
         lr.setZValue(10)
-        self.plot_2D.addItem(lr)
+        self.ROI.append(lr)
+        self.plot_2D.addItem(self.ROI[-1])
+
     def clearROI(self):
-        [self.plot_2D.removeItem(item) for item in self.plot_2D.items if item.__class__.__name__ == 'LinearRegionItem']
-        
-    
-    def updateIsocurve(self):
-        # global isoLine, iso
-        self.isoCurve.setLevel(self.isoLine.value())
-        # iso.setLevel(isoLine.value())
+        [self.removeROI(ROI) for ROI in self.ROI]
+
+    def removeROI(self,item):
+        self.plot_2D.removeItem(item) 
+        self.ROI.remove(item)
 
     def getImageData(self):
         return self.imageItem.image
     
     def getImageShape(self):
         return self.getImageData().shape
+
+
+
+# class LinearRegionItem(pg.LinearRegionItem):
+#     def __init__(self, *args, **kwargs):
+#         super(LinearRegionItem,self).__init__(*args, **kwargs)
+
+
+#     def doStuff(self):
+#         print('Doing stuff')
 
 def main():
     import sys

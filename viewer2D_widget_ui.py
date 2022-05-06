@@ -55,7 +55,7 @@ class Ui_Viewer2DWidget(object):
         self.toolBox.setLineWidth(1)
         self.page = QWidget()
         self.page.setObjectName(u"page")
-        self.page.setGeometry(QRect(0, 0, 88, 316))
+        self.page.setGeometry(QRect(0, 0, 76, 316))
         sizePolicy2.setHeightForWidth(self.page.sizePolicy().hasHeightForWidth())
         self.page.setSizePolicy(sizePolicy2)
         self.verticalLayout = QVBoxLayout(self.page)
@@ -73,17 +73,11 @@ class Ui_Viewer2DWidget(object):
 
         self.verticalLayout.addWidget(self.showHist_checkBox)
 
-        self.showIsoLine_checkBox_2 = QCheckBox(self.page)
-        self.showIsoLine_checkBox_2.setObjectName(u"showIsoLine_checkBox_2")
-        self.showIsoLine_checkBox_2.setChecked(True)
+        self.showROI_checkBox = QCheckBox(self.page)
+        self.showROI_checkBox.setObjectName(u"showROI_checkBox")
+        self.showROI_checkBox.setChecked(True)
 
-        self.verticalLayout.addWidget(self.showIsoLine_checkBox_2)
-
-        self.showIsoLine_checkBox = QCheckBox(self.page)
-        self.showIsoLine_checkBox.setObjectName(u"showIsoLine_checkBox")
-        self.showIsoLine_checkBox.setChecked(True)
-
-        self.verticalLayout.addWidget(self.showIsoLine_checkBox)
+        self.verticalLayout.addWidget(self.showROI_checkBox)
 
         self.toolBox.addItem(self.page, u"Display")
         self.page_2 = QWidget()
@@ -121,7 +115,7 @@ class Ui_Viewer2DWidget(object):
 
         self.retranslateUi(Viewer2DWidget)
 
-        self.toolBox.setCurrentIndex(1)
+        self.toolBox.setCurrentIndex(0)
         self.toolBox.layout().setSpacing(6)
 
 
@@ -132,8 +126,7 @@ class Ui_Viewer2DWidget(object):
         Viewer2DWidget.setWindowTitle(QCoreApplication.translate("Viewer2DWidget", u"Form", None))
         self.show2D_checkBox.setText(QCoreApplication.translate("Viewer2DWidget", u"Data", None))
         self.showHist_checkBox.setText(QCoreApplication.translate("Viewer2DWidget", u"Hist", None))
-        self.showIsoLine_checkBox_2.setText(QCoreApplication.translate("Viewer2DWidget", u"Isoline", None))
-        self.showIsoLine_checkBox.setText(QCoreApplication.translate("Viewer2DWidget", u"ROI", None))
+        self.showROI_checkBox.setText(QCoreApplication.translate("Viewer2DWidget", u"ROI", None))
         self.toolBox.setItemText(self.toolBox.indexOf(self.page), QCoreApplication.translate("Viewer2DWidget", u"Display", None))
         self.makeROI_toolButton.setText(QCoreApplication.translate("Viewer2DWidget", u"Add ROI", None))
         self.clearAll_pushButton.setText(QCoreApplication.translate("Viewer2DWidget", u"Clear all", None))
