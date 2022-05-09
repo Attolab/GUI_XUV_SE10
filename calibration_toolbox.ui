@@ -112,6 +112,13 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QCheckBox" name="showPeaks_ToF_checkBox">
+         <property name="text">
+          <string>Show Peaks</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item>
@@ -193,7 +200,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="showPeaks_checkBox">
+      <widget class="QCheckBox" name="showPeaks_KE_checkBox">
        <property name="text">
         <string>Show Peaks</string>
        </property>

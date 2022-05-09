@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'calibration_toolbox.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.4
+## Created by: Qt User Interface Compiler version 6.3.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -88,6 +88,11 @@ class Ui_CalibrationToolbox(object):
 
         self.horizontalLayout_3.addWidget(self.considerSBs_checkBox)
 
+        self.showPeaks_ToF_checkBox = QCheckBox(CalibrationToolbox)
+        self.showPeaks_ToF_checkBox.setObjectName(u"showPeaks_ToF_checkBox")
+
+        self.horizontalLayout_3.addWidget(self.showPeaks_ToF_checkBox)
+
 
         self.verticalLayout.addLayout(self.horizontalLayout_3)
 
@@ -140,10 +145,10 @@ class Ui_CalibrationToolbox(object):
 
         self.verticalLayout.addWidget(self.listPeaks_tableWidget)
 
-        self.showPeaks_checkBox = QCheckBox(CalibrationToolbox)
-        self.showPeaks_checkBox.setObjectName(u"showPeaks_checkBox")
+        self.showPeaks_KE_checkBox = QCheckBox(CalibrationToolbox)
+        self.showPeaks_KE_checkBox.setObjectName(u"showPeaks_KE_checkBox")
 
-        self.verticalLayout.addWidget(self.showPeaks_checkBox)
+        self.verticalLayout.addWidget(self.showPeaks_KE_checkBox)
 
         self.verticalLayout_3 = QVBoxLayout()
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
@@ -231,6 +236,7 @@ class Ui_CalibrationToolbox(object):
         self.toolButton.setText(QCoreApplication.translate("CalibrationToolbox", u"...", None))
         self.autoFillTable_checkBox.setText(QCoreApplication.translate("CalibrationToolbox", u"AutoFill", None))
         self.considerSBs_checkBox.setText(QCoreApplication.translate("CalibrationToolbox", u"With Sidebands", None))
+        self.showPeaks_ToF_checkBox.setText(QCoreApplication.translate("CalibrationToolbox", u"Show Peaks", None))
         self.label_5.setText(QCoreApplication.translate("CalibrationToolbox", u"Central frequency", None))
         self.centraFrequency_doubleSpinBox.setPrefix("")
         self.centraFrequency_doubleSpinBox.setSuffix("")
@@ -239,7 +245,7 @@ class Ui_CalibrationToolbox(object):
         ___qtablewidgetitem.setText(QCoreApplication.translate("CalibrationToolbox", u"Time", None));
         ___qtablewidgetitem1 = self.listPeaks_tableWidget.horizontalHeaderItem(1)
         ___qtablewidgetitem1.setText(QCoreApplication.translate("CalibrationToolbox", u"Energy", None));
-        self.showPeaks_checkBox.setText(QCoreApplication.translate("CalibrationToolbox", u"Show Peaks", None))
+        self.showPeaks_KE_checkBox.setText(QCoreApplication.translate("CalibrationToolbox", u"Show Peaks", None))
         self.fitPeaks_pushButton.setText(QCoreApplication.translate("CalibrationToolbox", u"Fit Peaks", None))
         self.label.setText(QCoreApplication.translate("CalibrationToolbox", u"Expression: A / t^2 + B", None))
         self.calibration_toolButton.setText(QCoreApplication.translate("CalibrationToolbox", u"Apply Calibration", None))

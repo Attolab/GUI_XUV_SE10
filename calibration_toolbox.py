@@ -68,10 +68,22 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.listPeaks_tableWidget.itemChanged.connect(self.updateListPeaksTable)
         self.considerSBs_checkBox.stateChanged.connect(self.updateListPeaksTable)
         self.centraFrequency_doubleSpinBox.valueChanged.connect(self.updateListPeaksTable)
-        self.showPeaks_checkBox.stateChanged.connect(self.showPeaksPlot)
+        self.showPeaks_ToF_checkBox.stateChanged.connect(self.showPeaksPlot)
+        self.showPeaks_KE_checkBox.stateChanged.connect(self.showPeaksEnergy)
 
     def showPeaksPlot(self):
-        print("Show position of current peaks: TODO")
+        for row in range(self.listPeaks_tableWidget.rowCount()):
+            t=float(self.listPeaks_tableWidget.item(row,0).text())
+            index = np.argmin(np.abs(t - np.array(self.plotRaw_plot.getDisplayDataset().x)))
+            y=self.plotRaw_plot.getDisplayDataset().y[index]
+            self.plotRaw_view.plot(x=[t], y=[y], symbol="o")
+    
+    def showPeaksEnergy(self):
+
+
+        
+        print("TODO")
+
     def setupPlotWidget(self):
         self.labelRaw = pg.LabelItem(justify = "right")
         self.plotRaw_window.addItem(self.labelRaw)
