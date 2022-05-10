@@ -179,14 +179,16 @@ class Ui_CalibrationToolbox(object):
         self.verticalLayout_3.addLayout(self.horizontalLayout)
 
         self.coeffCalib_tableWidget = QTableWidget(CalibrationToolbox)
-        if (self.coeffCalib_tableWidget.columnCount() < 3):
-            self.coeffCalib_tableWidget.setColumnCount(3)
+        if (self.coeffCalib_tableWidget.columnCount() < 4):
+            self.coeffCalib_tableWidget.setColumnCount(4)
         __qtablewidgetitem2 = QTableWidgetItem()
         self.coeffCalib_tableWidget.setHorizontalHeaderItem(0, __qtablewidgetitem2)
         __qtablewidgetitem3 = QTableWidgetItem()
         self.coeffCalib_tableWidget.setHorizontalHeaderItem(1, __qtablewidgetitem3)
         __qtablewidgetitem4 = QTableWidgetItem()
         self.coeffCalib_tableWidget.setHorizontalHeaderItem(2, __qtablewidgetitem4)
+        __qtablewidgetitem5 = QTableWidgetItem()
+        self.coeffCalib_tableWidget.setHorizontalHeaderItem(3, __qtablewidgetitem5)
         self.coeffCalib_tableWidget.setObjectName(u"coeffCalib_tableWidget")
         sizePolicy2.setHeightForWidth(self.coeffCalib_tableWidget.sizePolicy().hasHeightForWidth())
         self.coeffCalib_tableWidget.setSizePolicy(sizePolicy2)
@@ -255,5 +257,7 @@ class Ui_CalibrationToolbox(object):
         ___qtablewidgetitem3.setText(QCoreApplication.translate("CalibrationToolbox", u"B", None));
         ___qtablewidgetitem4 = self.coeffCalib_tableWidget.horizontalHeaderItem(2)
         ___qtablewidgetitem4.setText(QCoreApplication.translate("CalibrationToolbox", u"t0", None));
+        ___qtablewidgetitem5 = self.coeffCalib_tableWidget.horizontalHeaderItem(3)
+        ___qtablewidgetitem5.setText(QCoreApplication.translate("CalibrationToolbox", u"R\u00b2", None));
     # retranslateUi
 

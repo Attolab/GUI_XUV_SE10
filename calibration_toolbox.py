@@ -19,6 +19,7 @@
 # along with pymepixviewer.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
+from re import T
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,QRegularExpression,
     QMetaObject, QObject, QPoint, QRect,Signal,SIGNAL,QFile,QDataStream,QFileInfo,
     QSize, QTime, QUrl, Qt)
@@ -206,13 +207,22 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         table_value = np.array([[self.listPeaks_tableWidget.item(row,0).data(0),self.listPeaks_tableWidget.item(row,1).data(0)] 
                                                             for row in range(self.listPeaks_tableWidget.rowCount())]).astype(float).T  
         self.p_opt, self.pcov = opt.curve_fit(af.ToF2eV, table_value[0], table_value[1], bounds = (0,np.inf),p0 = [1e8,50,50])
-        self.addEntry(sender = self.coeffCalib_tableWidget,value=self.p_opt)     
+
+        Ecal=[af.ToF2eV(t,self.p_opt[0],self.p_opt[1],self.p_opt[2]) for t in table_value[0]]
+        residuals = [table_value[1][i] - Ecal[i] for i in range(len(table_value[0]))]
+        ss_res = np.sum([residuals[i]**2 for i in range(len(residuals))])
+        ss_tot = np.sum((table_value[1]-np.mean(table_value[1]))**2)
+        r_squared = 1 - (ss_res / ss_tot)
+
+        self.addEntry(sender = self.coeffCalib_tableWidget,value=(self.p_opt[0],self.p_opt[1],self.p_opt[2],r_squared))     
+
         self.updateCalibration()
+
     def getCalibration(self):
         return [float(item.text()) for item in self.coeffCalib_tableWidget.selectedItems()]                
 
     def updateCalibration(self):
-        alpha,beta,t0 = self.getCalibration()                
+        alpha,beta,t0,r_squared = self.getCalibration()                
         self.x_fit = af.ToF2eV(self.x,alpha,beta,t0)
         jac = af.ToF2eV_Jac(self.x,alpha,t0)
         self.x2,self.y2 = af.goFromTimeToEnergy(self.x,self.y,alpha,beta,t0)

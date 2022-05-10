@@ -280,6 +280,11 @@
            <string>t0</string>
           </property>
          </column>
+         <column>
+          <property name="text">
+           <string>R²</string>
+          </property>
+         </column>
         </widget>
        </item>
       </layout>
