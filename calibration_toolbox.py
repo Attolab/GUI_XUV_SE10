@@ -79,10 +79,18 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
             self.plotRaw_view.plot(x=[t], y=[y], symbol="o")
     
     def showPeaksEnergy(self):
+        a,b,t0=float(self.coeffCalib_tableWidget.item(0,0).text()),float(self.coeffCalib_tableWidget.item(0,1).text()),float(self.coeffCalib_tableWidget.item(0,2).text())
 
+        t_list=[]
+        for row in range(self.listPeaks_tableWidget.rowCount()):
+            t_list.append(float(self.listPeaks_tableWidget.item(row,0).text()))
 
-        
-        print("TODO")
+        E_list=[af.ToF2eV(t,a,b,t0) for t in t_list]
+
+        for E in E_list:
+            index = np.argmin(np.abs(E - np.array(self.plotCalib_plot.getDisplayDataset().x)))
+            y=self.plotCalib_plot.getDisplayDataset().y[index]
+            self.plotCalib_view.plot(x=[E], y=[y], symbol="o")
 
     def setupPlotWidget(self):
         self.labelRaw = pg.LabelItem(justify = "right")
@@ -212,6 +220,8 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.x_fit = self.x_fit[mask]
         self.y_fit = self.y[mask] * jac[mask]
         self.plotCalib_plot.setData(x=self.x_fit,y=self.y_fit)
+        self.plotCalib_view.setXRange(20,50)
+        self.plotCalib_view.setYRange(0,2)
         
 
     def updateListPeaksTable(self,item):        
