@@ -35,6 +35,7 @@ from calibration_toolbox_ui import Ui_CalibrationToolbox
 import pyqtgraph as pg
 import numpy as np
 import scipy.optimize as opt
+import scipy.signal as sgn
 from usefulclass import PeakFinder, PeakFitter
 from analysis_functions import AnalysisFunctions as af
 from file_manager import FileManager as FM
@@ -138,10 +139,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.calibration_toolButton.setMenu(tool_btn_menu)
         self.calibration_toolButton.setDefaultAction(tool_btn_menu.actions()[0])        
 
-    def findPeaks_gaussianFit(self):
-        self.findPeaks()
-    def findPeaks_scipyPeakFinder(self):
-        self.findPeaks()
+
     def findPeaks_custom(self):
         self.findPeaks()
 
@@ -174,7 +172,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
     def importCustomSignal_menuFunction(self):
         print('Action 3 activated.')    
 
-    def findPeaks(self):
+    def findPeaks_gaussianFit(self):
         param_lsq,number_of_peaks = PeakFitter.n_gaussian_fit(y=np.abs(self.y),x=self.x,prominence = 5e-2*np.max(self.y))
         amplitudes, peak_positions, peak_widths = PeakFitter.extract_gaussian_parameters(param_lsq, number_of_peaks)
 
@@ -182,14 +180,28 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         [self.addEntry(sender= self.listPeaks_tableWidget, value = [peak,None]) for peak in peak_positions]
 
         #show Peaks for later
-        for row in range(self.listPeaks_tableWidget.rowCount()):
-            t=float(self.listPeaks_tableWidget.item(row,0).text())
-            index = np.argmin(np.abs(t - np.array(self.plotRaw_plot.getDisplayDataset().x)))
-            y=self.plotRaw_plot.getDisplayDataset().y[index]
+        for peak in peak_positions:
+            index = np.argmin(np.abs(peak - np.array(self.x)))
+            y=self.y[index]
+            self.plotRaw_view.plot(x=[peak], y=[y], symbol="o")
+        
+        for plot in self.plotRaw_view.items[1:]:
+            plot.hide()
+    
+    def findPeaks_scipyPeakFinder(self):
+        peaks_index,properties = sgn.find_peaks(x=np.abs(self.y),prominence = 5e-2*np.max(self.y))
+        self.clearTable(self.listPeaks_tableWidget)
+        [self.addEntry(sender= self.listPeaks_tableWidget, value = [self.x[index],None]) for index in peaks_index]
+
+        #show Peaks for later
+        for index in peaks_index:
+            t=self.x[index]
+            y=self.y[index]
             self.plotRaw_view.plot(x=[t], y=[y], symbol="o")
         
         for plot in self.plotRaw_view.items[1:]:
             plot.hide()
+    
 
     def getData(self,input):
         self.x = input[0]
