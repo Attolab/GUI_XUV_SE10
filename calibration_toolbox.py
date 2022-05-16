@@ -58,6 +58,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.path_calib = 'Calibration/'
 
     def connectSignals(self):
+        #Set up widgets, buttons and checkboxes
         self.listPeaks_tableWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.listPeaks_tableWidget.connect(self.listPeaks_tableWidget,SIGNAL("customContextMenuRequested(QPoint)" ), self.listItemRightClicked)    
         self.coeffCalib_tableWidget.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -73,42 +74,8 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.showPeaks_ToF_checkBox.stateChanged.connect(self.showPeaksPlot)
         self.showPeaks_KE_checkBox.stateChanged.connect(self.showPeaksEnergy)
 
-    def showPeaksPlot(self):
-        boolean = self.showPeaks_ToF_checkBox.isChecked()
-        
-        t_list=[]
-        y=[]
-        for row in range(self.listPeaks_tableWidget.rowCount()):
-            t_list.append(float(self.listPeaks_tableWidget.item(row,0).text()))
-        
-        for t in t_list:
-            index = np.argmin(np.abs(t - np.array(self.plotRaw_plot.getDisplayDataset().x)))
-            y.append(self.plotRaw_plot.getDisplayDataset().y[index])
-        
-        self.plotRaw_peaks.setData(x=t_list, y=y, symbol="o")
-        self.plotRaw_peaks.setVisible(boolean)
-    
-    def showPeaksEnergy(self):
-        boolean = self.showPeaks_KE_checkBox.isChecked()
-        
-        t_list=[]
-        y=[]
-        for row in range(self.listPeaks_tableWidget.rowCount()):
-            t_list.append(float(self.listPeaks_tableWidget.item(row,0).text()))
-        
-        alpha,beta,t0,r_squared = self.getCalibration()
-        E_list=[af.ToF2eV(t,alpha,beta,t0) for t in t_list]
-
-        for E in E_list:
-            index = np.argmin(np.abs(E - np.array(self.plotCalib_plot.getDisplayDataset().x)))
-            y.append(self.plotCalib_plot.getDisplayDataset().y[index])
-
-        self.plotCalib_peaks.setData(x=E_list, y=y, symbol="o")
-        self.plotCalib_peaks.setVisible(boolean)
-        
-
-
     def setupPlotWidget(self):
+        #Creation of items in windows, tables and plots, data is set using setData later
         self.labelRaw = pg.LabelItem(justify = "right")
         self.plotRaw_window.addItem(self.labelRaw)
         self.plotRaw_view = self.plotRaw_window.addPlot(row=0,col =0,title="Raw Signal")
@@ -130,26 +97,18 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         # Enable antialiasing for prettier plots
         pg.setConfigOptions(antialias=True)
     
-
-
-    def mouseRawMoved(self,evt):
-        mousePoint = self.plotRaw_view.vb.mapSceneToView(evt[0])
-        self.labelRaw.setText("<span style='font-size: 14pt; color: white'> x = %0.2f, <span style='color: white'> y = %0.2f</span>" % (mousePoint.x(), mousePoint.y()))
-
-
-    def mouseCalibMoved(self,evt):
-        mousePoint = self.plotCalib_view.vb.mapSceneToView(evt[0])
-        self.labelCalib.setText("<span style='font-size: 14pt; color: white'> x = %0.2f, <span style='color: white'> y = %0.2f</span>" % (mousePoint.x(), mousePoint.y()))
-
     def setupToolButton(self):
+        #Set up buttons with multiple choices
         tool_btn_menu= QMenu(self)
+        #Different peak finder methods
         self.connect(tool_btn_menu.addAction("Gaussian Fit"),SIGNAL("triggered()"), self.findPeaks_gaussianFit)
         self.connect(tool_btn_menu.addAction("Peak finder (scipy)"),SIGNAL("triggered()"), self.findPeaks_scipyPeakFinder) 
         self.connect(tool_btn_menu.addAction("Custom finder"),SIGNAL("triggered()"), self.findPeaks_custom)  
         self.findPeaks_toolButton.setMenu(tool_btn_menu)
-        self.findPeaks_toolButton.setDefaultAction(tool_btn_menu.actions()[0])
+        self.findPeaks_toolButton.setDefaultAction(tool_btn_menu.actions()[1])
 
         tool_btn_menu= QMenu(self)
+        #Different signal loading methods
         self.connect(tool_btn_menu.addAction("Load current signal"),SIGNAL("triggered()"), self.importSignal_menuFunction)
         self.connect(tool_btn_menu.addAction("Load FT magnitude"),SIGNAL("triggered()"), self.importModuleFT_menuFunction) 
         self.connect(tool_btn_menu.addAction("Load custom signal"),SIGNAL("triggered()"), self.importCustomSignal_menuFunction)  
@@ -157,16 +116,59 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.loadSignal_toolButton.setDefaultAction(tool_btn_menu.actions()[1])
 
         tool_btn_menu= QMenu(self)
+        #Different calibration choices
         self.connect(tool_btn_menu.addAction("Apply Calibration"),SIGNAL("triggered()"), self.applyCalibration_menuFunction)
         self.connect(tool_btn_menu.addAction("Plot Calibration"),SIGNAL("triggered()"), self.plotCalibration_menuFunction) 
         self.connect(tool_btn_menu.addAction("Save Calibration"),SIGNAL("triggered()"), self.saveCalibration_menuFunction)  
         self.connect(tool_btn_menu.addAction("Load Calibration"),SIGNAL("triggered()"), self.loadCalibration_menuFunction)          
         self.calibration_toolButton.setMenu(tool_btn_menu)
         self.calibration_toolButton.setDefaultAction(tool_btn_menu.actions()[0])        
+    
+############################################ Mouse interaction ###############################################################
 
+    def mouseRawMoved(self,evt):
+        mousePoint = self.plotRaw_view.vb.mapSceneToView(evt[0])
+        self.labelRaw.setText("<span style='font-size: 14pt; color: white'> x = %0.2f, <span style='color: white'> y = %0.2f</span>" % (mousePoint.x(), mousePoint.y()))
 
+    def mouseCalibMoved(self,evt):
+        mousePoint = self.plotCalib_view.vb.mapSceneToView(evt[0])
+        self.labelCalib.setText("<span style='font-size: 14pt; color: white'> x = %0.2f, <span style='color: white'> y = %0.2f</span>" % (mousePoint.x(), mousePoint.y()))
+
+    def listItemRightClicked(self, QPos): 
+        sender = self.sender()
+        self.listMenu= QMenu(self)
+        self.connect(self.listMenu.addAction("Add Item"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_listPeaksAddItemClicked(who))
+        self.connect(self.listMenu.addAction("Remove Item(s)"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_listPeaksRemoveItemClicked(who)) 
+        self.connect(self.listMenu.addAction("Clear all"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_listPeaksClearClicked(who)) 
+        parentPosition = sender.mapToGlobal(QPoint(0, 0))        
+        self.listMenu.move(parentPosition + QPos)
+        self.listMenu.show()     
+
+################################################## Peak finder methods ##########################################################
+
+    def findPeaks_gaussianFit(self):
+        #Use of the Peak Fitter class in usefulclass.py to compute gaussian fits around the peaks 
+
+        param_lsq,number_of_peaks = PeakFitter.n_gaussian_fit(y=np.abs(self.y),x=self.x,prominence = 5e-2*np.max(self.y))
+        amplitudes, peak_positions, peak_widths = PeakFitter.extract_gaussian_parameters(param_lsq, number_of_peaks)
+
+        self.clearTable(self.listPeaks_tableWidget)
+        [self.addEntry(sender= self.listPeaks_tableWidget, value = [peak,None]) for peak in peak_positions]
+    
+    def findPeaks_scipyPeakFinder(self):
+        #Simple use of the scipy find_peaks method
+
+        peaks_index,properties = sgn.find_peaks(x=np.abs(self.y),prominence = 5e-2*np.max(self.y), distance = 100)
+
+        self.clearTable(self.listPeaks_tableWidget)
+        [self.addEntry(sender= self.listPeaks_tableWidget, value = [self.x[index],None]) for index in peaks_index]
+    
     def findPeaks_custom(self):
+        #not implemented yet, tbd in the future
         self.findPeaks_gaussianFit()
+
+
+################################### Calibration file loading and saving ####################################################
 
     def applyCalibration_menuFunction(self):
         self.updateCalibration()
@@ -197,61 +199,109 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
     def importCustomSignal_menuFunction(self):
         print('Action 3 activated.')    
 
-    def findPeaks_gaussianFit(self):
-        param_lsq,number_of_peaks = PeakFitter.n_gaussian_fit(y=np.abs(self.y),x=self.x,prominence = 5e-2*np.max(self.y))
-        amplitudes, peak_positions, peak_widths = PeakFitter.extract_gaussian_parameters(param_lsq, number_of_peaks)
-
-        self.clearTable(self.listPeaks_tableWidget)
-        [self.addEntry(sender= self.listPeaks_tableWidget, value = [peak,None]) for peak in peak_positions]
     
-    def findPeaks_scipyPeakFinder(self):
-        peaks_index,properties = sgn.find_peaks(x=np.abs(self.y),prominence = 5e-2*np.max(self.y), distance = 100)
-        self.clearTable(self.listPeaks_tableWidget)
-        [self.addEntry(sender= self.listPeaks_tableWidget, value = [self.x[index],None]) for index in peaks_index]
-    
+    ########################################## Calibration methods ######################################################
 
     def getData(self,input):
+        #Data setting in the raw plot
         self.x = input[0]
         self.y = input[1]    
         self.plotRaw_plot.setData(x=self.x,y=self.y)
 
     def press_fitButton_function(self):
+        #Fit Peaks function
         if self.listPeaks_tableWidget.rowCount() > 3:
             self.updateFit()
         else:
             print('Need at least three entries in table')
 
     def updateFit(self):
+        #Fetching the time and energy values in the table widget
         table_value = np.array([[self.listPeaks_tableWidget.item(row,0).data(0),self.listPeaks_tableWidget.item(row,1).data(0)] 
-                                                            for row in range(self.listPeaks_tableWidget.rowCount())]).astype(float).T  
+                                                            for row in range(self.listPeaks_tableWidget.rowCount())]).astype(float).T 
+
+        #Using the scipy curve_fit calibration function 
         self.p_opt, self.pcov = opt.curve_fit(af.ToF2eV, table_value[0], table_value[1], bounds = (0,np.inf),p0 = [1e8,50,50])
 
+        #Computation of R²
         Ecal=[af.ToF2eV(t,self.p_opt[0],self.p_opt[1],self.p_opt[2]) for t in table_value[0]]
         residuals = [table_value[1][i] - Ecal[i] for i in range(len(table_value[0]))]
         ss_res = np.sum([residuals[i]**2 for i in range(len(residuals))])
         ss_tot = np.sum((table_value[1]-np.mean(table_value[1]))**2)
         r_squared = 1 - (ss_res / ss_tot)
 
+        #Update of the parameters table widget
         self.addEntry(sender = self.coeffCalib_tableWidget,value=(self.p_opt[0],self.p_opt[1],self.p_opt[2],r_squared))     
 
         self.updateCalibration()
 
     def getCalibration(self):
+        #Returns the calibration parameters
         return [float(item.text()) for item in self.coeffCalib_tableWidget.selectedItems()]                
 
     def updateCalibration(self):
+        #Computation of the calibrated plot
         alpha,beta,t0,r_squared = self.getCalibration()                
         self.x_fit = af.ToF2eV(self.x,alpha,beta,t0)
         jac = af.ToF2eV_Jac(self.x,alpha,t0)
         self.x2,self.y2 = af.goFromTimeToEnergy(self.x,self.y,alpha,beta,t0)
+
+        #Truncation of the plot (jacobian and limitation to low energies)
         mask = jac >=0
         self.x_fit = self.x_fit[mask]
         self.y_fit = self.y[mask] * jac[mask]
-        self.plotCalib_plot.setData(x=self.x_fit,y=self.y_fit)
-        self.plotCalib_view.setXRange(20,50)
-        self.plotCalib_view.setYRange(0,2)
+        mask = self.x_fit < 150
+        self.x_fit = self.x_fit[mask]
+        self.y_fit = self.y_fit[mask]
 
+        #Plotting with certain limits
+        self.plotCalib_plot.setData(x=self.x_fit,y=self.y_fit)
+
+
+###################################### Show Peaks Widget #############################################################
+
+    def showPeaksPlot(self):
+        #checks if the checkbox is checked or not
+        boolean = self.showPeaks_ToF_checkBox.isChecked()
         
+        t_list=[]
+        y=[]
+
+        #retrieve list of peak times
+        for row in range(self.listPeaks_tableWidget.rowCount()):
+            t_list.append(float(self.listPeaks_tableWidget.item(row,0).text()))
+        
+        #retrieve list of signal amplitude at t
+        for t in t_list:
+            index = np.argmin(np.abs(t - np.array(self.plotRaw_plot.getDisplayDataset().x)))
+            y.append(self.plotRaw_plot.getDisplayDataset().y[index])
+        
+        self.plotRaw_peaks.setData(x=t_list, y=y, symbol="o")
+        self.plotRaw_peaks.setVisible(boolean)
+    
+    def showPeaksEnergy(self):
+         #checks if the checkbox is checked or not
+        boolean = self.showPeaks_KE_checkBox.isChecked()
+        
+        t_list=[]
+        y=[]
+
+        for row in range(self.listPeaks_tableWidget.rowCount()):
+            t_list.append(float(self.listPeaks_tableWidget.item(row,0).text()))
+        
+        #transformation of time of flight into energy
+        alpha,beta,t0,r_squared = self.getCalibration()
+        E_list=[af.ToF2eV(t,alpha,beta,t0) for t in t_list]
+
+        for E in E_list:
+            index = np.argmin(np.abs(E - np.array(self.plotCalib_plot.getDisplayDataset().x)))
+            y.append(self.plotCalib_plot.getDisplayDataset().y[index])
+
+        self.plotCalib_peaks.setData(x=E_list, y=y, symbol="o")
+        self.plotCalib_peaks.setVisible(boolean)
+
+
+##################################### Table Widget specific methods #############################################################
 
     def updateListPeaksTable(self,item):        
         if isinstance(item,int):
@@ -298,19 +348,13 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         row_index = np.flip(np.sort([index.row() for index in sender.selectedIndexes() if index.column()==0]))
         [self.removeEntry(row,sender) for row in row_index]
        
-    def listItemRightClicked(self, QPos): 
-        sender = self.sender()
-        self.listMenu= QMenu(self)
-        self.connect(self.listMenu.addAction("Add Item"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_listPeaksAddItemClicked(who))
-        self.connect(self.listMenu.addAction("Remove Item(s)"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_listPeaksRemoveItemClicked(who)) 
-        self.connect(self.listMenu.addAction("Clear all"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_listPeaksClearClicked(who)) 
-        parentPosition = sender.mapToGlobal(QPoint(0, 0))        
-        self.listMenu.move(parentPosition + QPos)
-        self.listMenu.show()     
+
     def clearTable(self,sender):
         [sender.removeRow(0) for row in range(sender.rowCount())]
 
-    ################################################## Context menu functions ##########################################    
+
+    ################################################## Context menu functions ##########################################  
+  
     def Qmenu_listPeaksRemoveItemClicked(self,sender):
         self.removeSelectedItems(sender)
 
