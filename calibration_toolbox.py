@@ -75,13 +75,38 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
 
     def showPeaksPlot(self):
         boolean = self.showPeaks_ToF_checkBox.isChecked()
-        for plot in self.plotRaw_view.items[1:]:
-            plot.setVisible(boolean)
+        
+        t_list=[]
+        y=[]
+        for row in range(self.listPeaks_tableWidget.rowCount()):
+            t_list.append(float(self.listPeaks_tableWidget.item(row,0).text()))
+        
+        for t in t_list:
+            index = np.argmin(np.abs(t - np.array(self.plotRaw_plot.getDisplayDataset().x)))
+            y.append(self.plotRaw_plot.getDisplayDataset().y[index])
+        
+        self.plotRaw_peaks.setData(x=t_list, y=y, symbol="o")
+        self.plotRaw_peaks.setVisible(boolean)
     
     def showPeaksEnergy(self):
         boolean = self.showPeaks_KE_checkBox.isChecked()
-        for plot in self.plotCalib_view.items[1:]:
-            plot.setVisible(boolean)
+        
+        t_list=[]
+        y=[]
+        for row in range(self.listPeaks_tableWidget.rowCount()):
+            t_list.append(float(self.listPeaks_tableWidget.item(row,0).text()))
+        
+        alpha,beta,t0,r_squared = self.getCalibration()
+        E_list=[af.ToF2eV(t,alpha,beta,t0) for t in t_list]
+
+        for E in E_list:
+            index = np.argmin(np.abs(E - np.array(self.plotCalib_plot.getDisplayDataset().x)))
+            y.append(self.plotCalib_plot.getDisplayDataset().y[index])
+
+        self.plotCalib_peaks.setData(x=E_list, y=y, symbol="o")
+        self.plotCalib_peaks.setVisible(boolean)
+        
+
 
     def setupPlotWidget(self):
         self.labelRaw = pg.LabelItem(justify = "right")
@@ -90,7 +115,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.plotRaw_view.setLabel('left', 'Signal', units='mV')
         self.plotRaw_view.setLabel('bottom', 'Time', units='ns')
         self.plotRaw_plot = self.plotRaw_view.plot()
-        self.plotRaw_fit = self.plotRaw_view.plot()
+        self.plotRaw_peaks = self.plotRaw_view.plot()
         self.plotRaw_tablePlot = self.plotRaw_view.plot()
         self.proxyRaw = pg.SignalProxy(self.plotRaw_view.scene().sigMouseMoved, rateLimit=60, slot=self.mouseRawMoved)  
         self.labelCalib = pg.LabelItem(justify = "right")
@@ -99,7 +124,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.plotCalib_view.setLabel('left', 'Signal', units='mV')
         self.plotCalib_view.setLabel('bottom', 'Energy', units='eV')        
         self.plotCalib_plot = self.plotCalib_view.plot()     
-        self.plotCalib_fit = self.plotCalib_view.plot()
+        self.plotCalib_peaks = self.plotCalib_view.plot()
         self.plotCalib_tablePlot = self.plotCalib_view.plot()
         self.proxyCalib = pg.SignalProxy(self.plotCalib_view.scene().sigMouseMoved, rateLimit=60, slot=self.mouseCalibMoved)     
         # Enable antialiasing for prettier plots
@@ -141,7 +166,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
 
 
     def findPeaks_custom(self):
-        self.findPeaks()
+        self.findPeaks_gaussianFit()
 
     def applyCalibration_menuFunction(self):
         self.updateCalibration()
@@ -178,29 +203,11 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
 
         self.clearTable(self.listPeaks_tableWidget)
         [self.addEntry(sender= self.listPeaks_tableWidget, value = [peak,None]) for peak in peak_positions]
-
-        #show Peaks for later
-        for peak in peak_positions:
-            index = np.argmin(np.abs(peak - np.array(self.x)))
-            y=self.y[index]
-            self.plotRaw_view.plot(x=[peak], y=[y], symbol="o")
-        
-        for plot in self.plotRaw_view.items[1:]:
-            plot.hide()
     
     def findPeaks_scipyPeakFinder(self):
-        peaks_index,properties = sgn.find_peaks(x=np.abs(self.y),prominence = 5e-2*np.max(self.y))
+        peaks_index,properties = sgn.find_peaks(x=np.abs(self.y),prominence = 5e-2*np.max(self.y), distance = 100)
         self.clearTable(self.listPeaks_tableWidget)
         [self.addEntry(sender= self.listPeaks_tableWidget, value = [self.x[index],None]) for index in peaks_index]
-
-        #show Peaks for later
-        for index in peaks_index:
-            t=self.x[index]
-            y=self.y[index]
-            self.plotRaw_view.plot(x=[t], y=[y], symbol="o")
-        
-        for plot in self.plotRaw_view.items[1:]:
-            plot.hide()
     
 
     def getData(self,input):
@@ -243,21 +250,6 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.plotCalib_plot.setData(x=self.x_fit,y=self.y_fit)
         self.plotCalib_view.setXRange(20,50)
         self.plotCalib_view.setYRange(0,2)
-
-        #show Peaks for later
-        t_list=[]
-        for row in range(self.listPeaks_tableWidget.rowCount()):
-            t_list.append(float(self.listPeaks_tableWidget.item(row,0).text()))
-
-        E_list=[af.ToF2eV(t,alpha,beta,t0) for t in t_list]
-
-        for E in E_list:
-            index = np.argmin(np.abs(E - np.array(self.plotCalib_plot.getDisplayDataset().x)))
-            y=self.plotCalib_plot.getDisplayDataset().y[index]
-            self.plotCalib_view.plot(x=[E], y=[y], symbol="o")
-        
-        for plot in self.plotCalib_view.items[1:]:
-            plot.hide()
 
         
 
