@@ -106,8 +106,8 @@ class PeakFitter():
         return a * np.exp(-(x - x0) ** 2 / (2 * sigma ** 2))
 
     # Return initial guess from peak_finder
-    def make_initial_guess(x, y, peak_indices =None, results_half=None, prominence = 0.5, distance = 100):
-            peak_indices, results_half = PeakFinder.find_peaks_scipy(y, prominence=prominence, rel_height=0.5, distance = distance)
+    def make_initial_guess(x, y, prominence, distance, rel_height, peak_indices =None, results_half=None):
+            peak_indices, results_half = PeakFinder.find_peaks_scipy(y, prominence=prominence, distance = distance, rel_height=rel_height)
             amplitude = y[peak_indices]
             mean = x[peak_indices]
             sigma = (x[np.round(results_half[0]).astype(int)]-x[0]) / (2 * np.sqrt(2 * np.log(2)))
@@ -118,10 +118,10 @@ class PeakFitter():
             return number_of_peaks, initial_guess, lb, ub        
 
     # Launch least_square command
-    def n_gaussian_fit(y, x=np.zeros((1,0)),prominence = 0.5, distance = 100):
+    def n_gaussian_fit(y, x,prominence, distance, rel_height):
         if not(x.size):        
             x = np.arange(len(y))
-        number_of_peaks, initial_guess, lb, ub = PeakFitter.make_initial_guess(x, y, prominence = prominence, distance = distance)
+        number_of_peaks, initial_guess, lb, ub = PeakFitter.make_initial_guess(x, y, prominence = prominence, distance = distance, rel_height=rel_height)
         parameters_lsq = least_squares(PeakFitter.res, initial_guess, args=(y, x, number_of_peaks), bounds=tuple([lb, ub]),max_nfev = 1e3)
         print(f'Success:{parameters_lsq.success}?')
         return parameters_lsq.x, number_of_peaks
@@ -160,7 +160,7 @@ class PeakFitter():
 
 class PeakFinder():
     # Basic peak finder
-    def find_peaks_scipy(y, prominence=0.5, rel_height=0.5, distance = 100):
+    def find_peaks_scipy(y, prominence, distance, rel_height):
         peak_indices, _ = sc_sig.find_peaks(y, prominence=prominence, distance = distance)
         results_half = sc_sig.peak_widths(y, peak_indices, rel_height=rel_height)
         return peak_indices, results_half

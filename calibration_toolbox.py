@@ -149,7 +149,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
     def findPeaks_gaussianFit(self):
         #Use of the Peak Fitter class in usefulclass.py to compute gaussian fits around the peaks 
 
-        param_lsq,number_of_peaks = PeakFitter.n_gaussian_fit(y=np.abs(self.y),x=self.x,prominence = 5e-2*np.max(self.y))
+        param_lsq,number_of_peaks = PeakFitter.n_gaussian_fit(y=np.abs(self.y),x=self.x,prominence = 5e-2*np.max(self.y), distance=100, rel_height=0.5)
         amplitudes, peak_positions, peak_widths = PeakFitter.extract_gaussian_parameters(param_lsq, number_of_peaks)
 
         self.clearTable(self.listPeaks_tableWidget)
@@ -158,7 +158,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
     def findPeaks_scipyPeakFinder(self):
         #Simple use of the scipy find_peaks method
 
-        peaks_index,properties = sgn.find_peaks(x=np.abs(self.y),prominence = 5e-2*np.max(self.y), distance = 100)
+        peaks_index,properties = sgn.find_peaks(x=np.abs(self.y), prominence = 5e-2*np.max(self.y), distance = 100, rel_height=0.5)
 
         self.clearTable(self.listPeaks_tableWidget)
         [self.addEntry(sender= self.listPeaks_tableWidget, value = [self.x[index],None]) for index in peaks_index]
