@@ -84,13 +84,6 @@
       </layout>
      </item>
      <item>
-      <widget class="QComboBox" name="findPeaks_comboBox">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
         <widget class="QCheckBox" name="autoFillTable_checkBox">

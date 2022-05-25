@@ -58,6 +58,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.y = 1.
         self.isNotUpdating = True         
         self.path_calib = 'Calibration/'
+        self.parameter_list = dict([("inputAxis0Mult_lineEdit_2",0.05),("inputAxis0Mult_lineEdit",100),("inputAxis0Mult_lineEdit_3",0.5)])
         
     def connectSignals(self):
         #Set up widgets, buttons and checkboxes
@@ -163,8 +164,11 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
     
     def findPeaks_scipyPeakFinder(self):
         #Simple use of the scipy find_peaks method
+        prominence_factor = self.parameter_list["inputAxis0Mult_lineEdit_2"]
+        distance = self.parameter_list["inputAxis0Mult_lineEdit"]
+        rel_height = self.parameter_list["inputAxis0Mult_lineEdit_3"]
 
-        peaks_index,properties = sgn.find_peaks(x=np.abs(self.y), prominence = 5e-2*np.max(self.y), distance = 100, rel_height=0.5)
+        peaks_index,properties = sgn.find_peaks(x=np.abs(self.y), prominence = prominence_factor*np.max(self.y), distance = distance, rel_height=rel_height)
 
         self.clearTable(self.listPeaks_tableWidget)
         [self.addEntry(sender= self.listPeaks_tableWidget, value = [self.x[index],None]) for index in peaks_index]
@@ -227,7 +231,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
                                                             for row in range(self.listPeaks_tableWidget.rowCount())]).astype(float).T 
 
         #Using the scipy curve_fit calibration function 
-        self.p_opt, self.pcov = opt.curve_fit(af.ToF2eV, table_value[0], table_value[1], bounds = (0,np.inf),p0 = [1e8,50,50])
+        self.p_opt, self.pcov = opt.curve_fit(af.ToF2eV, table_value[0], table_value[1], bounds = (0,np.inf), p0 = [1e8,50,50])
 
         #Computation of R²
         Ecal=[af.ToF2eV(t,self.p_opt[0],self.p_opt[1],self.p_opt[2]) for t in table_value[0]]
@@ -358,19 +362,26 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
     def clearTable(self,sender):
         [sender.removeRow(0) for row in range(sender.rowCount())]
 
-    
+    ################################################# Calibration Parameters Widget ###########################################
 
     def openParameters(self):
         self.update_Parameters()
         self._calibration_parameters.show()
 
     def update_Parameters(self):
+        #if there is already a window open
         if (hasattr(self,'_calibration_parameters')):
             self.parameter_list = dict(self._calibration_parameters.widget_extraction.extractValues())
-            print(self.parameter_list)
+        #if there is no window open, open one
         else:
-            self.parameter_list = dict([("inputAxis0Mult_lineEdit_2",0.05),("inputAxis0Mult_lineEdit",100),("inputAxis0Mult_lineEdit_3",0.5)])
             self._calibration_parameters = Calibration_parameters(item_list = self.parameter_list)
+            self._calibration_parameters.emitParameters.connect(self.updateSettings)
+        
+    def updateSettings(self):
+        self.update_Parameters()
+        self._calibration_parameters.widget_extraction.initializeValues(self.parameter_list)
+        #automatically find peaks with new parameters
+        self.findPeaks_scipyPeakFinder()
 
 
 

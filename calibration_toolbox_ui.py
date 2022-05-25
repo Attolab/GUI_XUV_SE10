@@ -15,10 +15,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComboBox,
-    QDoubleSpinBox, QHBoxLayout, QHeaderView, QLabel,
-    QLayout, QPushButton, QSizePolicy, QTableWidget,
-    QTableWidgetItem, QToolButton, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QDoubleSpinBox,
+    QHBoxLayout, QHeaderView, QLabel, QLayout,
+    QPushButton, QSizePolicy, QTableWidget, QTableWidgetItem,
+    QToolButton, QVBoxLayout, QWidget)
 
 from pyqtgraph import GraphicsLayoutWidget
 
@@ -67,12 +67,6 @@ class Ui_CalibrationToolbox(object):
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
-
-        self.findPeaks_comboBox = QComboBox(CalibrationToolbox)
-        self.findPeaks_comboBox.setObjectName(u"findPeaks_comboBox")
-        self.findPeaks_comboBox.setEnabled(False)
-
-        self.verticalLayout.addWidget(self.findPeaks_comboBox)
 
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")

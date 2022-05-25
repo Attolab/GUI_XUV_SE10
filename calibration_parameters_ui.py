@@ -23,7 +23,7 @@ class Ui_Calibration_parameters(object):
         if not Calibration_parameters.objectName():
             Calibration_parameters.setObjectName(u"Calibration_parameters")
         Calibration_parameters.setEnabled(True)
-        Calibration_parameters.resize(455, 225)
+        Calibration_parameters.resize(798, 259)
         self.horizontalLayout = QHBoxLayout(Calibration_parameters)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.vertical_layout = QVBoxLayout()
@@ -97,6 +97,71 @@ class Ui_Calibration_parameters(object):
 
         self.horizontalLayout.addLayout(self.vertical_layout)
 
+        self.vertical_layout_2 = QVBoxLayout()
+        self.vertical_layout_2.setObjectName(u"vertical_layout_2")
+        self.vertical_layout_2.setContentsMargins(1, -1, -1, -1)
+        self.label_5 = QLabel(Calibration_parameters)
+        self.label_5.setObjectName(u"label_5")
+        sizePolicy.setHeightForWidth(self.label_5.sizePolicy().hasHeightForWidth())
+        self.label_5.setSizePolicy(sizePolicy)
+        self.label_5.setAlignment(Qt.AlignCenter)
+
+        self.vertical_layout_2.addWidget(self.label_5)
+
+        self.horizontal_layout_2 = QHBoxLayout()
+        self.horizontal_layout_2.setObjectName(u"horizontal_layout_2")
+        self.label_6 = QLabel(Calibration_parameters)
+        self.label_6.setObjectName(u"label_6")
+
+        self.horizontal_layout_2.addWidget(self.label_6)
+
+        self.inputAxis0Mult_lineEdit_4 = QLineEdit(Calibration_parameters)
+        self.inputAxis0Mult_lineEdit_4.setObjectName(u"inputAxis0Mult_lineEdit_4")
+        sizePolicy1.setHeightForWidth(self.inputAxis0Mult_lineEdit_4.sizePolicy().hasHeightForWidth())
+        self.inputAxis0Mult_lineEdit_4.setSizePolicy(sizePolicy1)
+
+        self.horizontal_layout_2.addWidget(self.inputAxis0Mult_lineEdit_4)
+
+
+        self.vertical_layout_2.addLayout(self.horizontal_layout_2)
+
+        self.horizontalLayout_5 = QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        self.label_7 = QLabel(Calibration_parameters)
+        self.label_7.setObjectName(u"label_7")
+
+        self.horizontalLayout_5.addWidget(self.label_7)
+
+        self.inputAxis0Mult_lineEdit_5 = QLineEdit(Calibration_parameters)
+        self.inputAxis0Mult_lineEdit_5.setObjectName(u"inputAxis0Mult_lineEdit_5")
+        sizePolicy1.setHeightForWidth(self.inputAxis0Mult_lineEdit_5.sizePolicy().hasHeightForWidth())
+        self.inputAxis0Mult_lineEdit_5.setSizePolicy(sizePolicy1)
+
+        self.horizontalLayout_5.addWidget(self.inputAxis0Mult_lineEdit_5)
+
+
+        self.vertical_layout_2.addLayout(self.horizontalLayout_5)
+
+        self.horizontalLayout_6 = QHBoxLayout()
+        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
+        self.label_8 = QLabel(Calibration_parameters)
+        self.label_8.setObjectName(u"label_8")
+
+        self.horizontalLayout_6.addWidget(self.label_8)
+
+        self.inputAxis0Mult_lineEdit_6 = QLineEdit(Calibration_parameters)
+        self.inputAxis0Mult_lineEdit_6.setObjectName(u"inputAxis0Mult_lineEdit_6")
+        sizePolicy1.setHeightForWidth(self.inputAxis0Mult_lineEdit_6.sizePolicy().hasHeightForWidth())
+        self.inputAxis0Mult_lineEdit_6.setSizePolicy(sizePolicy1)
+
+        self.horizontalLayout_6.addWidget(self.inputAxis0Mult_lineEdit_6)
+
+
+        self.vertical_layout_2.addLayout(self.horizontalLayout_6)
+
+
+        self.horizontalLayout.addLayout(self.vertical_layout_2)
+
 
         self.retranslateUi(Calibration_parameters)
 
@@ -112,5 +177,12 @@ class Ui_Calibration_parameters(object):
         self.inputAxis0Mult_lineEdit.setText(QCoreApplication.translate("Calibration_parameters", u"100", None))
         self.label_3.setText(QCoreApplication.translate("Calibration_parameters", u"Relative height of peaks", None))
         self.inputAxis0Mult_lineEdit_3.setText(QCoreApplication.translate("Calibration_parameters", u"0.5", None))
+        self.label_5.setText(QCoreApplication.translate("Calibration_parameters", u"Calibration initial guess", None))
+        self.label_6.setText(QCoreApplication.translate("Calibration_parameters", u"A", None))
+        self.inputAxis0Mult_lineEdit_4.setText(QCoreApplication.translate("Calibration_parameters", u"1e8", None))
+        self.label_7.setText(QCoreApplication.translate("Calibration_parameters", u"B", None))
+        self.inputAxis0Mult_lineEdit_5.setText(QCoreApplication.translate("Calibration_parameters", u"50", None))
+        self.label_8.setText(QCoreApplication.translate("Calibration_parameters", u"t0", None))
+        self.inputAxis0Mult_lineEdit_6.setText(QCoreApplication.translate("Calibration_parameters", u"50", None))
     # retranslateUi
 
