@@ -30,6 +30,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,QRegularExp
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QPushButton,QFileDialog,
     QTableWidgetItem,QStyledItemDelegate,QLineEdit,
     QSizePolicy, QWidget,QMenu)
+from calibration_parameters import Calibration_parameters
 
 from calibration_toolbox_ui import Ui_CalibrationToolbox
 import pyqtgraph as pg
@@ -43,6 +44,7 @@ from file_manager import FileManager as FM
 class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
     signal_requestInput = Signal(str)
     signal_applyCalibration = Signal(object)
+
     # signal_updateFit = Signal(str)
     def __init__(self,parent=None):
         super(CalibrationToolBox, self).__init__(parent)
@@ -56,7 +58,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.y = 1.
         self.isNotUpdating = True         
         self.path_calib = 'Calibration/'
-
+        
     def connectSignals(self):
         #Set up widgets, buttons and checkboxes
         self.listPeaks_tableWidget.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -73,6 +75,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.centraFrequency_doubleSpinBox.valueChanged.connect(self.updateListPeaksTable)
         self.showPeaks_ToF_checkBox.stateChanged.connect(self.showPeaksPlot)
         self.showPeaks_KE_checkBox.stateChanged.connect(self.showPeaksEnergy)
+        self.parametersButton.clicked.connect(self.openParameters)
 
     def setupPlotWidget(self):
         #Creation of items in windows, tables and plots, data is set using setData later
@@ -101,11 +104,11 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         #Set up buttons with multiple choices
         tool_btn_menu= QMenu(self)
         #Different peak finder methods
-        self.connect(tool_btn_menu.addAction("Gaussian Fit"),SIGNAL("triggered()"), self.findPeaks_gaussianFit)
         self.connect(tool_btn_menu.addAction("Peak finder (scipy)"),SIGNAL("triggered()"), self.findPeaks_scipyPeakFinder) 
+        self.connect(tool_btn_menu.addAction("Gaussian Fit"),SIGNAL("triggered()"), self.findPeaks_gaussianFit)
         self.connect(tool_btn_menu.addAction("Custom finder"),SIGNAL("triggered()"), self.findPeaks_custom)  
         self.findPeaks_toolButton.setMenu(tool_btn_menu)
-        self.findPeaks_toolButton.setDefaultAction(tool_btn_menu.actions()[1])
+        self.findPeaks_toolButton.setDefaultAction(tool_btn_menu.actions()[0])
 
         tool_btn_menu= QMenu(self)
         #Different signal loading methods
@@ -148,8 +151,11 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
 
     def findPeaks_gaussianFit(self):
         #Use of the Peak Fitter class in usefulclass.py to compute gaussian fits around the peaks 
+        prominence_factor = self.parameter_list["inputAxis0Mult_lineEdit_2"]
+        distance = self.parameter_list["inputAxis0Mult_lineEdit"]
+        rel_height = self.parameter_list["inputAxis0Mult_lineEdit_3"]
 
-        param_lsq,number_of_peaks = PeakFitter.n_gaussian_fit(y=np.abs(self.y),x=self.x,prominence = 5e-2*np.max(self.y), distance=100, rel_height=0.5)
+        param_lsq,number_of_peaks = PeakFitter.n_gaussian_fit(y=np.abs(self.y),x=self.x,prominence = prominence_factor*np.max(self.y), distance=distance, rel_height=rel_height)
         amplitudes, peak_positions, peak_widths = PeakFitter.extract_gaussian_parameters(param_lsq, number_of_peaks)
 
         self.clearTable(self.listPeaks_tableWidget)
@@ -351,6 +357,21 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
 
     def clearTable(self,sender):
         [sender.removeRow(0) for row in range(sender.rowCount())]
+
+    
+
+    def openParameters(self):
+        self.update_Parameters()
+        self._calibration_parameters.show()
+
+    def update_Parameters(self):
+        if (hasattr(self,'_calibration_parameters')):
+            self.parameter_list = dict(self._calibration_parameters.widget_extraction.extractValues())
+            print(self.parameter_list)
+        else:
+            self.parameter_list = dict([("inputAxis0Mult_lineEdit_2",0.05),("inputAxis0Mult_lineEdit",100),("inputAxis0Mult_lineEdit_3",0.5)])
+            self._calibration_parameters = Calibration_parameters(item_list = self.parameter_list)
+
 
 
     ################################################## Context menu functions ##########################################  

@@ -59,11 +59,11 @@ class Ui_CalibrationToolbox(object):
 
         self.horizontalLayout_2.addWidget(self.findPeaks_toolButton)
 
-        self.toolButton = QToolButton(CalibrationToolbox)
-        self.toolButton.setObjectName(u"toolButton")
-        self.toolButton.setEnabled(False)
+        self.parametersButton = QPushButton(CalibrationToolbox)
+        self.parametersButton.setObjectName(u"parametersButton")
+        self.parametersButton.setEnabled(True)
 
-        self.horizontalLayout_2.addWidget(self.toolButton)
+        self.horizontalLayout_2.addWidget(self.parametersButton)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
@@ -235,7 +235,7 @@ class Ui_CalibrationToolbox(object):
         CalibrationToolbox.setWindowTitle(QCoreApplication.translate("CalibrationToolbox", u"Form", None))
         self.loadSignal_toolButton.setText(QCoreApplication.translate("CalibrationToolbox", u"Find Peaks", None))
         self.findPeaks_toolButton.setText(QCoreApplication.translate("CalibrationToolbox", u"Fit data", None))
-        self.toolButton.setText(QCoreApplication.translate("CalibrationToolbox", u"...", None))
+        self.parametersButton.setText(QCoreApplication.translate("CalibrationToolbox", u"Parameters", None))
         self.autoFillTable_checkBox.setText(QCoreApplication.translate("CalibrationToolbox", u"AutoFill", None))
         self.considerSBs_checkBox.setText(QCoreApplication.translate("CalibrationToolbox", u"With Sidebands", None))
         self.showPeaks_ToF_checkBox.setText(QCoreApplication.translate("CalibrationToolbox", u"Show Peaks", None))
