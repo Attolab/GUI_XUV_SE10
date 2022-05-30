@@ -24,12 +24,15 @@ class Calibration_parameters(Ui_Calibration_parameters, QWidget):
         self.connectSignal()
     
     def makeList_QWidget(self):
-        return ["inputAxis0Mult_lineEdit_2", "inputAxis0Mult_lineEdit", "inputAxis0Mult_lineEdit_3"]
+        return ["inputAxis0Mult_lineEdit_2", "inputAxis0Mult_lineEdit", "inputAxis0Mult_lineEdit_3", "inputAxis0Mult_lineEdit_4", "inputAxis0Mult_lineEdit_5", "inputAxis0Mult_lineEdit_6"]
     
     def connectSignal(self):
         self.inputAxis0Mult_lineEdit_2.editingFinished.connect(self.applyParameters)
         self.inputAxis0Mult_lineEdit.editingFinished.connect(self.applyParameters)
         self.inputAxis0Mult_lineEdit_3.editingFinished.connect(self.applyParameters)
+        self.inputAxis0Mult_lineEdit_4.editingFinished.connect(self.applyParameters)
+        self.inputAxis0Mult_lineEdit_5.editingFinished.connect(self.applyParameters)
+        self.inputAxis0Mult_lineEdit_6.editingFinished.connect(self.applyParameters)
     
     def applyParameters(self):
         self.emitParameters.emit(self.widget_extraction.extractValues())
