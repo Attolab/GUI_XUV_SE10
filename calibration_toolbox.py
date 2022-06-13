@@ -215,7 +215,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
     def getData(self,input):
         #Data setting in the raw plot
         self.x = input[0]
-        self.y = input[1]    
+        self.y = input[1]-input[1][0] #corrects initial offset for calibration
         self.plotRaw_plot.setData(x=self.x,y=self.y)
 
     def press_fitButton_function(self):

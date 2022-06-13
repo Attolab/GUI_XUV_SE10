@@ -109,12 +109,12 @@ class FileManager:
     def readCalibration(self):
         with open(self.filename, "r") as f:  
             file_content = f.read().split()
-            if len(file_content) != 6:
+            if len(file_content) != 8:
                 print('File non valid')
                 return None
             else:
-                headers = file_content[0:3]
-                coeffs = file_content[3:6]
+                headers = file_content[0:4]
+                coeffs = file_content[4:8]
                 [print(f'{headers[i]}: {coeffs[i]}') for i in range(3)]
                 return [float(coeff) for coeff in coeffs]
 
