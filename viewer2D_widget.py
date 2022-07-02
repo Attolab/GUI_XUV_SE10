@@ -198,7 +198,8 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         # Create ROI item
         lr = CustomLinearRegionItem(self.makeInitialShape(np.diff(edges)),orientation=orientation,clipItem=self.imageItem)        
         # lr = pg.LinearRegionItem(self.makeInitialShape(np.diff(edges)),orientation=orientation,clipItem=self.imageItem)        
-        lr.doubleClicked.connect(self.gotDoubleClicked)
+        lr.leftDoubleClicked.connect(self.gotLeftDoubleClicked)
+        lr.singleMiddleClicked.connect(self.gotMiddleSingleClicked)
         lr.setZValue(10)
         # Type of syntax to accept clicking on it
 
@@ -209,8 +210,20 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         # Store ROI item in table
         self.addEntry_tableWidget(orientation=orientation)
 
-    def gotDoubleClicked(self):
+    def gotMiddleSingleClicked(self,ROI_doubleclicked):
+        print('I got destroyed')
+        for index, ROI in enumerate(self.ROI): 
+            if ROI_doubleclicked == ROI:
+                self.removeROI(ROI)
+                self.tableROI_tableWidget.removeRow(index)
+                return
+
+    def gotLeftDoubleClicked(self,ROI_doubleclicked):
         print('I got doubleclicked')
+        for index, ROI in enumerate(self.ROI): 
+            if ROI_doubleclicked == ROI:
+                self.tableROI_tableWidget.selectRow(index)
+                return
     def removeROI(self,item):
         self.plot_2D.removeItem(item) 
         self.ROI.remove(item)
