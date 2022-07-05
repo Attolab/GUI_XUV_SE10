@@ -1,24 +1,3 @@
-##############################################################################
-##
-# This file is part of pymepixviewer
-#
-# https://arxiv.org/abs/1905.07999
-#
-#
-# pymepixviewer is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# pymepixviewer is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with pymepixviewer.  If not, see <http://www.gnu.org/licenses/>.
-#
-##############################################################################
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,SIGNAL,QSize, QTime, QUrl, Qt)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
@@ -47,7 +26,6 @@ class MainPanel(Ui_main_panel,QWidget):
         self.path_folder = ''
         self.path_calib = 'Calibration/'
         self.setupGUI()
-
         self.connectSignals()
 
     ################################################## Widget functions ##########################################    
@@ -61,7 +39,6 @@ class MainPanel(Ui_main_panel,QWidget):
     def setupGUI(self):
         self.calibration_toolbox = CalibrationToolBox()
         self.plotPreview_panel = PreviewPlot_Panel()
-        # self.h_centralLayout.insertWidget(0,self.plotPreview_panel)
         self.main_layout.insertWidget(1,self.plotPreview_panel)
         self.connectSignals_widgets()
         self.updateGUI()
@@ -193,7 +170,7 @@ class MainPanel(Ui_main_panel,QWidget):
 
     def clearList(self,sender):    
         # Remove all items    
-        [self.removeEntry(self.fileSelection_listWidget.item(row),sender) for row in np.flip(np.arange(sender.count()))]    
+        [self.removeEntry(sender.item(row),sender) for row in np.flip(np.arange(sender.count()))]    
 
     ################################################## Context menu functions ##########################################    
     def Qmenu_listPeaksRemoveItemClicked(self,sender):

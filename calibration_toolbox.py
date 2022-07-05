@@ -155,13 +155,12 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         prominence_factor = self.parameter_list["inputAxis0Mult_lineEdit_2"]
         distance = self.parameter_list["inputAxis0Mult_lineEdit"]
         rel_height = self.parameter_list["inputAxis0Mult_lineEdit_3"]
-
         param_lsq,number_of_peaks = PeakFitter.n_gaussian_fit(y=np.abs(self.y),x=self.x,prominence = prominence_factor*np.max(self.y), distance=distance, rel_height=rel_height)
         amplitudes, peak_positions, peak_widths = PeakFitter.extract_gaussian_parameters(param_lsq, number_of_peaks)
-
         self.clearTable(self.listPeaks_tableWidget)
         [self.addEntry(sender= self.listPeaks_tableWidget, value = [peak,None]) for peak in peak_positions]
-    
+        self.updatePeakPosition()
+
     def findPeaks_scipyPeakFinder(self):
         #Simple use of the scipy find_peaks method
         prominence_factor = self.parameter_list["inputAxis0Mult_lineEdit_2"]
@@ -172,6 +171,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
 
         self.clearTable(self.listPeaks_tableWidget)
         [self.addEntry(sender= self.listPeaks_tableWidget, value = [self.x[index],None]) for index in peaks_index]
+        self.updatePeakPosition()
     
     def findPeaks_custom(self):
         #not implemented yet, tbd in the future
@@ -282,26 +282,27 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
 
 
 ###################################### Show Peaks Widget #############################################################
-
+    def makePeaks(self,plot_data):
+        #checks if the checkbox is checked or not
+            nRow = self.listPeaks_tableWidget.rowCount()
+            x = np.zeros(nRow)
+            y = np.zeros(nRow)
+            x_data,y_data = plot_data.getData()
+            for row in range(nRow):     
+                #retrieve list of peak times
+                x[row] = float(self.listPeaks_tableWidget.item(row,0).text())        
+                #retrieve list of signal amplitude at x       
+                y[row] = y_data[np.argmin(np.abs(x[row] - x_data))] 
+            return x,y
     def showPeaksPlot(self):
         #checks if the checkbox is checked or not
-        boolean = self.showPeaks_ToF_checkBox.isChecked()
-        
-        t_list=[]
-        y=[]
+        if self.showPeaks_ToF_checkBox.isChecked():
+            t_peaks,y_peaks = self.makePeaks(self.plotRaw_plot)
+            self.plotRaw_peaks.setData(x=t_peaks, y=y_peaks, symbol="o")
+            self.plotRaw_peaks.setVisible(True)
+        else:
+            self.plotRaw_peaks.setVisible(False)
 
-        #retrieve list of peak times
-        for row in range(self.listPeaks_tableWidget.rowCount()):
-            t_list.append(float(self.listPeaks_tableWidget.item(row,0).text()))
-        
-        #retrieve list of signal amplitude at t
-        for t in t_list:
-            index = np.argmin(np.abs(t - np.array(self.plotRaw_plot.getDisplayDataset().x)))
-            y.append(self.plotRaw_plot.getDisplayDataset().y[index])
-        
-        self.plotRaw_peaks.setData(x=t_list, y=y, symbol="o")
-        self.plotRaw_peaks.setVisible(boolean)
-    
     def showPeaksEnergy(self):
          #checks if the checkbox is checked or not
         boolean = self.showPeaks_KE_checkBox.isChecked()
@@ -393,9 +394,13 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
     def updateSettings(self):
         self.update_Parameters()
         self._calibration_parameters.widget_extraction.initializeValues(self.parameter_list)
+        self.updatePeakPosition()
         #automatically find peaks with new parameters
         #self.findPeaks_scipyPeakFinder()
-
+    
+    def updatePeakPosition(self):
+        self.showPeaksPlot()
+        # self.showPeaksEnergy()
 
 
     ################################################## Context menu functions ##########################################  

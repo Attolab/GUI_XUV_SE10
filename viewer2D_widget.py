@@ -22,13 +22,14 @@
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,SIGNAL,Signal,
     QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,QTransform,QAction,
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,QAction,
+    QFont, QFontDatabase, QGradient, QIcon,QTransform,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform,QCloseEvent)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QPushButton,
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QPushButton,QListWidgetItem,QTableWidgetItem,
     QSizePolicy, QWidget, QFileDialog,QMenu)
 import pyqtgraph as pg
+from CustomLinearRegionItem import CustomLinearRegionItem
 from viewer2D_widget_ui import Ui_Viewer2DWidget
 import numpy as np
 
@@ -52,6 +53,7 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         self.ROI = []
         self.connectSignals()
         self.setupToolButton()
+        self.updateGUI()
 
     def setupImageWidget(self,layout,title = '', row = None, col = None):
         plot = layout.addPlot(title=title,labels={'bottom': ('x axis title'), 'left': ('y axis title')},row = row, col = col)
@@ -113,8 +115,13 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
     def connectSignals(self):
         self.show2D_checkBox.stateChanged.connect(self.updateGUI)
         self.showHist_checkBox.stateChanged.connect(self.updateGUI)        
-        self.clearAll_pushButton.pressed.connect(self.clearROI)
         self.showROI_checkBox.pressed.connect(self.updateGUI)
+        # Table connection
+        self.tableROI_tableWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.tableROI_tableWidget.connect(self.tableROI_tableWidget,SIGNAL("customContextMenuRequested(QPoint)" ), self.tableItemRightClicked)                        
+        self.tableROI_tableWidget.itemSelectionChanged.connect(self.tableItemLeftClicked)
+        
+
     def showHideWidget(self,items,show_bool = True):
         if show_bool:        
             [item.show() for item in items]
@@ -129,9 +136,9 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
 
     def setupToolButton(self):        
         tool_btn_menu= QMenu(self)
-        self.connect(tool_btn_menu.addAction("Add ROI"),SIGNAL("triggered()"), self.addROIh_menuFunction)
-        self.connect(tool_btn_menu.addAction("Add ROI (horizontal)"),SIGNAL("triggered()"), self.addROIh_menuFunction) 
-        self.connect(tool_btn_menu.addAction("Add ROI (vertical)"),SIGNAL("triggered()"), self.addROIv_menuFunction) 
+        # self.connect(tool_btn_menu.addAction("Add ROI"),SIGNAL("triggered()"), self.addROI)
+        self.connect(tool_btn_menu.addAction("Add ROI (H)"),SIGNAL("triggered()"), self.addROIh_menuFunction) 
+        self.connect(tool_btn_menu.addAction("Add ROI (V)"),SIGNAL("triggered()"), self.addROIv_menuFunction) 
         self.makeROI_toolButton.setMenu(tool_btn_menu)
         self.makeROI_toolButton.setDefaultAction(tool_btn_menu.actions()[0])
     def getScaling(self,input,total_length):        
@@ -159,6 +166,13 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         self.updateView(self.view_2D,x,y)
         self.histLUT_2D._updateView()
 
+    def getImageData(self):
+        return self.imageItem.image
+    
+    def getImageShape(self):
+        return self.getImageData().shape
+
+    ################################################## ROI functions ##########################################    
 
     def addROIh_menuFunction(self):
         self.addROI_linearRegionItem(self.view_2D.viewRange()[1],'horizontal')
@@ -170,35 +184,178 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         lengths = size*np.array([2,3])/5
         return lengths
 
+
+    # def addROI(self):
+    #     edges = self.makeInitialShape(np.diff(self.view_2D.viewRange()))
+    #     pos = edges[0][0],edges[1][0]
+    #     size = np.diff(edges)
+    #     roi = pg.ROI(pos,size)
+    #     roi.setZValue(10)
+    #     self.ROI.append(roi)
+    #     self.addEntry(QListWidgetItem(f'{self.listROI_listWidget.count()}'))
+
     def addROI_linearRegionItem(self,edges,orientation):
-        # lr = LinearRegionItem(self.makeInitialShape(np.diff(edges)),orientation=orientation,clipItem=self.imageItem)
-        lr = pg.LinearRegionItem(self.makeInitialShape(np.diff(edges)),orientation=orientation,clipItem=self.imageItem)
+        # Create ROI item
+        lr = CustomLinearRegionItem(self.makeInitialShape(np.diff(edges)),orientation=orientation,clipItem=self.imageItem)        
+        # lr = pg.LinearRegionItem(self.makeInitialShape(np.diff(edges)),orientation=orientation,clipItem=self.imageItem)        
+        lr.leftDoubleClicked.connect(self.gotLeftDoubleClicked)
+        lr.singleMiddleClicked.connect(self.gotMiddleSingleClicked)
         lr.setZValue(10)
+        # Type of syntax to accept clicking on it
+
+        # Store ROI item
         self.ROI.append(lr)
-        self.plot_2D.addItem(self.ROI[-1])
+        # Show ROI item in viewer
+        self.plot_2D.addItem(self.ROI[-1])   
+        # Store ROI item in table
+        self.addEntry_tableWidget(orientation=orientation)
 
-    def clearROI(self):
-        [self.removeROI(ROI) for ROI in self.ROI]
+    def gotMiddleSingleClicked(self,ROI_doubleclicked):
+        print('I got destroyed')
+        for index, ROI in enumerate(self.ROI): 
+            if ROI_doubleclicked == ROI:
+                self.removeROI(ROI)
+                self.tableROI_tableWidget.removeRow(index)
+                return
 
+    def gotLeftDoubleClicked(self,ROI_doubleclicked):
+        print('I got doubleclicked')
+        for index, ROI in enumerate(self.ROI): 
+            if ROI_doubleclicked == ROI:
+                self.tableROI_tableWidget.selectRow(index)
+                return
     def removeROI(self,item):
         self.plot_2D.removeItem(item) 
         self.ROI.remove(item)
 
-    def getImageData(self):
-        return self.imageItem.image
-    
-    def getImageShape(self):
-        return self.getImageData().shape
+    def changeROIColor(self,index,status):
+        if status == 'unselected':   
+            color_base = QColor(0, 0, 255, 50)
+            color_hover = QColor(0, 0, 255, 100)
+        elif status == 'selected':
+            color_base = QColor(0, 255, 0, 50)     
+            color_hover = QColor(0, 255, 0, 100)
+        brush = QBrush(color_base)
+        hoverBrush = QBrush(color_hover)
+        if len(self.ROI) > index:
+            self.ROI[index].setBrush(brush)
+            self.ROI[index].setHoverBrush(hoverBrush)
+            self.ROI[index].setMouseHover(True)
+            self.ROI[index].setMouseHover(False)
+    ################################################## Table widget functions ##########################################    
+
+    def addEntry_tableWidget(self,name=None,orientation='H'):
+        nRow = self.tableROI_tableWidget.rowCount()        
+        # Add a new entry to listWidget
+        self.tableROI_tableWidget.insertRow(nRow)
+        if not(name):
+            name = f'{nRow}'          
+        if orientation == 'horizontal':
+            orientation ='H'
+        elif orientation == 'vertical':
+            orientation ='V'
+        item = QTableWidgetItem(name)
+        item.setFlags(item.flags() | Qt.ItemIsEditable)    
+        self.tableROI_tableWidget.setItem(nRow,0,item)
+        item = QTableWidgetItem(orientation)
+        item.setFlags(item.flags() & ~Qt.ItemIsEditable)        
+        self.tableROI_tableWidget.setItem(nRow,1,item)
+        self.tableROI_tableWidget.clearSelection()
+        self.tableROI_tableWidget.setCurrentItem(item)   
+
+    def tableItemLeftClicked(self):
+        row_sel = np.unique([self.tableROI_tableWidget.row(item) for item in self.tableROI_tableWidget.selectedItems()])
+        for row in np.arange(self.tableROI_tableWidget.rowCount()):
+            if row in row_sel:
+                self.changeROIColor(row,'selected')            
+            else:
+                self.changeROIColor(row,'unselected')            
+
+    def tableItemRightClicked(self, QPos): 
+        sender = self.sender()
+        self.roiMenu= QMenu(self)
+        self.roiManipulationMenu = QMenu(self)
+        self.roiMenu.addMenu(self.roiManipulationMenu)
+        show_button = QAction("Show Item(s)", self.roiMenu)        
+
+        # show_button = QAction("Show Item(s)", self.roiMenu)
+        # show_button.setCheckable(True)
+        # show_button.setChecked(True)
+        # connect(show_button, SIGNAL("triggered()"), this, SLOT(slot_SomethingChecked()));
 
 
 
-# class LinearRegionItem(pg.LinearRegionItem):
-#     def __init__(self, *args, **kwargs):
-#         super(LinearRegionItem,self).__init__(*args, **kwargs)
+        self.connect(self.roiMenu.addAction("Remove Item(s)"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_tableRemoveItemClicked(who)) 
+        self.connect(self.roiMenu.addAction("Clear all"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_tableClearClicked(who)) 
+        
+        parentPosition = sender.mapToGlobal(QPoint(0, 0))        
+        self.roiMenu.move(parentPosition + QPos)
+        self.roiMenu.show()   
 
+    def removeEntry_table(self,row,sender):
+        # Remove entry in table
+        sender.removeRow(row)
+    def removeSelectedItems_table(self,sender):
+        # Remove all selected items
+        row_sel = np.flip(np.unique([sender.row(item) for item in sender.selectedItems()]))
+        for row in row_sel:
+            self.removeROI(self.ROI[row])
+            self.removeEntry_table(row,sender)           
 
-#     def doStuff(self):
-#         print('Doing stuff')
+    def clearTable(self,sender):    
+        # Remove all items    
+        for row in np.flip(np.arange(sender.rowCount())):
+            self.removeROI(self.ROI[row])
+            self.removeEntry_table(row,sender)   
+        # [self.removeEntry_table(sender.item(row),sender) for row in np.flip(np.arange(sender.count()))]    
+
+    ################################################## List widget functions ##########################################        
+
+    # def addEntry(self,item):
+    #     # Add a new entry to listWidget
+    #     item.setFlags(item.flags() | Qt.ItemIsEditable)
+    #     self.listROI_listWidget.addItem(item)
+    #     self.listROI_listWidget.clearSelection()
+    #     self.listROI_listWidget.setCurrentItem(item)   
+
+    # def listItemLeftClicked(self,current_item,old_item):
+    #     self.changeROIColor(self.listROI_listWidget.row(current_item),'selected')
+    #     self.changeROIColor(self.listROI_listWidget.row(old_item),'unselected')
+
+    # def listItemRightClicked(self, QPos): 
+    #     sender = self.sender()
+    #     self.roiMenu= QMenu(self)
+    #     self.connect(self.roiMenu.addAction("Remove Item(s)"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_listRemoveItemClicked(who)) 
+    #     self.connect(self.roiMenu.addAction("Clear all"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_listClearClicked(who)) 
+    #     parentPosition = sender.mapToGlobal(QPoint(0, 0))        
+    #     self.roiMenu.move(parentPosition + QPos)
+    #     self.roiMenu.show()
+
+    # def removeEntry_list(self,item,sender):
+    #     # Remove entry in list
+    #     sender.takeItem(sender.row(item))
+
+    # def removeSelectedItems_list(self,sender):
+    #     # Remove all selected items
+    #     [self.removeEntry_list(item,sender) for item in sender.selectedItems()]        
+
+    # def clearList(self,sender):    
+    #     # Remove all items    
+    #     [self.removeEntry_list(sender.item(row),sender) for row in np.flip(np.arange(sender.count()))]    
+
+    ################################################## Context menu functions ##########################################    
+    def Qmenu_tableRemoveItemClicked(self,sender):
+        self.removeSelectedItems_table(sender)
+
+    def Qmenu_tableClearClicked(self,sender):
+        self.clearTable(sender)     
+
+    ################################################## Context menu functions ##########################################    
+    def Qmenu_listRemoveItemClicked(self,sender):
+        self.removeSelectedItems_list(sender)
+
+    def Qmenu_listClearClicked(self,sender):
+        self.clearList(sender)     
 
 def main():
     import sys
