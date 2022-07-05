@@ -58,7 +58,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.y = 1.
         self.isNotUpdating = True         
         self.path_calib = 'Calibration/'
-        self.parameter_list = dict([("inputAxis0Mult_lineEdit_2",0.05),("inputAxis0Mult_lineEdit",100),("inputAxis0Mult_lineEdit_3",0.5), ("inputAxis0Mult_lineEdit_4",1e8), ("inputAxis0Mult_lineEdit_5",50), ("inputAxis0Mult_lineEdit_6",50)])
+        self.parameter_list = dict([("inputAxis0Mult_lineEdit_2",0.05),("inputAxis0Mult_lineEdit",10),("inputAxis0Mult_lineEdit_3",0.5), ("inputAxis0Mult_lineEdit_4",1e8), ("inputAxis0Mult_lineEdit_5",50), ("inputAxis0Mult_lineEdit_6",50)])
         
     def connectSignals(self):
         #Set up widgets, buttons and checkboxes
@@ -226,6 +226,9 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
             print('Need at least three entries in table')
 
     def updateFit(self):
+        #Commented lines are for a calibration with a retarded potential of 10V
+        #Not really useful since l<<L
+
         #Fetching the time and energy values in the table widget
         table_value = np.array([[self.listPeaks_tableWidget.item(row,0).data(0),self.listPeaks_tableWidget.item(row,1).data(0)] 
                                                             for row in range(self.listPeaks_tableWidget.rowCount())]).astype(float).T 
@@ -233,17 +236,27 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         #Using the scipy curve_fit calibration function 
         self.p_opt, self.pcov = opt.curve_fit(af.ToF2eV, table_value[0], table_value[1], bounds = (0,np.inf), p0 = (self.parameter_list["inputAxis0Mult_lineEdit_4"],self.parameter_list["inputAxis0Mult_lineEdit_5"],self.parameter_list["inputAxis0Mult_lineEdit_6"]))
 
+        #self.p_opt, self.pcov = opt.curve_fit(CalibrationToolBox.newToF2eV, table_value[0], table_value[1], bounds = (0,np.inf))
+
         #Computation of R²
         Ecal=[af.ToF2eV(t,self.p_opt[0],self.p_opt[1],self.p_opt[2]) for t in table_value[0]]
+        #Ecal=[af.ToF2eV(t, 4.55*10**(-31)*(5.066111707*10**18 - self.p_opt[0])**2, -10, 135.87398456792158) for t in table_value[0]]
         residuals = [table_value[1][i] - Ecal[i] for i in range(len(table_value[0]))]
         ss_res = np.sum([residuals[i]**2 for i in range(len(residuals))])
         ss_tot = np.sum((table_value[1]-np.mean(table_value[1]))**2)
         r_squared = 1 - (ss_res / ss_tot)
 
         #Update of the parameters table widget
-        self.addEntry(sender = self.coeffCalib_tableWidget,value=(self.p_opt[0],self.p_opt[1],self.p_opt[2],r_squared))     
-
+        self.addEntry(sender = self.coeffCalib_tableWidget,value=(self.p_opt[0],self.p_opt[1],self.p_opt[2],r_squared))
+        #self.addEntry(sender = self.coeffCalib_tableWidget,value=(4.55*10**(-31)*(5.066111707*10**18 - self.p_opt[0])**2,-10,135.87398456792158,r_squared))
         self.updateCalibration()
+
+    def newToF2eV(t, l):
+        #Values are extracted from the calibration with no retard
+        t0 = 135.87398456792158
+        beta = -10
+        alpha = 4.55*10**(-31)
+        return alpha*((5.066111707*10**18 - l)/(t-t0))**2 + beta
 
     def getCalibration(self):
         #Returns the calibration parameters
