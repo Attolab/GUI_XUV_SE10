@@ -93,8 +93,10 @@ class PreviewPlot_Panel(Ui_previewPlot_Panel,QWidget):
     def displayPlotWidget(self):
         self.inputViewerWidget.updateViewerWidget(self.signal_inputPlot,self.axis0_inputPlot,self.axis1_inputPlot)
         self.outputMagnViewerWidget.updateViewerWidget(np.abs(self.signal_outputPlot),self.axis0_outputPlot,self.axis1_inputPlot)
-        self.outputPhaseViewerWidget.updateViewerWidget(np.unwrap(np.angle(self.signal_outputPlot),axis = 1),self.axis0_outputPlot,self.axis1_inputPlot)        
-        self.outputPhaseViewerWidget.updateViewerWidget(np.unwrap(np.angle(self.signal_outputPlot),axis = 0),self.axis0_outputPlot,self.axis1_inputPlot)        
+        angle = np.unwrap(np.angle(self.signal_outputPlot),axis = 0)
+        # angle -= np.min(angle,axis =1)
+        self.outputPhaseViewerWidget.updateViewerWidget(angle-angle[0][:,np.newaxis].T,self.axis0_outputPlot,self.axis1_inputPlot)        
+        # self.outputPhaseViewerWidget.updateViewerWidget(np.unwrap(np.angle(self.signal_outputPlot),axis = 0),self.axis0_outputPlot,self.axis1_inputPlot)        
 
     def connectSignal(self):    
         self.configuration_button.clicked.connect(self.openConfig)  

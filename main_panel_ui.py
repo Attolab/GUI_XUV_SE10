@@ -78,10 +78,35 @@ class Ui_main_panel(object):
 
         self.verticalLayout_2.addWidget(self.fileSelection_listWidget)
 
+        self.horizontalLayout_5 = QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.loadSpectrum_pushButton = QPushButton(self.page_5)
         self.loadSpectrum_pushButton.setObjectName(u"loadSpectrum_pushButton")
 
-        self.verticalLayout_2.addWidget(self.loadSpectrum_pushButton)
+        self.horizontalLayout_5.addWidget(self.loadSpectrum_pushButton)
+
+        self.verticalLayout_4 = QVBoxLayout()
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.transient_radioButton = QRadioButton(self.page_5)
+        self.transient_radioButton.setObjectName(u"transient_radioButton")
+
+        self.verticalLayout_4.addWidget(self.transient_radioButton)
+
+        self.dressingOn_radioButton = QRadioButton(self.page_5)
+        self.dressingOn_radioButton.setObjectName(u"dressingOn_radioButton")
+
+        self.verticalLayout_4.addWidget(self.dressingOn_radioButton)
+
+        self.dressingOff_radioButton = QRadioButton(self.page_5)
+        self.dressingOff_radioButton.setObjectName(u"dressingOff_radioButton")
+
+        self.verticalLayout_4.addWidget(self.dressingOff_radioButton)
+
+
+        self.horizontalLayout_5.addLayout(self.verticalLayout_4)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_5)
 
         self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -289,8 +314,7 @@ class Ui_main_panel(object):
 
         QWidget.setTabOrder(self.folderBase_lineEdit, self.forderSelection_toolButton)
         QWidget.setTabOrder(self.forderSelection_toolButton, self.fileSelection_listWidget)
-        QWidget.setTabOrder(self.fileSelection_listWidget, self.loadSpectrum_pushButton)
-        QWidget.setTabOrder(self.loadSpectrum_pushButton, self.makeCalibration_pushButton)
+        QWidget.setTabOrder(self.fileSelection_listWidget, self.makeCalibration_pushButton)
         QWidget.setTabOrder(self.makeCalibration_pushButton, self.loadCalibration_pushButton)
         QWidget.setTabOrder(self.loadCalibration_pushButton, self.time_radioButton)
         QWidget.setTabOrder(self.time_radioButton, self.energy_radioButton)
@@ -318,6 +342,9 @@ class Ui_main_panel(object):
         self.fileSelection_listWidget.setToolTip(QCoreApplication.translate("main_panel", u"<html><head/><body><p>List of selected files:</p><p>- double click on a file to load it</p><p>- right click to remove selected files or clear list</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.loadSpectrum_pushButton.setText(QCoreApplication.translate("main_panel", u"Load Spectrum", None))
+        self.transient_radioButton.setText(QCoreApplication.translate("main_panel", u"Transient", None))
+        self.dressingOn_radioButton.setText(QCoreApplication.translate("main_panel", u"Dressing On", None))
+        self.dressingOff_radioButton.setText(QCoreApplication.translate("main_panel", u"Dressing off", None))
         self.toolBox.setItemText(self.toolBox.indexOf(self.page_5), QCoreApplication.translate("main_panel", u"File selection", None))
 #if QT_CONFIG(tooltip)
         self.makeCalibration_pushButton.setToolTip(QCoreApplication.translate("main_panel", u"<html><head/><body><p>Create a panel to make a calibration from the current signal/FT or from a custom input</p></body></html>", None))

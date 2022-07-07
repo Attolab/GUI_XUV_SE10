@@ -39,7 +39,7 @@
           <x>0</x>
           <y>0</y>
           <width>582</width>
-          <height>278</height>
+          <height>320</height>
          </rect>
         </property>
         <attribute name="label">
@@ -100,11 +100,40 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="loadSpectrum_pushButton">
-           <property name="text">
-            <string>Load Spectrum</string>
-           </property>
-          </widget>
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <widget class="QPushButton" name="loadSpectrum_pushButton">
+             <property name="text">
+              <string>Load Spectrum</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_4">
+             <item>
+              <widget class="QRadioButton" name="transient_radioButton">
+               <property name="text">
+                <string>Transient</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="dressingOn_radioButton">
+               <property name="text">
+                <string>Dressing On</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="dressingOff_radioButton">
+               <property name="text">
+                <string>Dressing off</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
          </item>
          <item>
           <spacer name="verticalSpacer_3">
@@ -445,6 +474,14 @@
         </layout>
        </widget>
        <widget class="QWidget" name="page_7">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>582</width>
+          <height>278</height>
+         </rect>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -506,7 +543,6 @@
   <tabstop>folderBase_lineEdit</tabstop>
   <tabstop>forderSelection_toolButton</tabstop>
   <tabstop>fileSelection_listWidget</tabstop>
-  <tabstop>loadSpectrum_pushButton</tabstop>
   <tabstop>makeCalibration_pushButton</tabstop>
   <tabstop>loadCalibration_pushButton</tabstop>
   <tabstop>time_radioButton</tabstop>
