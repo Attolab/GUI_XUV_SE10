@@ -58,7 +58,8 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.y = 1.
         self.isNotUpdating = True         
         self.path_calib = 'Calibration/'
-        self.parameter_list = dict([("inputAxis0Mult_lineEdit_2",0.05),("inputAxis0Mult_lineEdit",10),("inputAxis0Mult_lineEdit_3",0.5), ("inputAxis0Mult_lineEdit_4",1e8), ("inputAxis0Mult_lineEdit_5",50), ("inputAxis0Mult_lineEdit_6",0)])
+        self.parameter_list = dict([("inputAxis0Mult_lineEdit_2",0.05),("inputAxis0Mult_lineEdit",100),("inputAxis0Mult_lineEdit_3",0.5), ("inputAxis0Mult_lineEdit_4",1e8), ("inputAxis0Mult_lineEdit_5",0), ("inputAxis0Mult_lineEdit_6",0)])
+
         
     def connectSignals(self):
         #Set up widgets, buttons and checkboxes
@@ -253,7 +254,6 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
             #print(r_squared)
             #if r_squared<r_squared_min:
                 #l_min=l
-
 
 
         #Computation of R²

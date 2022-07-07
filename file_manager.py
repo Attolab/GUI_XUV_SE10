@@ -80,7 +80,7 @@ class FileManager:
     def extractAll(self):
         with h5py.File(self.filename, 'r') as file:
             keys = self.extractKeys(file)
-            values = get_values(self, file, keys)
+            values = self.get_values(self, file, keys)
             shape = values.shape
             dtype = values.dtype
         return keys,values,shape,dtype        
@@ -91,20 +91,28 @@ class FileManager:
         with h5py.File(self.filename, 'r') as file:
             keys = self.get_dataset_keys(file)
             keys = self.convertInput(keys)
-            data = npa(self.get_values(file, get_key_data(keys)))
             position = self.get_values(file, get_key_position(keys))[0]
             parameters = self.get_values(file, get_key_parameters(keys))
+            data_transient = npa(self.get_values(file, get_key_data(keys,"Data/Y_axis/Averaged_data"))).T            
+            try:
+                data_statOn = npa(self.get_values(file,get_key_data(keys,"Static spectra/Averaged_on"))).T
+                data_statOff = npa(self.get_values(file,get_key_data(keys,"Static spectra/Averaged_off"))).T
+            except:
+                data_statOn = np.zeros_like(data_transient)
+                data_statOff = np.zeros_like(data_transient)
+            data = npa([data_transient,data_statOn,data_statOff])
         return self.convert_h5(data,position,parameters)
 
     def convert_h5(self,data,position,parameters):
         delay = position * 0.635 / ( 2 * np.pi * 0.299792458)        
-        t_vol = parameters[-2] * np.arange(data.shape[1])*1e9
+        t_vol = parameters[-2] * 1e9 * np.arange(data[0].shape[0])
         indexing = np.argsort(delay)
         delay = delay[indexing]
-        data = data[indexing,:]
-        return data.T,delay,t_vol
+        data = data[:,:,indexing]
+        return data,delay,t_vol
 
-
+    def order_data(self,data,indexing):
+        return data[indexing,:].T
 
     def readCalibration(self):
         with open(self.filename, "r") as f:  
@@ -124,7 +132,7 @@ class FileManager:
             return
         else:         
             with open(self.filename, "w") as f:       
-                [f.write(letter+'\t') for letter in ['A','B','t0']]
+                [f.write(letter+'\t') for letter in ['A','B','t0','R2']]
                 f.write('\n') 
                 [f.write(item.text()+'\t') for item in calibration_inputs]
                 # [f.write(str(coeff)) for coeff in self.getCalibration()]
@@ -132,10 +140,10 @@ class FileManager:
 
 
     # Get key for data array
-def get_key_data(keys):
+def get_key_data(keys,data_label):
     # Extract key data and associated index 
     key_data, key_data_index = zip(
-        *[(key, int(re.search('(\d+)$', key)[0])) for key in keys if "Data/Y_axis/Averaged_data" in key])
+        *[(key, int(re.search('(\d+)$', key)[0])) for key in keys if data_label in key])
     # List is not sorted so we sort it using the index
     ordering_index = np.argsort(key_data_index)
     # Return sorted key_data array
@@ -149,10 +157,12 @@ def get_key_position(keys):
 def get_key_parameters(keys):
     return npa([key for key in keys if "Scan_parameters" in key])
 
-# def get_values(f, keys):
-#     return [npa(f[key][0]) if len(f[key].shape) > 1 else npa(f[key]) for key in keys]
    
-
+    # static_key = []
+    # for key in keys:
+    #     if "Static spectra/shots on" in key or "Static spectra/shots off" in key:
+    #         static_key.append(key)
+    # return npa(static_key)
 
 
 def main():

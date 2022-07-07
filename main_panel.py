@@ -50,6 +50,10 @@ class MainPanel(Ui_main_panel,QWidget):
         self.makeCalibration_pushButton.pressed.connect(self.press_makeCalibrationButton_function)
         self.loadCalibration_pushButton.pressed.connect(self.press_loadCalibrationButton_function)
         self.energy_radioButton.toggled.connect(self.loadCurrentItem)
+        self.time_radioButton.toggled.connect(self.loadCurrentItem)
+        self.transient_radioButton.toggled.connect(self.loadCurrentItem)
+        self.dressingOn_radioButton.toggled.connect(self.loadCurrentItem)
+        self.dressingOff_radioButton.toggled.connect(self.loadCurrentItem)
         self.folderBase_lineEdit.editingFinished.connect(self.updateBaseFolder)
         self.forderSelection_toolButton.pressed.connect(self.press_selectFolder_function)
         self.fileSelection_listWidget.itemDoubleClicked.connect(self.loadDatafromItem)
@@ -140,8 +144,20 @@ class MainPanel(Ui_main_panel,QWidget):
         axis1,signal = af.linearizeData(axis1,signal,C.str2float(self.energyMin_lineEdit.text()),C.str2float(self.energyMax_lineEdit.text()),C.str2float(self.energySteps_lineEdit.text())) # Linearize energy space
         return axis1,signal
 
+
+    def getDataType(self):
+        if self.transient_radioButton.isChecked():
+            return 0
+        elif self.dressingOn_radioButton.isChecked():
+            return 1
+        elif self.dressingOff_radioButton.isChecked():
+            return 2
+        else:
+            return 0
+
     def loadData(self,filename):
-        signal, delay, t_vol = FM(filename).Read_h5()      
+        signal, delay, t_vol = FM(filename).Read_h5()     
+        signal = signal[self.getDataType()] 
         self.isDataLoaded = True  
         if self.time_radioButton.isChecked():
             self.plotPreview_panel.setData(axis_0=delay,axis_1=t_vol, data=signal)    

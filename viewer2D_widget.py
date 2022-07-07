@@ -55,18 +55,6 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         self.setupToolButton()
         self.updateGUI()
 
-    def setupImageWidget(self,layout,title = '', row = None, col = None):
-        plot = layout.addPlot(title=title,labels={'bottom': ('x axis title'), 'left': ('y axis title')},row = row, col = col)
-        plot.ctrlMenu = None
-        view = plot.getViewBox()
-        img = pg.ImageItem()              
-        data = np.random.normal(size=(200, 100))
-        data[20:80, 20:80] += 2.
-        data = pg.gaussianFilter(data, (3, 3))
-        data += np.random.normal(size=(200, 100)) * 0.1                
-        img.setImage(data,autoRange=True)
-        plot.addItem(img)     
-        return plot,view,img
 
     # self.showIsoLine_checkBox.stateChanged.connect(self.updateGUI)
     # self.showHideWidget([self.isoCurve],self.showIsoLine_checkBox.isChecked())
@@ -91,13 +79,6 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
     #     isoLine.sigDragged.connect(self.updateIsocurve)
     #     return isoLine
 
-    def setupHistItem(self,layout,image,row = None, col = None):
-        hist = pg.HistogramLUTItem(gradientPosition="left")
-        hist.gradient.setColorMap(pg.colormap.get('hot', source='matplotlib'))
-        layout.addItem(hist,row = row, col = col)
-        hist.setImageItem(image)   
-        hist.autoHistogramRange()
-        return hist
 
     def mouseMoved(self,evt):
         real_mousePoint = self.view_2D.mapSceneToView(evt[0])
@@ -120,7 +101,7 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         self.tableROI_tableWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tableROI_tableWidget.connect(self.tableROI_tableWidget,SIGNAL("customContextMenuRequested(QPoint)" ), self.tableItemRightClicked)                        
         self.tableROI_tableWidget.itemSelectionChanged.connect(self.tableItemLeftClicked)
-        
+
 
     def showHideWidget(self,items,show_bool = True):
         if show_bool:        
@@ -141,6 +122,29 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         self.connect(tool_btn_menu.addAction("Add ROI (V)"),SIGNAL("triggered()"), self.addROIv_menuFunction) 
         self.makeROI_toolButton.setMenu(tool_btn_menu)
         self.makeROI_toolButton.setDefaultAction(tool_btn_menu.actions()[0])
+
+##################################### IMAGE VIEW/ITEM ########################################
+
+    def setupImageWidget(self,layout,title = '', row = None, col = None):
+        plot = layout.addPlot(title=title,labels={'bottom': ('x axis title'), 'left': ('y axis title')},row = row, col = col)
+        plot.ctrlMenu = None
+        view = plot.getViewBox()
+        img = pg.ImageItem()              
+        data = np.random.normal(size=(200, 100))
+        data[20:80, 20:80] += 2.
+        data = pg.gaussianFilter(data, (3, 3))
+        data += np.random.normal(size=(200, 100)) * 0.1                
+        img.setImage(data,autoRange=True)
+        plot.addItem(img)     
+        return plot,view,img
+
+    def setupHistItem(self,layout,image,row = None, col = None):
+        hist = pg.HistogramLUTItem(gradientPosition="left")
+        hist.gradient.setColorMap(pg.colormap.get('hot', source='matplotlib'))
+        layout.addItem(hist,row = row, col = col)
+        hist.setImageItem(image)   
+        hist.autoHistogramRange()
+        return hist
     def getScaling(self,input,total_length):        
         return (input[-1]-input[0])/total_length
 
@@ -152,8 +156,7 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
 
     def updateImage(self,item,data,xaxis,yaxis):
         item.setImage(data,autoRange=False)
-        Q = self.getTransform(data,xaxis,yaxis)
-        item.setTransform(Q)
+        item.setTransform(self.getTransform(data,xaxis,yaxis))
 
     def updateView(self,view,xaxis,yaxis):
         offset_x = (xaxis[-1]-xaxis[0])/10
@@ -243,6 +246,8 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
             self.ROI[index].setMouseHover(True)
             self.ROI[index].setMouseHover(False)
     ################################################## Table widget functions ##########################################    
+    def get_selectedRows(self,sender):
+        return np.unique([sender.row(item) for item in sender.selectedItems()])
 
     def addEntry_tableWidget(self,name=None,orientation='H'):
         nRow = self.tableROI_tableWidget.rowCount()        
@@ -264,7 +269,8 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         self.tableROI_tableWidget.setCurrentItem(item)   
 
     def tableItemLeftClicked(self):
-        row_sel = np.unique([self.tableROI_tableWidget.row(item) for item in self.tableROI_tableWidget.selectedItems()])
+        row_sel = self.get_selectedRows(self.tableROI_tableWidget)
+        # row_sel = np.unique([self.tableROI_tableWidget.row(item) for item in self.tableROI_tableWidget.selectedItems()])
         for row in np.arange(self.tableROI_tableWidget.rowCount()):
             if row in row_sel:
                 self.changeROIColor(row,'selected')            
@@ -274,16 +280,14 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
     def tableItemRightClicked(self, QPos): 
         sender = self.sender()
         self.roiMenu= QMenu(self)
-        self.roiManipulationMenu = QMenu(self)
-        self.roiMenu.addMenu(self.roiManipulationMenu)
-        show_button = QAction("Show Item(s)", self.roiMenu)        
-
+        self.roiOperationMenu = QMenu('Operation',self)
+        self.roiMenu.addMenu(self.roiOperationMenu)
         # show_button = QAction("Show Item(s)", self.roiMenu)
         # show_button.setCheckable(True)
         # show_button.setChecked(True)
         # connect(show_button, SIGNAL("triggered()"), this, SLOT(slot_SomethingChecked()));
-
-
+        # show_button = QAction("Show Sum", self.roiOperationMenu) 
+        self.connect(self.roiOperationMenu.addAction("Sum ROI("),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_tableOperationSum(who)) 
 
         self.connect(self.roiMenu.addAction("Remove Item(s)"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_tableRemoveItemClicked(who)) 
         self.connect(self.roiMenu.addAction("Clear all"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_tableClearClicked(who)) 
@@ -343,7 +347,23 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
     #     # Remove all items    
     #     [self.removeEntry_list(sender.item(row),sender) for row in np.flip(np.arange(sender.count()))]    
 
-    ################################################## Context menu functions ##########################################    
+    ################################################## Context menu functions ##########################################   
+    def Qmenu_tableOperationSum(self,sender) :
+        import matplotlib.pyplot as plt
+        row_sel = self.get_selectedRows(self.tableROI_tableWidget)
+        for row in row_sel:
+            lr,hr = self.ROI[row].getRegion()
+            if self.tableROI_tableWidget.item(row,1).text() == 'H':
+                ROI_zone = np.sum(self.getImageData()[:,int(lr):int(hr)],axis = 1)
+            elif self.tableROI_tableWidget.item(row,1).text() == 'V':
+                ROI_zone = np.sum(self.getImageData()[int(lr):int(hr),:],axis = 0)                
+            plt.plot(ROI_zone,label=self.tableROI_tableWidget.item(row,0).text)
+        plt.show()
+        # I = self.getImageData()
+        # range_bottom = self.plot_2D.getAxis('bottom').range
+        # self.plot_2D.getAxis('left').range
+        # Npoints = self.getImageShape()
+        # np.linspace()
     def Qmenu_tableRemoveItemClicked(self,sender):
         self.removeSelectedItems_table(sender)
 
