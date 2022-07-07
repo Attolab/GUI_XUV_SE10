@@ -105,7 +105,7 @@ class FileManager:
 
     def convert_h5(self,data,position,parameters):
         delay = position * 0.635 / ( 2 * np.pi * 0.299792458)        
-        t_vol = parameters[-2] * np.arange(data[0].shape[0])*1e9
+        t_vol = parameters[-2] * 1e9 * np.arange(data[0].shape[0])
         indexing = np.argsort(delay)
         delay = delay[indexing]
         data = data[:,:,indexing]

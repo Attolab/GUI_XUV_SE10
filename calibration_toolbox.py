@@ -58,7 +58,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.y = 1.
         self.isNotUpdating = True         
         self.path_calib = 'Calibration/'
-        self.parameter_list = dict([("inputAxis0Mult_lineEdit_2",0.05),("inputAxis0Mult_lineEdit",100),("inputAxis0Mult_lineEdit_3",0.5), ("inputAxis0Mult_lineEdit_4",1e8), ("inputAxis0Mult_lineEdit_5",50), ("inputAxis0Mult_lineEdit_6",50)])
+        self.parameter_list = dict([("inputAxis0Mult_lineEdit_2",0.05),("inputAxis0Mult_lineEdit",100),("inputAxis0Mult_lineEdit_3",0.5), ("inputAxis0Mult_lineEdit_4",1e8), ("inputAxis0Mult_lineEdit_5",0), ("inputAxis0Mult_lineEdit_6",0)])
         
     def connectSignals(self):
         #Set up widgets, buttons and checkboxes
@@ -231,7 +231,8 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
                                                             for row in range(self.listPeaks_tableWidget.rowCount())]).astype(float).T 
 
         #Using the scipy curve_fit calibration function 
-        self.p_opt, self.pcov = opt.curve_fit(af.ToF2eV, table_value[0], table_value[1], bounds = (0,np.inf), p0 = (self.parameter_list["inputAxis0Mult_lineEdit_4"],self.parameter_list["inputAxis0Mult_lineEdit_5"],self.parameter_list["inputAxis0Mult_lineEdit_6"]))
+        self.p_opt, self.pcov = opt.curve_fit(af.ToF2eV, table_value[0], table_value[1], bounds = (-np.inf,np.inf), 
+                        p0 = (self.parameter_list["inputAxis0Mult_lineEdit_4"],self.parameter_list["inputAxis0Mult_lineEdit_5"],self.parameter_list["inputAxis0Mult_lineEdit_6"]))
 
         #Computation of R²
         Ecal=[af.ToF2eV(t,self.p_opt[0],self.p_opt[1],self.p_opt[2]) for t in table_value[0]]
