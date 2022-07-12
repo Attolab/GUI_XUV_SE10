@@ -76,7 +76,8 @@ class PreviewPlot_Panel(Ui_previewPlot_Panel,QWidget):
 
             elif self.path[-3:]=="csv":
                 with open(self.path) as file_name:
-                    output = np.array(csv.reader(file_name))
+                    output_str = list(csv.reader(file_name))
+                    output = [float(str) for str in output_str]
 
         self.signal_sendData.emit(output)
         
