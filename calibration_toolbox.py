@@ -58,7 +58,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.y = 1.
         self.isNotUpdating = True         
         self.path_calib = 'Calibration/'
-        self.parameter_list = dict([("inputAxis0Mult_lineEdit_2",0.05),("inputAxis0Mult_lineEdit",100),("inputAxis0Mult_lineEdit_3",0.5), ("inputAxis0Mult_lineEdit_4",1e8), ("inputAxis0Mult_lineEdit_5",0), ("inputAxis0Mult_lineEdit_6",0)])
+        self.parameter_list = dict([("inputAxis0Mult_lineEdit_2",0.05),("inputAxis0Mult_lineEdit",5),("inputAxis0Mult_lineEdit_3",0.5), ("inputAxis0Mult_lineEdit_4",1e8), ("inputAxis0Mult_lineEdit_5",0), ("inputAxis0Mult_lineEdit_6",0)])
 
         
     def connectSignals(self):
@@ -208,6 +208,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         print('Action 2 activated.')
         self.signal_requestInput.emit('FT')
     def importCustomSignal_menuFunction(self):
+        self.signal_requestInput.emit("custom")
         print('Action 3 activated.')    
 
     
@@ -234,9 +235,9 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
                                                             for row in range(self.listPeaks_tableWidget.rowCount())]).astype(float).T 
 
         #Using the scipy curve_fit calibration function 
-        #self.p_opt, self.pcov = opt.curve_fit(af.ToF2eV, table_value[0], table_value[1], bounds = (0,np.inf), p0 = (self.parameter_list["inputAxis0Mult_lineEdit_4"],self.parameter_list["inputAxis0Mult_lineEdit_5"],self.parameter_list["inputAxis0Mult_lineEdit_6"]))
-
-        self.p_opt, self.pcov = opt.curve_fit(CalibrationToolBox.newToF2eV, table_value[0], table_value[1], bounds = (-np.inf,np.inf))
+        self.p_opt, self.pcov = opt.curve_fit(af.ToF2eV, table_value[0], table_value[1], bounds = (-500,np.inf), p0 = (self.parameter_list["inputAxis0Mult_lineEdit_4"],self.parameter_list["inputAxis0Mult_lineEdit_5"],self.parameter_list["inputAxis0Mult_lineEdit_6"]))
+        #self.p_opt, self.pcov = opt.curve_fit(CalibrationToolBox.neweV2ToF, table_value[1], table_value[0], bounds = (1e15,np.inf))
+        #print(self.p_opt[0])
         
         #l_list = [i*1e15 for i in range(1,1000)]
         #l_min = 1e15
@@ -252,14 +253,12 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
             #ss_tot = np.sum((table_value[0]-np.mean(table_value[0]))**2)
             #r_squared = 1 - (ss_res / ss_tot)
             #print(r_squared)
-            #if r_squared<r_squared_min:
+            #if r_squared>r_squared_min:
                 #l_min=l
-
+        #print(l_min)
 
         #Computation of R²
         Ecal=[af.ToF2eV(t,self.p_opt[0],self.p_opt[1],self.p_opt[2]) for t in table_value[0]]
-        
-        #Ecal=[af.ToF2eV(t, 4.55*10**(-31)*(5.066111707*10**18 - self.p_opt[0])**2, -10, 135.87398456792158) for t in table_value[0]]
 
         residuals = [table_value[1][i] - Ecal[i] for i in range(len(table_value[0]))]
 
@@ -269,26 +268,16 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
 
         #Update of the parameters table widget
         self.addEntry(sender = self.coeffCalib_tableWidget,value=(self.p_opt[0],self.p_opt[1],self.p_opt[2],r_squared))
-
-        #self.addEntry(sender = self.coeffCalib_tableWidget,value=(4.55*10**(-31)*(5.066111707*10**18 - self.p_opt[0])**2,-10,135.87398456792158,r_squared))
         
         self.updateCalibration()
 
         #self.updateCalibrationPotential(l_min)
 
-    def newToF2eV(t, l):
-        #Values are extracted from the calibration with no retard
-        t0 = 135.87398456792158
-        beta = -10
-        alpha = 4.55*10**(-31)
-        return alpha*((5.066111707*10**18 - l)/(t-t0))**2 + beta
-
     def neweV2ToF(E,l):
-        #Same here
-        t0 = 135.87398456792158
-        alpha = 11677796.963885024
-        beta = 5.067897996272598e-17
-        V = 10
+        t0 = 63.75584484048288
+        alpha = 18013482.633733194
+        beta = -8.281556118297484
+        V = -20
         L = np.sqrt(2*alpha/9.1e-31)
         return t0 + np.sqrt(9.1e-31/2)*(l/np.sqrt(E-beta) + (L-l)/np.sqrt(E-beta+V))
 
@@ -316,10 +305,10 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
     
     def updateCalibrationPotential(self,l):
     
-        alpha = 11677796.963885024
-        beta = 5.067897996272598e-17
-        t0 = 135.87398456792158
-        V = 10
+        alpha = 18013482.633733194
+        beta = -8.281556118297484
+        t0 = 63.75584484048288
+        V = -20
 
         #Create E axis to check which energies to keep
         E_list = [i*0.05 for i in range(1,3000)]

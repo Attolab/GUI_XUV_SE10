@@ -17,6 +17,8 @@ from viewer_widget import ViewerWidget
 from viewer2D_widget import Viewer2DWidget
 from scipy.interpolate import interp1d
 import numpy as np
+from file_manager import FileManager as FM7
+import csv
 
 class PreviewPlot_Panel(Ui_previewPlot_Panel,QWidget):
     signal_updatePlot = Signal(object,object,object) # [2D, x ,y ]
@@ -33,7 +35,8 @@ class PreviewPlot_Panel(Ui_previewPlot_Panel,QWidget):
         self.isNotProcessing = True
         self.setData(signal,axis_0,axis_1)
         # Show plot
-        self.displayPlotWidget()        
+        self.displayPlotWidget()     
+        self.path_folder = " "   
 
     def setData(self,data,axis_0,axis_1):
         self.signal_input = np.array(data)
@@ -55,10 +58,26 @@ class PreviewPlot_Panel(Ui_previewPlot_Panel,QWidget):
         return [self.axis0_input,self.axis1_input,self.signal_input]   
 
     def getData(self,output_choice):
+        tof = [2.000000026702864e-10*i for i in range(10001)]
+
         if output_choice == 'Signal':
             output = [self.axis1_inputPlot,np.sum(self.signal_inputPlot,axis=1)]
         elif output_choice == 'FT':
-            output = [self.axis1_inputPlot,np.abs(np.sum(self.signal_outputPlot,axis=1))]         
+            output = [self.axis1_inputPlot,np.abs(np.sum(self.signal_outputPlot,axis=1))] 
+
+        elif output_choice == 'custom' :
+
+            #open folder to choose file according to type
+            self.path_filenames = QFileDialog.getOpenFileNames(self, 'Choose file',self.path_folder)[0]
+            self.path = self.path_filenames[0]
+
+            if self.path[-3:]=="npy":
+                output = [tof,np.load(self.path)]
+
+            elif self.path[-3:]=="csv":
+                with open(self.path) as file_name:
+                    output = np.array(csv.reader(file_name))
+
         self.signal_sendData.emit(output)
         
     def setupPlotWidget(self):        
