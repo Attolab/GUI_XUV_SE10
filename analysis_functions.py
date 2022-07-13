@@ -28,8 +28,15 @@ class AnalysisFunctions():
 
     def eV2ToF(E,alpha,beta,t0):
         return t0 + np.sqrt(alpha/(E-beta))
+    def eV2ToF_potential(E,alpha,beta,t0,V,l):
+        L = np.sqrt(2*alpha/9.1e-31)
+        return t0 + np.sqrt(9.1e-31/2)*(l/np.sqrt(E-beta) + (L-l)/np.sqrt(E-beta+V))
     def eV2ToF_Jac(E,alpha,beta):
         return np.sqrt(alpha/(E-beta)**3)
+    def eV2ToF_Jac_potential(E,alpha,beta,V,l):
+        L = np.sqrt(2*alpha/9.1e-31)
+        print("done")
+        return np.sqrt(9.1e-31/2)*(l/np.sqrt((E-beta)**2) + (L-l)/np.sqrt((E-beta+V)**2))
 
     def ToF2eV(t,alpha,beta,t0):
         return alpha/(t-t0)**2 + beta

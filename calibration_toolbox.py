@@ -58,7 +58,8 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.y = 1.
         self.isNotUpdating = True         
         self.path_calib = 'Calibration/'
-        self.parameter_list = dict([("inputAxis0Mult_lineEdit_2",0.05),("inputAxis0Mult_lineEdit",100),("inputAxis0Mult_lineEdit_3",0.5), ("inputAxis0Mult_lineEdit_4",1e8), ("inputAxis0Mult_lineEdit_5",0), ("inputAxis0Mult_lineEdit_6",0)])
+        self.parameter_list = dict([("inputAxis0Mult_lineEdit_2",0.05),("inputAxis0Mult_lineEdit",5),("inputAxis0Mult_lineEdit_3",0.5), ("inputAxis0Mult_lineEdit_4",1e8), ("inputAxis0Mult_lineEdit_5",0), ("inputAxis0Mult_lineEdit_6",0)])
+
         
     def connectSignals(self):
         #Set up widgets, buttons and checkboxes
@@ -207,6 +208,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         print('Action 2 activated.')
         self.signal_requestInput.emit('FT')
     def importCustomSignal_menuFunction(self):
+        self.signal_requestInput.emit("custom")
         print('Action 3 activated.')    
 
     
@@ -226,25 +228,58 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
             print('Need at least three entries in table')
 
     def updateFit(self):
+        #Commented lines are for a calibration with a retarded potential of 10V
+
         #Fetching the time and energy values in the table widget
         table_value = np.array([[self.listPeaks_tableWidget.item(row,0).data(0),self.listPeaks_tableWidget.item(row,1).data(0)] 
                                                             for row in range(self.listPeaks_tableWidget.rowCount())]).astype(float).T 
 
         #Using the scipy curve_fit calibration function 
-        self.p_opt, self.pcov = opt.curve_fit(af.ToF2eV, table_value[0], table_value[1], bounds = (-np.inf,np.inf), 
-                        p0 = (self.parameter_list["inputAxis0Mult_lineEdit_4"],self.parameter_list["inputAxis0Mult_lineEdit_5"],self.parameter_list["inputAxis0Mult_lineEdit_6"]))
+        self.p_opt, self.pcov = opt.curve_fit(af.ToF2eV, table_value[0], table_value[1], bounds = (-500,np.inf), p0 = (self.parameter_list["inputAxis0Mult_lineEdit_4"],self.parameter_list["inputAxis0Mult_lineEdit_5"],self.parameter_list["inputAxis0Mult_lineEdit_6"]))
+        #self.p_opt, self.pcov = opt.curve_fit(CalibrationToolBox.neweV2ToF, table_value[1], table_value[0], bounds = (1e15,np.inf))
+        #print(self.p_opt[0])
+        
+        #l_list = [i*1e15 for i in range(1,1000)]
+        #l_min = 1e15
+        #tcal_min=[CalibrationToolBox.neweV2ToF(E,l_min) for E in table_value[1]]
+        #residuals_min = [table_value[0][i] - tcal_min[i] for i in range(len(table_value[1]))]
+        #ss_res_min = np.sum([residuals_min[i]**2 for i in range(len(residuals_min))])
+        #ss_tot_min = np.sum((table_value[0]-np.mean(table_value[0]))**2)
+        #r_squared_min = 1 - (ss_res_min / ss_tot_min)
+        #for l in l_list:
+            #tcal=[CalibrationToolBox.neweV2ToF(E,l) for E in table_value[1]]
+            #residuals = [table_value[0][i] - tcal[i] for i in range(len(table_value[1]))]
+            #ss_res = np.sum([residuals[i]**2 for i in range(len(residuals))])
+            #ss_tot = np.sum((table_value[0]-np.mean(table_value[0]))**2)
+            #r_squared = 1 - (ss_res / ss_tot)
+            #print(r_squared)
+            #if r_squared>r_squared_min:
+                #l_min=l
+        #print(l_min)
 
         #Computation of R²
         Ecal=[af.ToF2eV(t,self.p_opt[0],self.p_opt[1],self.p_opt[2]) for t in table_value[0]]
+
         residuals = [table_value[1][i] - Ecal[i] for i in range(len(table_value[0]))]
+
         ss_res = np.sum([residuals[i]**2 for i in range(len(residuals))])
         ss_tot = np.sum((table_value[1]-np.mean(table_value[1]))**2)
         r_squared = 1 - (ss_res / ss_tot)
 
         #Update of the parameters table widget
-        self.addEntry(sender = self.coeffCalib_tableWidget,value=(self.p_opt[0],self.p_opt[1],self.p_opt[2],r_squared))     
-
+        self.addEntry(sender = self.coeffCalib_tableWidget,value=(self.p_opt[0],self.p_opt[1],self.p_opt[2],r_squared))
+        
         self.updateCalibration()
+
+        #self.updateCalibrationPotential(l_min)
+
+    def neweV2ToF(E,l):
+        t0 = 63.75584484048288
+        alpha = 18013482.633733194
+        beta = -8.281556118297484
+        V = -20
+        L = np.sqrt(2*alpha/9.1e-31)
+        return t0 + np.sqrt(9.1e-31/2)*(l/np.sqrt(E-beta) + (L-l)/np.sqrt(E-beta+V))
 
     def getCalibration(self):
         #Returns the calibration parameters
@@ -261,6 +296,59 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         mask = jac >=0
         self.x_fit = self.x_fit[mask]
         self.y_fit = self.y[mask] * jac[mask]
+        mask = self.x_fit < 150
+        self.x_fit = self.x_fit[mask]
+        self.y_fit = self.y_fit[mask]
+
+        #Plotting with certain limits
+        self.plotCalib_plot.setData(x=self.x_fit,y=self.y_fit)
+    
+    def updateCalibrationPotential(self,l):
+    
+        alpha = 18013482.633733194
+        beta = -8.281556118297484
+        t0 = 63.75584484048288
+        V = -20
+
+        #Create E axis to check which energies to keep
+        E_list = [i*0.05 for i in range(1,3000)]
+        self.x_fit = np.array([])
+        self.y_fit = np.array([])
+        index = 1
+
+        #for each time, check which energy corresponds to it with brute force
+        for j in range(len(self.x)):
+    
+            t = self.x[j]
+
+            for i in range(1,len(E_list)):
+
+                t_cal = af.eV2ToF_potential(E_list[i],alpha,beta,t0,V,l)
+
+                #check if the previous energy corresponds better, add it to the list
+                if t_cal<t:
+
+                    t_bis = af.eV2ToF_potential(E_list[i],alpha,beta,t0,V,l)
+
+                    if abs(t_cal-t)>abs(t_bis-t):
+                        self.x_fit=np.append(self.x_fit,E_list[i-1])
+                        index=i-1
+                    else:
+                        self.x_fit=np.append(self.x_fit,E_list[i])
+                        index=i
+                    
+                    #time is an inverse function of energy, to each time corresponds one energy only
+                    self.y_fit=np.append(self.y_fit,self.y[j])
+                    print("index="+str(index))
+                    break
+        
+        #(f-1)'=1/(f'°f-1)
+        jac = 1/af.eV2ToF_Jac_potential(self.x_fit,alpha,beta,V,l)
+
+        #Truncation of the plot (jacobian and limitation to low energies)
+        mask = jac >=0
+        self.x_fit = self.x_fit[mask]
+        self.y_fit = self.y_fit[mask] * jac[mask]
         mask = self.x_fit < 150
         self.x_fit = self.x_fit[mask]
         self.y_fit = self.y_fit[mask]
