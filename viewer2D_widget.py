@@ -370,7 +370,10 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
             ROI_zone = self.getImageData()[l_b:h_b,:]
             axis_plot[0] = axis_plot[0][np.logical_and(axis_plot[0] >= edges[0],axis_plot[0] <= edges[1])]
         return ROI_zone,axis_plot
-  
+    
+    def getAxis(self):
+        return self.makeAxis(self.getImageTransformParameters())
+
     def makeAxis(self,parameters):
         axis = []
         for parameter in parameters:

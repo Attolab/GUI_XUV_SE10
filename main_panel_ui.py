@@ -15,10 +15,11 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QGridLayout, QHBoxLayout,
-    QLabel, QLineEdit, QListWidget, QListWidgetItem,
-    QPushButton, QRadioButton, QSizePolicy, QSpacerItem,
-    QToolBox, QToolButton, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComboBox,
+    QGridLayout, QHBoxLayout, QLabel, QLineEdit,
+    QListWidget, QListWidgetItem, QPushButton, QRadioButton,
+    QSizePolicy, QSpacerItem, QToolBox, QToolButton,
+    QVBoxLayout, QWidget)
 
 class Ui_main_panel(object):
     def setupUi(self, main_panel):
@@ -291,18 +292,47 @@ class Ui_main_panel(object):
         self.page_7.setSizePolicy(sizePolicy)
         self.verticalLayout_3 = QVBoxLayout(self.page_7)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.advancedPlot_pushButton = QPushButton(self.page_7)
-        self.advancedPlot_pushButton.setObjectName(u"advancedPlot_pushButton")
-        sizePolicy2.setHeightForWidth(self.advancedPlot_pushButton.sizePolicy().hasHeightForWidth())
-        self.advancedPlot_pushButton.setSizePolicy(sizePolicy2)
+        self.gridLayout_3 = QGridLayout()
+        self.gridLayout_3.setObjectName(u"gridLayout_3")
+        self.oscillationUnits_comboBox = QComboBox(self.page_7)
+        self.oscillationUnits_comboBox.addItem("")
+        self.oscillationUnits_comboBox.addItem("")
+        self.oscillationUnits_comboBox.addItem("")
+        self.oscillationUnits_comboBox.addItem("")
+        self.oscillationUnits_comboBox.setObjectName(u"oscillationUnits_comboBox")
 
-        self.verticalLayout_3.addWidget(self.advancedPlot_pushButton)
+        self.gridLayout_3.addWidget(self.oscillationUnits_comboBox, 1, 1, 1, 1)
+
+        self.label_9 = QLabel(self.page_7)
+        self.label_9.setObjectName(u"label_9")
+
+        self.gridLayout_3.addWidget(self.label_9, 0, 0, 1, 1)
+
+        self.oscillationFrequency_lineEdit = QLineEdit(self.page_7)
+        self.oscillationFrequency_lineEdit.setObjectName(u"oscillationFrequency_lineEdit")
+
+        self.gridLayout_3.addWidget(self.oscillationFrequency_lineEdit, 1, 0, 1, 1)
+
+        self.unwrapPhase_checkBox = QCheckBox(self.page_7)
+        self.unwrapPhase_checkBox.setObjectName(u"unwrapPhase_checkBox")
+
+        self.gridLayout_3.addWidget(self.unwrapPhase_checkBox, 2, 1, 1, 1)
+
+        self.showPhase_pushButton = QPushButton(self.page_7)
+        self.showPhase_pushButton.setObjectName(u"showPhase_pushButton")
+        sizePolicy2.setHeightForWidth(self.showPhase_pushButton.sizePolicy().hasHeightForWidth())
+        self.showPhase_pushButton.setSizePolicy(sizePolicy2)
+
+        self.gridLayout_3.addWidget(self.showPhase_pushButton, 2, 0, 1, 1)
+
+
+        self.verticalLayout_3.addLayout(self.gridLayout_3)
 
         self.verticalSpacer_4 = QSpacerItem(20, 226, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_3.addItem(self.verticalSpacer_4)
 
-        self.toolBox.addItem(self.page_7, u"ROI")
+        self.toolBox.addItem(self.page_7, u"RABBIT")
 
         self.v_optionLayout.addWidget(self.toolBox)
 
@@ -326,7 +356,7 @@ class Ui_main_panel(object):
 
         self.retranslateUi(main_panel)
 
-        self.toolBox.setCurrentIndex(0)
+        self.toolBox.setCurrentIndex(2)
 
 
         QMetaObject.connectSlotsByName(main_panel)
@@ -395,7 +425,15 @@ class Ui_main_panel(object):
 #endif // QT_CONFIG(tooltip)
         self.label_4.setText(QCoreApplication.translate("main_panel", u"dE", None))
         self.toolBox.setItemText(self.toolBox.indexOf(self.page_6), QCoreApplication.translate("main_panel", u"Calibration", None))
-        self.advancedPlot_pushButton.setText(QCoreApplication.translate("main_panel", u"Advanced plot", None))
-        self.toolBox.setItemText(self.toolBox.indexOf(self.page_7), QCoreApplication.translate("main_panel", u"ROI", None))
+        self.oscillationUnits_comboBox.setItemText(0, QCoreApplication.translate("main_panel", u"Wavelength (nm)", None))
+        self.oscillationUnits_comboBox.setItemText(1, QCoreApplication.translate("main_panel", u"Energy (eV)", None))
+        self.oscillationUnits_comboBox.setItemText(2, QCoreApplication.translate("main_panel", u"Frequency (THz)", None))
+        self.oscillationUnits_comboBox.setItemText(3, QCoreApplication.translate("main_panel", u"Angular frequency (PHz)", None))
+
+        self.label_9.setText(QCoreApplication.translate("main_panel", u"Oscillation frequency", None))
+        self.oscillationFrequency_lineEdit.setText(QCoreApplication.translate("main_panel", u"400", None))
+        self.unwrapPhase_checkBox.setText(QCoreApplication.translate("main_panel", u"Unwrapped", None))
+        self.showPhase_pushButton.setText(QCoreApplication.translate("main_panel", u"Show phase", None))
+        self.toolBox.setItemText(self.toolBox.indexOf(self.page_7), QCoreApplication.translate("main_panel", u"RABBIT", None))
     # retranslateUi
 
