@@ -89,6 +89,7 @@ class Ui_main_panel(object):
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.transient_radioButton = QRadioButton(self.page_5)
         self.transient_radioButton.setObjectName(u"transient_radioButton")
+        self.transient_radioButton.setChecked(True)
 
         self.verticalLayout_4.addWidget(self.transient_radioButton)
 
