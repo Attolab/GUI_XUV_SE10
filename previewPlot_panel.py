@@ -36,7 +36,7 @@ class PreviewPlot_Panel(Ui_previewPlot_Panel,QWidget):
         self.setData(signal,axis_0,axis_1)
         # Show plot
         self.displayPlotWidget()     
-        self.path_folder = " "   
+        self.path_folder = ""   
 
     def setData(self,data,axis_0,axis_1):
         self.signal_input = np.array(data)
@@ -76,8 +76,12 @@ class PreviewPlot_Panel(Ui_previewPlot_Panel,QWidget):
 
             elif self.path[-3:]=="csv":
                 with open(self.path) as file_name:
-                    output_str = list(csv.reader(file_name))
-                    output = [float(str) for str in output_str]
+                    file_read = csv.reader(file_name)
+                    array = list(file_read)
+                    array = array[1:]
+                    x = [float(array[i][0]) for i in range(len(array))]
+                    y = [float(array[i][1]) for i in range(len(array))]
+                    output = [np.array(x),np.array(y)]
 
         self.signal_sendData.emit(output)
         
