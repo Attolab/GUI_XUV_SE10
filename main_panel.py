@@ -15,6 +15,8 @@ from analysis_functions import AnalysisFunctions as af
 import numpy as np
 from usefulclass import Filter
 from convertinator_class import Convertinator as C
+
+import matplotlib.pyplot as plt
 class MainPanel(Ui_main_panel,QWidget):
     def __init__(self,parent=None):
         super(MainPanel, self).__init__(parent)
@@ -60,7 +62,7 @@ class MainPanel(Ui_main_panel,QWidget):
         self.energyMax_lineEdit.editingFinished.connect(self.updateEnergyAxis)
         self.energyMin_lineEdit.editingFinished.connect(self.updateEnergyAxis)
         self.energySteps_lineEdit.editingFinished.connect(self.updateEnergyAxis)        
-
+        self.showPhase_pushButton.pressed.connect(self.plotRabbitPhase)
     def connectSignals_widgets(self):
         self.calibration_toolbox.signal_requestInput.connect(self.plotPreview_panel.getData)
         self.calibration_toolbox.signal_applyCalibration.connect(self.updateCalibration)
@@ -205,16 +207,69 @@ class MainPanel(Ui_main_panel,QWidget):
 
     def press_loadButton_function(self):    
         self.path_filenames = QFileDialog.getOpenFileNames(self, 'Choose file',self.path_folder)[0]            
-        [self.addFileToList(filename= path) for path in self.path_filenames if path]
-        self.fileSelection_listWidget.setCurrentRow(self.fileSelection_listWidget.count())      
-        self.path = self.path_filenames[0]
-        self.loadData(self.path)
+        self.path = self.path_filenames[0]            
+
+        try:
+            self.loadData(self.path)
+            [self.addFileToList(filename= path) for path in self.path_filenames if path]
+            self.fileSelection_listWidget.setCurrentRow(self.fileSelection_listWidget.count())      
+        except:
+            print('Error loading file')
 
     def addFileToList(self,filename):
         self.fileSelection_listWidget.addItem(QListWidgetItem(filename))
 
 
 
+    ################################################## RABBIT functions ##########################################    
+
+    def plotRabbitPhase(self):
+        if self.isDataLoaded:
+            frequency_axis,y_axis = self.plotPreview_panel.outputPhaseViewerWidget.getAxis()
+            oscillation_frequency = C.str2float(self.oscillationFrequency_lineEdit.text())
+            oscillation_units = self.oscillationUnits_comboBox.currentIndex()
+            if oscillation_units == 0:
+                oscillation_frequency = C.wavelength2omega(oscillation_frequency)
+            elif oscillation_units == 1:
+                oscillation_frequency = C.energy2omega(oscillation_frequency)
+            elif oscillation_units == 2:
+                oscillation_frequency = 2*np.pi*(oscillation_frequency)
+            elif oscillation_units == 3:                
+                oscillation_frequency = oscillation_frequency
+
+            data = self.plotPreview_panel.outputPhaseViewerWidget.getImageData()
+            data = data[np.argmin(np.abs(frequency_axis - oscillation_frequency)),:]
+
+            if self.unwrapPhase_checkBox.isChecked():
+                data = np.unwrap(data)
+            plt.plot(y_axis,data)
+            plt.show()
+        else:
+            print('No data has been loaded')
+
+    # def plotRabbitPhase(self):
+    #     if self.isDataLoaded:
+    #         frequency_axis,y_axis = self.plotPreview_panel.outputPhaseViewerWidget.getAxis()
+    #         oscillation_frequency = C.str2float(self.oscillationFrequency_lineEdit.text())
+    #         oscillation_units = self.oscillationUnits_comboBox.currentIndex()
+    #         if oscillation_units == 0:
+    #             oscillation_frequency = C.wavelength2omega(oscillation_frequency)
+    #         elif oscillation_units == 1:
+    #             oscillation_frequency = C.energy2omega(oscillation_frequency)
+    #         elif oscillation_units == 2:
+    #             oscillation_frequency = 2*np.pi*(oscillation_frequency)
+    #         elif oscillation_units == 3:                
+    #             oscillation_frequency = oscillation_frequency
+
+    #         data = self.plotPreview_panel.outputPhaseViewerWidget.getImageData()
+    #         data = data[np.argmin(np.abs(frequency_axis - oscillation_frequency)),:]
+
+    #         if self.unwrapPhase_checkBox.isChecked():
+    #             data = np.unwrap(data)
+    #         plt.plot(y_axis,data)
+    #         plt.show()
+    #     else:
+    #         print('No data has been loaded')
 
 def main():
     import sys

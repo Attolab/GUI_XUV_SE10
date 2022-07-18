@@ -32,6 +32,7 @@ import pyqtgraph as pg
 from CustomLinearRegionItem import CustomLinearRegionItem
 from viewer2D_widget_ui import Ui_Viewer2DWidget
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
@@ -121,7 +122,7 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         self.connect(tool_btn_menu.addAction("Add ROI (H)"),SIGNAL("triggered()"), self.addROIh_menuFunction) 
         self.connect(tool_btn_menu.addAction("Add ROI (V)"),SIGNAL("triggered()"), self.addROIv_menuFunction) 
         self.makeROI_toolButton.setMenu(tool_btn_menu)
-        self.makeROI_toolButton.setDefaultAction(tool_btn_menu.actions()[0])
+        self.makeROI_toolButton.setDefaultAction(tool_btn_menu.actions()[1])
 
 ##################################### IMAGE VIEW/ITEM ########################################
 
@@ -148,7 +149,15 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
     def getScaling(self,input,total_length):        
         return (input[-1]-input[0])/total_length
 
-    def getTransform(self,data,xaxis,yaxis):
+    def getImageTransformParameters(self):
+        scale_x = self.imageItem.transform().m11() # Image/Axis scaling
+        offset_x = self.imageItem.transform().m31() # Axis offset
+        scale_y = self.imageItem.transform().m22() # Image/Axis scaling
+        offset_y = self.imageItem.transform().m32() # Axis offset      
+        n_x,n_y = self.getImageData().shape # Length of non integrated axis
+        return [(n_x,scale_x,offset_x),(n_y,scale_y,offset_y)]
+
+    def makeTransform(self,data,xaxis,yaxis):
         Q = QTransform()
         Q.translate(xaxis[0],yaxis[0])
         Q.scale(self.getScaling(xaxis,data.shape[0]),self.getScaling(yaxis,data.shape[1]))
@@ -156,7 +165,7 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
 
     def updateImage(self,item,data,xaxis,yaxis):
         item.setImage(data,autoRange=False)
-        item.setTransform(self.getTransform(data,xaxis,yaxis))
+        item.setTransform(self.makeTransform(data,xaxis,yaxis))
 
     def updateView(self,view,xaxis,yaxis):
         offset_x = (xaxis[-1]-xaxis[0])/10
@@ -183,35 +192,27 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
     def addROIv_menuFunction(self):        
         self.addROI_linearRegionItem(self.view_2D.viewRange()[0],'vertical')
 
-    def makeInitialShape(self,size):      
-        lengths = size*np.array([2,3])/5
-        return lengths
 
-
-    # def addROI(self):
-    #     edges = self.makeInitialShape(np.diff(self.view_2D.viewRange()))
-    #     pos = edges[0][0],edges[1][0]
-    #     size = np.diff(edges)
-    #     roi = pg.ROI(pos,size)
-    #     roi.setZValue(10)
-    #     self.ROI.append(roi)
-    #     self.addEntry(QListWidgetItem(f'{self.listROI_listWidget.count()}'))
 
     def addROI_linearRegionItem(self,edges,orientation):
+
         # Create ROI item
-        lr = CustomLinearRegionItem(self.makeInitialShape(np.diff(edges)),orientation=orientation,clipItem=self.imageItem)        
+        lr = CustomLinearRegionItem(self.makeInitialShape(edges),orientation=orientation,clipItem=self.imageItem)        
         # lr = pg.LinearRegionItem(self.makeInitialShape(np.diff(edges)),orientation=orientation,clipItem=self.imageItem)        
         lr.leftDoubleClicked.connect(self.gotLeftDoubleClicked)
         lr.singleMiddleClicked.connect(self.gotMiddleSingleClicked)
         lr.setZValue(10)
         # Type of syntax to accept clicking on it
-
         # Store ROI item
         self.ROI.append(lr)
         # Show ROI item in viewer
         self.plot_2D.addItem(self.ROI[-1])   
         # Store ROI item in table
         self.addEntry_tableWidget(orientation=orientation)
+
+    def makeInitialShape(self,edges):      
+        lengths = edges[0] + np.diff(edges)*np.array([2,3])/5
+        return lengths
 
     def gotMiddleSingleClicked(self,ROI_doubleclicked):
         print('I got destroyed')
@@ -286,9 +287,10 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         # show_button.setCheckable(True)
         # show_button.setChecked(True)
         # connect(show_button, SIGNAL("triggered()"), this, SLOT(slot_SomethingChecked()));
-        # show_button = QAction("Show Sum", self.roiOperationMenu) 
-        self.connect(self.roiOperationMenu.addAction("Sum ROI("),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_tableOperationSum(who)) 
-
+        # show_button = QAction("Show Sum", self.roiOperationMenu) Qmenu_tableOperationFindCOM
+        self.connect(self.roiOperationMenu.addAction("COM ROI"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_tableOperationFindCOM(who)) 
+        self.connect(self.roiOperationMenu.addAction("Sum ROI"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_tableOperationSum(who)) 
+        self.connect(self.roiOperationMenu.addAction("Find Max"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_tableOperationFindMax(who)) 
         self.connect(self.roiMenu.addAction("Remove Item(s)"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_tableRemoveItemClicked(who)) 
         self.connect(self.roiMenu.addAction("Clear all"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_tableClearClicked(who)) 
         
@@ -347,23 +349,87 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
     #     # Remove all items    
     #     [self.removeEntry_list(sender.item(row),sender) for row in np.flip(np.arange(sender.count()))]    
 
-    ################################################## Context menu functions ##########################################   
+
+
+    ################################################## Context menu functions ##########################################  
+
+
+    def axisToIndex(self,axis,scale,offset):
+        return int((axis-offset)/scale)
+    def indexToAxis(self,index,scale,offset):        
+        return (index*scale+offset)
+
+    def getImageRegion(self,edges,orientation,parameters):
+        axis_plot = self.makeAxis(parameters)       
+        if orientation == 'H':
+            l_b,h_b = [self.axisToIndex(edge,parameters[1][1],parameters[1][2]) for edge in edges]
+            ROI_zone = self.getImageData()[:,l_b:h_b]
+            axis_plot[1] = axis_plot[1][np.logical_and(axis_plot[1] >= edges[0],axis_plot[1] <= edges[1])]
+        elif orientation == 'V':
+            l_b,h_b = [self.axisToIndex(edge,parameters[0][1],parameters[0][2]) for edge in edges]
+            ROI_zone = self.getImageData()[l_b:h_b,:]
+            axis_plot[0] = axis_plot[0][np.logical_and(axis_plot[0] >= edges[0],axis_plot[0] <= edges[1])]
+        return ROI_zone,axis_plot
+    
+    def getAxis(self):
+        return self.makeAxis(self.getImageTransformParameters())
+
+    def makeAxis(self,parameters):
+        axis = []
+        for parameter in parameters:
+            n,scale,offset = parameter
+            axis.append(np.arange(n)*scale+offset)
+        return axis
+
+    def getOrientationIndex(self,orientation):
+        if orientation == 'H':
+            return 0
+        elif orientation == 'V':
+            return 1
+
+    def Qmenu_tableOperationFindCOM(self,sender) :
+        image_parameters = self.getImageTransformParameters()
+        for row in self.get_selectedRows(self.tableROI_tableWidget):
+            orientation = self.tableROI_tableWidget.item(row,1).text()
+            image_ROI,axis_plot = self.getImageRegion(self.ROI[row].getRegion(),orientation,image_parameters)
+            if orientation == 'H':
+                xAxis_plot = axis_plot[0]
+                max_ROI = axis_plot[1][np.argmax(image_ROI,axis=1)]
+            elif orientation == 'V':     
+                xAxis_plot = axis_plot[1]       
+                max_ROI = axis_plot[0][np.argmax(image_ROI,axis=0)]
+            plt.plot(xAxis_plot,max_ROI,label=self.tableROI_tableWidget.item(row,0).text)
+        plt.show()    
+
+    def Qmenu_tableOperationFindMax(self,sender) :
+        image_parameters = self.getImageTransformParameters()        
+        for row in self.get_selectedRows(self.tableROI_tableWidget):
+            orientation = self.tableROI_tableWidget.item(row,1).text()
+            image_ROI,axis_plot = self.getImageRegion(self.ROI[row].getRegion(),orientation,image_parameters)
+            if orientation == 'H':
+                xAxis_plot = axis_plot[0]
+                max_ROI = axis_plot[1][np.argmax(image_ROI,axis=1)]
+            elif orientation == 'V':     
+                xAxis_plot = axis_plot[1]       
+                max_ROI = axis_plot[0][np.argmax(image_ROI,axis=0)]
+            plt.plot(xAxis_plot,max_ROI,label=self.tableROI_tableWidget.item(row,0).text)
+        plt.show()    
+            
     def Qmenu_tableOperationSum(self,sender) :
-        import matplotlib.pyplot as plt
-        row_sel = self.get_selectedRows(self.tableROI_tableWidget)
-        for row in row_sel:
-            lr,hr = self.ROI[row].getRegion()
-            if self.tableROI_tableWidget.item(row,1).text() == 'H':
-                ROI_zone = np.sum(self.getImageData()[:,int(lr):int(hr)],axis = 1)
-            elif self.tableROI_tableWidget.item(row,1).text() == 'V':
-                ROI_zone = np.sum(self.getImageData()[int(lr):int(hr),:],axis = 0)                
-            plt.plot(ROI_zone,label=self.tableROI_tableWidget.item(row,0).text)
+        image_parameters = self.getImageTransformParameters()
+        for row in self.get_selectedRows(self.tableROI_tableWidget):
+            orientation = self.tableROI_tableWidget.item(row,1).text()
+            image_ROI,axis_plot = self.getImageRegion(self.ROI[row].getRegion(),orientation,image_parameters)
+            if orientation == 'H':
+                xAxis_plot = axis_plot[0]                
+                sum_ROI = np.sum(image_ROI,axis=1)
+            elif orientation == 'V':    
+                xAxis_plot = axis_plot[1]        
+                sum_ROI = np.sum(image_ROI,axis=0)
+            plt.plot(xAxis_plot,sum_ROI,label=self.tableROI_tableWidget.item(row,0).text)
         plt.show()
-        # I = self.getImageData()
-        # range_bottom = self.plot_2D.getAxis('bottom').range
-        # self.plot_2D.getAxis('left').range
-        # Npoints = self.getImageShape()
-        # np.linspace()
+
+
     def Qmenu_tableRemoveItemClicked(self,sender):
         self.removeSelectedItems_table(sender)
 
