@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import csv
+from scipy.stats import norm
 
 specter = np.zeros(10001)
 tof = [2.000000026702864e-10*i for i in range(10001)]
@@ -43,6 +44,18 @@ with open("Ne-CH3i_20.csv") as file_name:
 
 
 plt.plot(x,y)
+
+
+peak = 31.5
+sigma = 0.2
+y_fit = np.zeros(len(y))
+
+for i in range(4):
+    for j in range(len(y_fit)):
+        y_fit[j] += 0.15*norm.pdf(x[j], loc = peak+3.4*i, scale = sigma)
+        y_fit[j] += 0.2*norm.pdf(x[j], loc = peak+1.8+3.4*i, scale = sigma)
+
+plt.plot(x,y_fit)
 
 plt.xlabel("Energie (eV)")
 plt.ylabel("Signal (mV)")
