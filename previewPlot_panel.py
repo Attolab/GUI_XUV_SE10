@@ -13,7 +13,6 @@ import pyqtgraph as pg
 from usefulclass import FourierTransform
 from usefulclass import Filter
 import pyqtgraph.graphicsItems.NonUniformImage as NonUniformImage
-from viewer_widget import ViewerWidget
 from viewer2D_widget import Viewer2DWidget
 from scipy.interpolate import interp1d
 import numpy as np
