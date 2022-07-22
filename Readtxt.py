@@ -35,28 +35,33 @@ tof = [2.000000026702864e-10*i for i in range(10001)]
 # a = np.asarray([ [1,2,3], [4,5,6], [7,8,9] ])
 # np.savetxt("foo.csv", a, delimiter=",")
 
-with open("Ne-CH3i_20.csv") as file_name:
+with open("Ne-CH3i_20_10.csv") as file_name:
     file_read = csv.reader(file_name)
     array = list(file_read)
     array = array[1:]
     x = [float(array[i][0]) for i in range(len(array))]
     y = [float(array[i][1]) for i in range(len(array))]
 
+plt.figure ()
 
 plt.plot(x,y)
 
 
-peak = 31.5
-sigma = 0.2
+peak = 55*1.55-58.4
+sigma = 0.3
 y_fit = np.zeros(len(y))
 
-for i in range(4):
-    for j in range(len(y_fit)):
-        y_fit[j] += 0.15*norm.pdf(x[j], loc = peak+3.4*i, scale = sigma)
-        y_fit[j] += 0.2*norm.pdf(x[j], loc = peak+1.8+3.4*i, scale = sigma)
-
+for j in range(len(y_fit)):
+    for i in range(5):
+        y_fit[j] += 0.2*norm.pdf(x[j], loc = peak+3.1*i, scale = sigma)
+        y_fit[j] += 0.4*norm.pdf(x[j], loc = peak+1.8+3.1*i, scale = sigma)
+    
 plt.plot(x,y_fit)
 
 plt.xlabel("Energie (eV)")
 plt.ylabel("Signal (mV)")
+
+plt.xlim(20, 50)
+plt.ylim(0,2)
+
 plt.show()

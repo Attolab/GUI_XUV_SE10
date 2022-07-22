@@ -118,7 +118,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.connect(tool_btn_menu.addAction("Load FT magnitude"),SIGNAL("triggered()"), self.importModuleFT_menuFunction) 
         self.connect(tool_btn_menu.addAction("Load custom signal"),SIGNAL("triggered()"), self.importCustomSignal_menuFunction)  
         self.loadSignal_toolButton.setMenu(tool_btn_menu)
-        self.loadSignal_toolButton.setDefaultAction(tool_btn_menu.actions()[1])
+        self.loadSignal_toolButton.setDefaultAction(tool_btn_menu.actions()[0])
 
         tool_btn_menu= QMenu(self)
         #Different calibration choices
