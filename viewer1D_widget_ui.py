@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QFram
     QToolButton, QVBoxLayout, QWidget)
 
 from CustomTableWidget import (PlotTableWidget, ROITableWidget)
+from ParameterTree import CustomParameterTree
 from pyqtgraph import GraphicsLayoutWidget
 
 class Ui_Viewer1DWidget(object):
@@ -55,11 +56,8 @@ class Ui_Viewer1DWidget(object):
         self.splitter.addWidget(self.viewer_GraphicsLayoutWidget)
         self.toolBox = QToolBox(self.splitter)
         self.toolBox.setObjectName(u"toolBox")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.toolBox.sizePolicy().hasHeightForWidth())
-        self.toolBox.setSizePolicy(sizePolicy3)
+        sizePolicy.setHeightForWidth(self.toolBox.sizePolicy().hasHeightForWidth())
+        self.toolBox.setSizePolicy(sizePolicy)
         self.toolBox.setMinimumSize(QSize(50, 0))
         self.toolBox.setFrameShape(QFrame.Panel)
         self.toolBox.setFrameShadow(QFrame.Plain)
@@ -67,6 +65,9 @@ class Ui_Viewer1DWidget(object):
         self.page = QWidget()
         self.page.setObjectName(u"page")
         self.page.setGeometry(QRect(0, 0, 274, 361))
+        sizePolicy3 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.page.sizePolicy().hasHeightForWidth())
         self.page.setSizePolicy(sizePolicy3)
         self.page.setMinimumSize(QSize(40, 0))
@@ -95,6 +96,11 @@ class Ui_Viewer1DWidget(object):
 
         self.verticalLayout.addWidget(self.tablePlot_tableWidget)
 
+        self.plot_ParameterTree = CustomParameterTree(self.page)
+        self.plot_ParameterTree.setObjectName(u"plot_ParameterTree")
+
+        self.verticalLayout.addWidget(self.plot_ParameterTree)
+
         self.addPlot_pushButton = QPushButton(self.page)
         self.addPlot_pushButton.setObjectName(u"addPlot_pushButton")
         sizePolicy5 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
@@ -108,7 +114,7 @@ class Ui_Viewer1DWidget(object):
         self.toolBox.addItem(self.page, u"Display")
         self.page_2 = QWidget()
         self.page_2.setObjectName(u"page_2")
-        self.page_2.setGeometry(QRect(0, 0, 274, 361))
+        self.page_2.setGeometry(QRect(0, 0, 399, 361))
         self.verticalLayout_2 = QVBoxLayout(self.page_2)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.showROI_checkBox = QCheckBox(self.page_2)
@@ -128,13 +134,26 @@ class Ui_Viewer1DWidget(object):
 
         self.verticalLayout_2.addWidget(self.makeROI_toolButton)
 
+        self.makeIL_toolButton = QToolButton(self.page_2)
+        self.makeIL_toolButton.setObjectName(u"makeIL_toolButton")
+        sizePolicy5.setHeightForWidth(self.makeIL_toolButton.sizePolicy().hasHeightForWidth())
+        self.makeIL_toolButton.setSizePolicy(sizePolicy5)
+        self.makeIL_toolButton.setPopupMode(QToolButton.MenuButtonPopup)
+        self.makeIL_toolButton.setToolButtonStyle(Qt.ToolButtonTextOnly)
+        self.makeIL_toolButton.setAutoRaise(False)
+        self.makeIL_toolButton.setArrowType(Qt.NoArrow)
+
+        self.verticalLayout_2.addWidget(self.makeIL_toolButton)
+
         self.tableROI_tableWidget = ROITableWidget(self.page_2)
-        if (self.tableROI_tableWidget.columnCount() < 2):
-            self.tableROI_tableWidget.setColumnCount(2)
+        if (self.tableROI_tableWidget.columnCount() < 3):
+            self.tableROI_tableWidget.setColumnCount(3)
         __qtablewidgetitem3 = QTableWidgetItem()
         self.tableROI_tableWidget.setHorizontalHeaderItem(0, __qtablewidgetitem3)
         __qtablewidgetitem4 = QTableWidgetItem()
         self.tableROI_tableWidget.setHorizontalHeaderItem(1, __qtablewidgetitem4)
+        __qtablewidgetitem5 = QTableWidgetItem()
+        self.tableROI_tableWidget.setHorizontalHeaderItem(2, __qtablewidgetitem5)
         self.tableROI_tableWidget.setObjectName(u"tableROI_tableWidget")
         sizePolicy4.setHeightForWidth(self.tableROI_tableWidget.sizePolicy().hasHeightForWidth())
         self.tableROI_tableWidget.setSizePolicy(sizePolicy4)
@@ -171,10 +190,13 @@ class Ui_Viewer1DWidget(object):
         self.toolBox.setItemText(self.toolBox.indexOf(self.page), QCoreApplication.translate("Viewer1DWidget", u"Display", None))
         self.showROI_checkBox.setText(QCoreApplication.translate("Viewer1DWidget", u"ROI", None))
         self.makeROI_toolButton.setText(QCoreApplication.translate("Viewer1DWidget", u"Add ROI", None))
+        self.makeIL_toolButton.setText(QCoreApplication.translate("Viewer1DWidget", u"Add ROI", None))
         ___qtablewidgetitem3 = self.tableROI_tableWidget.horizontalHeaderItem(0)
         ___qtablewidgetitem3.setText(QCoreApplication.translate("Viewer1DWidget", u"Name", None));
         ___qtablewidgetitem4 = self.tableROI_tableWidget.horizontalHeaderItem(1)
-        ___qtablewidgetitem4.setText(QCoreApplication.translate("Viewer1DWidget", u"Type", None));
+        ___qtablewidgetitem4.setText(QCoreApplication.translate("Viewer1DWidget", u"Orientation", None));
+        ___qtablewidgetitem5 = self.tableROI_tableWidget.horizontalHeaderItem(2)
+        ___qtablewidgetitem5.setText(QCoreApplication.translate("Viewer1DWidget", u"Type", None));
         self.toolBox.setItemText(self.toolBox.indexOf(self.page_2), QCoreApplication.translate("Viewer1DWidget", u"ROI", None))
     # retranslateUi
 

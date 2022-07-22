@@ -1,6 +1,3 @@
-from encodings import normalize_encoding
-from pyqtgraph import TableWidget
-
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,SIGNAL,
     QSize, QTime, QUrl, Qt,Signal)
@@ -12,15 +9,29 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QPushButton, QSizePolicy
     QVBoxLayout, QWidget,QTableWidgetItem,QFileDialog,QDockWidget,QMainWindow,QHeaderView)
 import numpy as np
 
-import pyqtgraph as pg
-from CustomQMenu import *
+from pyqtgraph.parametertree import ParameterItem
+from pyqtgraph.parametertree import Parameter
+
+class CustomParameter(ParameterItem):
+
+    def makeTreeItem(self, depth):
+        """
+        Return a TreeWidgetItem suitable for displaying/controlling the content of 
+        this parameter. This is called automatically when a ParameterTree attempts
+        to display this Parameter.
+        Most subclasses will want to override this function.
+        """
+        # Default to user-specified itemClass. If not present, check for a registered item class. Finally,
+        # revert to ParameterItem if both fail
+        itemClass = self.itemClass or _PARAM_ITEM_TYPES.get(self.opts['type'], CustomParameterItem)
+        return itemClass(self, depth)
 
 
-class CustomTableWidget(QTableWidget):
+class CustomParameterItem(ParameterItem):
     removeItem_signal = Signal(int)
     itemSelected_signal = Signal(int,str)
     def __init__(self,parent=None):
-        super(CustomTableWidget, self).__init__(parent)
+        super(CustomParameterTreeItem, self).__init__(parent)
         self.connectSignals()
         # self.check_columnwidth()
     def connectSignals(self):

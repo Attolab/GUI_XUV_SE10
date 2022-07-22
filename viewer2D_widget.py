@@ -29,7 +29,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,QAction,
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QPushButton,QListWidgetItem,QTableWidgetItem,
     QSizePolicy, QWidget, QFileDialog,QMenu)
 import pyqtgraph as pg
-from CustomLinearRegionItem import CustomLinearRegionItem
+from CustomROI import CustomLinearRegionItem
 from viewer2D_widget_ui import Ui_Viewer2DWidget
 import numpy as np
 import matplotlib.pyplot as plt
