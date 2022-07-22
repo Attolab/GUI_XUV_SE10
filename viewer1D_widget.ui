@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Viewer2DWidget</class>
- <widget class="QWidget" name="Viewer2DWidget">
+ <class>Viewer1DWidget</class>
+ <widget class="QWidget" name="Viewer1DWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>762</width>
+    <width>795</width>
     <height>443</height>
    </rect>
   </property>
@@ -22,8 +22,20 @@
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <widget class="QSplitter" name="splitter">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="childrenCollapsible">
+      <bool>true</bool>
      </property>
      <widget class="GraphicsLayoutWidget" name="viewer_GraphicsLayoutWidget">
       <property name="sizePolicy">
@@ -42,7 +54,7 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>20</width>
+        <width>50</width>
         <height>0</height>
        </size>
       </property>
@@ -56,7 +68,7 @@
        <number>1</number>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="tabSpacing">
        <number>6</number>
@@ -66,8 +78,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>76</width>
-         <height>99</height>
+         <width>274</width>
+         <height>361</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -76,43 +88,69 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>0</height>
+        </size>
+       </property>
        <attribute name="label">
         <string>Display</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetMinimumSize</enum>
+        </property>
         <item>
-         <widget class="QCheckBox" name="show2D_checkBox">
-          <property name="text">
-           <string>Data</string>
+         <widget class="PlotTableWidget" name="tablePlot_tableWidget">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
-          <property name="checked">
-           <bool>true</bool>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
           </property>
-          <property name="tristate">
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <attribute name="horizontalHeaderHighlightSections">
            <bool>false</bool>
-          </property>
+          </attribute>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>false</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Name</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Color</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Show</string>
+           </property>
+          </column>
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="showHist_checkBox">
+         <widget class="QPushButton" name="addPlot_pushButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
-           <string>Hist</string>
-          </property>
-          <property name="checked">
-           <bool>false</bool>
-          </property>
-          <property name="tristate">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="showROI_checkBox">
-          <property name="text">
-           <string>ROI</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
+           <string>AddPlot</string>
           </property>
          </widget>
         </item>
@@ -131,6 +169,16 @@
         <string>ROI</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QCheckBox" name="showROI_checkBox">
+          <property name="text">
+           <string>ROI</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
         <item>
          <widget class="QToolButton" name="makeROI_toolButton">
           <property name="sizePolicy">
@@ -203,6 +251,11 @@
   </customwidget>
   <customwidget>
    <class>ROITableWidget</class>
+   <extends>QTableWidget</extends>
+   <header>CustomTableWidget</header>
+  </customwidget>
+  <customwidget>
+   <class>PlotTableWidget</class>
    <extends>QTableWidget</extends>
    <header>CustomTableWidget</header>
   </customwidget>

@@ -17,9 +17,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QFrame,
     QHBoxLayout, QHeaderView, QSizePolicy, QSplitter,
-    QTableWidget, QTableWidgetItem, QToolBox, QToolButton,
-    QVBoxLayout, QWidget)
+    QTableWidgetItem, QToolBox, QToolButton, QVBoxLayout,
+    QWidget)
 
+from CustomTableWidget import ROITableWidget
 from pyqtgraph import GraphicsLayoutWidget
 
 class Ui_Viewer2DWidget(object):
@@ -58,7 +59,7 @@ class Ui_Viewer2DWidget(object):
         self.toolBox.setLineWidth(1)
         self.page = QWidget()
         self.page.setObjectName(u"page")
-        self.page.setGeometry(QRect(0, 0, 76, 361))
+        self.page.setGeometry(QRect(0, 0, 76, 99))
         sizePolicy2.setHeightForWidth(self.page.sizePolicy().hasHeightForWidth())
         self.page.setSizePolicy(sizePolicy2)
         self.verticalLayout = QVBoxLayout(self.page)
@@ -86,7 +87,7 @@ class Ui_Viewer2DWidget(object):
         self.toolBox.addItem(self.page, u"Display")
         self.page_2 = QWidget()
         self.page_2.setObjectName(u"page_2")
-        self.page_2.setGeometry(QRect(0, 0, 274, 347))
+        self.page_2.setGeometry(QRect(0, 0, 274, 361))
         self.verticalLayout_2 = QVBoxLayout(self.page_2)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.makeROI_toolButton = QToolButton(self.page_2)
@@ -103,7 +104,7 @@ class Ui_Viewer2DWidget(object):
 
         self.verticalLayout_2.addWidget(self.makeROI_toolButton)
 
-        self.tableROI_tableWidget = QTableWidget(self.page_2)
+        self.tableROI_tableWidget = ROITableWidget(self.page_2)
         if (self.tableROI_tableWidget.columnCount() < 2):
             self.tableROI_tableWidget.setColumnCount(2)
         __qtablewidgetitem = QTableWidgetItem()
@@ -130,7 +131,7 @@ class Ui_Viewer2DWidget(object):
 
         self.retranslateUi(Viewer2DWidget)
 
-        self.toolBox.setCurrentIndex(0)
+        self.toolBox.setCurrentIndex(1)
         self.toolBox.layout().setSpacing(6)
 
 

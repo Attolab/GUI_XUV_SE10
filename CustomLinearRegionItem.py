@@ -1,5 +1,6 @@
 from pyqtgraph import LinearRegionItem
 from PySide6.QtCore import Signal,Qt
+from PySide6.QtGui import QColor,QBrush
 
 class CustomLinearRegionItem(LinearRegionItem):
     leftDoubleClicked = Signal(object)
@@ -25,3 +26,17 @@ class CustomLinearRegionItem(LinearRegionItem):
         if ev.button() == Qt.MouseButton.MiddleButton:
             ev.accept()
             self.singleMiddleClicked.emit(self)
+
+    def changeROIColor(self,status):
+        if status == 'unselected':   
+            color_base = QColor(0, 0, 255, 50)
+            color_hover = QColor(0, 0, 255, 100)
+        elif status == 'selected':
+            color_base = QColor(0, 255, 0, 50)     
+            color_hover = QColor(0, 255, 0, 100)
+        brush = QBrush(color_base)
+        hoverBrush = QBrush(color_hover)
+        self.setBrush(brush)
+        self.setHoverBrush(hoverBrush)
+        self.setMouseHover(True)
+        self.setMouseHover(False)
