@@ -159,7 +159,11 @@ class MainPanel(Ui_main_panel,QWidget):
 
     def loadData(self,filename):
         signal, delay, t_vol = FM(filename).Read_h5()     
+
         signal = signal[self.getDataType()] 
+        if len(delay) < 2:
+            delay = np.append(delay,-delay)
+            signal = np.append(signal,signal,axis = 1)
         self.isDataLoaded = True  
         if self.time_radioButton.isChecked():
             self.plotPreview_panel.setData(axis_0=delay,axis_1=t_vol, data=signal)    
