@@ -298,7 +298,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.x_fit = self.x_fit[mask]
         self.y_fit = self.y_fit[mask]
         #Plotting with certain limits
-        self.plotCalib_plot.setData(x=self.x,y=self.y)
+        self.plotCalib_plot.setData(x=self.x_fit,y=self.y_fit)
     
     def updateCalibrationPotential(self,l):
     
