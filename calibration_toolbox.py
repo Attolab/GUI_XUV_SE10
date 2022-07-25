@@ -290,8 +290,6 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         alpha,beta,t0,r_squared = self.getCalibration()                
         self.x_fit = af.ToF2eV(self.x,alpha,beta,t0)
         jac = af.ToF2eV_Jac(self.x,alpha,t0)
-        self.x2,self.y2 = af.goFromTimeToEnergy(self.x,self.y,alpha,beta,t0)
-
         #Truncation of the plot (jacobian and limitation to low energies)
         mask = jac >=0
         self.x_fit = self.x_fit[mask]
@@ -299,9 +297,8 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         mask = self.x_fit < 150
         self.x_fit = self.x_fit[mask]
         self.y_fit = self.y_fit[mask]
-
         #Plotting with certain limits
-        self.plotCalib_plot.setData(x=self.x_fit,y=self.y_fit)
+        self.plotCalib_plot.setData(x=self.x,y=self.y)
     
     def updateCalibrationPotential(self,l):
     
@@ -403,7 +400,8 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
 
 ##################################### Table Widget specific methods #############################################################
 
-    def updateListPeaksTable(self,item):        
+    def updateListPeaksTable(self,item):  
+        item.setText(item.text().replace(',', '.'))
         if isinstance(item,int):
             # If a row is given, extract column value
             item = self.listPeaks_tableWidget.item(self.listPeaks_tableWidget.currentRow(),1)

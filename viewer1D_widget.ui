@@ -47,7 +47,7 @@
      </widget>
      <widget class="QToolBox" name="toolBox">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -142,6 +142,9 @@
          </widget>
         </item>
         <item>
+         <widget class="CustomParameterTree" name="plot_ParameterTree" native="true"/>
+        </item>
+        <item>
          <widget class="QPushButton" name="addPlot_pushButton">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -161,7 +164,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>274</width>
+         <width>399</width>
          <height>361</height>
         </rect>
        </property>
@@ -181,6 +184,31 @@
         </item>
         <item>
          <widget class="QToolButton" name="makeROI_toolButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Add ROI</string>
+          </property>
+          <property name="popupMode">
+           <enum>QToolButton::MenuButtonPopup</enum>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextOnly</enum>
+          </property>
+          <property name="autoRaise">
+           <bool>false</bool>
+          </property>
+          <property name="arrowType">
+           <enum>Qt::NoArrow</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="makeIL_toolButton">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -231,6 +259,11 @@
           </column>
           <column>
            <property name="text">
+            <string>Orientation</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
             <string>Type</string>
            </property>
           </column>
@@ -258,6 +291,12 @@
    <class>PlotTableWidget</class>
    <extends>QTableWidget</extends>
    <header>CustomTableWidget</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomParameterTree</class>
+   <extends>QWidget</extends>
+   <header>ParameterTree</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
