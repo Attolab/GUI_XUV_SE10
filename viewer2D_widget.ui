@@ -56,7 +56,7 @@
        <number>1</number>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="tabSpacing">
        <number>6</number>
@@ -67,7 +67,7 @@
          <x>0</x>
          <y>0</y>
          <width>76</width>
-         <height>99</height>
+         <height>361</height>
         </rect>
        </property>
        <property name="sizePolicy">

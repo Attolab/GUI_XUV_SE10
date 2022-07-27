@@ -19,6 +19,7 @@
 # along with pymepixviewer.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
+from re import I
 from turtle import Pen
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,SIGNAL,Signal,QItemSelectionModel,
@@ -35,7 +36,7 @@ from viewer1D_widget_ui import Ui_Viewer1DWidget
 import numpy as np
 import matplotlib.pyplot as plt
 # app = pg.mkQApp("Parameter Tree Example")
-from ParameterTree import PlotGroupParameters
+from ParameterTree import PlotGroupParameter,Viewer1DGroupParameter
 
 class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
     signal_importCurrentData = Signal()
@@ -52,20 +53,45 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
         self.setupTreeParameterWidget()
         self.proxy = pg.SignalProxy(self.view_1D.scene().sigMouseMoved, rateLimit=60, slot=self.mouseMoved)     
         self.connectSignals()
-        self.setupToolButton()
-        self.updateGUI()    
         self.addPlot_pushButton.clicked.connect(self.addPlot)
-
     def setupTreeParameterWidget(self):
-        self.plotGroupParameter = PlotGroupParameters(name="plot_list",title="Plot List", tip='Click to add plot', children=[],context= [
-        'menu1',
-        'menu2'])
-        self.plotGroupParameter.sigContextMenu.connect(self.test)
+        contextMenu = {'Expand/Collapse':
+                        [
+                            {'Expand':[]},
+                            {'Collapse':[]}
+                        ],
+                        'Clear':[],
+                        'New':
+                        [
+                            {'File':
+                            [
+                                {'.txt':[]},
+                                {'.py':[]},
+                                {'.something':[]}
+                            ] }
+                        ]
+                        }        
+                        
+        contextMenu = {'Expand/Collapse':[{'Expand':[]},{'Collapse':[]}],
+                        'Clear': [],
+                        'New':[{'File':[{'.txt':[]},{'.py':[]},{'.something':[]}] }]}        
+        contextActions = ['Expand All','Collapse All']
+        self.plotGroupParameter = PlotGroupParameter(name="plot_list",title="Plot List", tip='',
+                     children=[],context=contextActions,menu= contextMenu)
+        # self.plotGroupParameter.sigContextMenu.connect(self.plotGroupParameter.contextMenuEvent)
         self.plot_ParameterTree.setParameters(self.plotGroupParameter)
         self.plot_ParameterTree.itemSelected_signal.connect(self.updatePlotSelection)
         self.plot_ParameterTree.plot_list = self.plot_list
-        # p.trigger.connect(print(0))
-    def test(self):
+
+        self.viewerGroupParameter = Viewer1DGroupParameter(name="viewer_options",title="Viewer settings", tip='',
+                     children=[],context=contextActions,menu= contextMenu,expanded = False)
+
+        self.settings_ParameterTree.setParameters(self.viewerGroupParameter)
+
+
+    def test(self,group_parameter,contextMenu):
+        if (contextMenu =='Expand All') | (contextMenu =='Collapse All'):
+            self.plotGroupParameter.activate(contextMenu)
         print(self.plot_ParameterTree.selectedItems())
 
 
@@ -91,37 +117,31 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
         plot_dataItem.setCurveClickable(True,width = 3)
         plot_dataItem.sigClicked.connect(self.plotDataGotClicked)
         self.plot.addItem(plot_dataItem)
-        self.plot_list.append(plot_dataItem)
-        self.tablePlot_tableWidget.addEntry(name = name,color=color_plot)
-        self.plotGroupParameter.addNew(plot_dataItem.opts['pen'])
-        self.plotGroupParameter.sigChildRemoved.connect(self.newParameterEntry)
-        self.plotGroupParameter.childs[len(self.plot_list)-1].sigTreeStateChanged.connect(self.updatePlotDataItem)
-        self.plotGroupParameter.childs[len(self.plot_list)-1].sigRemoved.connect(self.removePlotTree)
 
-        # self.plotGroupParameter.childs[len(self.plot_list)-1].valueChanging_signal.connect(self.updatePlotDataItem)sigRemoved
-        # self.plotGroupParameter.sigChildRemoved.connect(self.removePlotTree)
+        index = len(self.plot_list)
+        self.plotGroupParameter.addNew(parameters=plot_dataItem.opts['pen'],name = name)        
+        self.plotGroupParameter.removedItem_signal.connect(self.removePlotTree)
+        self.plotGroupParameter.valueChanging_signal.connect(self.updatePlotDataItem)
+        self.plot_list.append([plot_dataItem,self.plotGroupParameter.childs[index]])
+
     def updatePlotDataItem(self,plotParameter,item):
-        name = item[0][0].name()
-        index = [i for i in range(len(self.plot_list)) if self.plotGroupParameter.childs[i] == plotParameter][0]
-        status = item[0][2]
-        if name == 'show_plot':
-            self.showPlot(status,index)
-        elif name == 'pen_param':
-            self.setPenPlot(status,index)
+        name = plotParameter.name()
+        for index in range(len(self.plot_list)):
+            if self.plotGroupParameter.childs[index] == plotParameter.parent():
+                if name == 'show_plot':
+                    self.showPlot(item,index)
+                elif name == 'pen_param':
+                    self.setPenPlot(item,index)
 
-    def updatePen(self,value):    
-        print('Changing pen')
-    def newParameterEntry(self):
-        print('New plot')
-    def newParameterEntry(self):
-        print('New plot')
     def plotDataGotClicked(self,ev): 
-        self.tablePlot_tableWidget.setCurrentCell([i for i in range(len(self.plot_list)) if self.plot_list[i] == ev][0],0)
+        print('Got clicked')
+        # self.tablePlot_tableWidget.setCurrentCell([i for i in range(len(self.plot_list)) if self.plot_list[i] == ev][0],0)
 
     def setupPlotWidget(self,layout,title = '', row = None, col = None):
         plot = layout.addPlot(title=title,labels={'bottom': ('x axis title'), 'left': ('y axis title')}
                                 ,row = row, col = col,enableMenu = True)
         plot.ctrlMenu = None
+        plot.showGrid(x = True, y = True, alpha = 0.3)                                                
         # self.legend = pg.LegendItem()
         # self.legend.setParentItem(plot)
         view = plot.getViewBox()
@@ -131,48 +151,30 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
         mousePoint = self.plot.vb.mapSceneToView(evt[0])
         self.label.setText("<span style='font-size: 14pt; color: white'> x = %0.2f, <span style='color: white'> y = %0.2f</span>" % (mousePoint.x(), mousePoint.y()))
 
-
     def connectSignals(self):     
-        self.showROI_checkBox.pressed.connect(self.updateGUI)
-        # Table connection
-        # self.tablePlot_tableWidget.itemSelected_signal.connect(self.updatePlotSelection)
-        # self.tablePlot_tableWidget.QMenu_signal.connect(self.sendQMenuCommand)
-        self.tablePlot_tableWidget.removeItem_signal.connect(self.removePlotTableItem)        
-        # Table connection
-        self.tableROI_tableWidget.itemSelected_signal.connect(self.updateROISelection)
-        self.tableROI_tableWidget.QMenu_signal.connect(self.sendQMenuCommand)
+        self.makeROI_toolButton.toolButtonClicked_signal.connect(self.addROI)
         self.tableROI_tableWidget.removeItem_signal.connect(self.removeROITableItem)
-
-        self.tablePlot_tableWidget.checkBox_signal.connect(self.showPlot)
-        self.tablePlot_tableWidget.colorButton_signal.connect(self.colorPlot)
 
     def selectPlot(self,row):        
         if row in self.plot_ParameterTree.get_selectedRows():
-            shadowpen = self.plot_list[row].pen()
+            shadowpen = self.plot_list[row][0].pen()
             shadowpen.setWidth(shadowpen.width()+1)
-            self.plot_list[row].setShadowPen(shadowpen)
+            self.plot_list[row][0].setShadowPen(shadowpen)
         else:
-            self.plot_list[row].setShadowPen(None)
+            self.plot_list[row][0].setShadowPen(None)
 
     def setPenPlot(self,pen,row):
-        self.plot_list[row].setPen(pen)
+        self.plot_list[row][0].setPen(pen)
         if row in self.plot_ParameterTree.get_selectedRows():
             shadowpen = pg.mkPen(pen)
             shadowpen.setWidth(shadowpen.width()+1)
-            self.plot_list[row].setShadowPen(shadowpen)
-        # if row in self.tablePlot_tableWidget.get_selectedRows():
-            # self.plot_list[row].setShadowPen(shadowpen)
-
-    def colorPlot(self,color,row):
-        self.plot_list[row].setPen(color)
-        if row in self.tablePlot_tableWidget.get_selectedRows():
-            self.plot_list[row].setShadowPen(pg.mkPen(self.tablePlot_tableWidget.getColorButton(row), width=2, cosmetic=True))
+            self.plot_list[row][0].setShadowPen(shadowpen)
 
     def showPlot(self,status,row):
         if status:
-            self.plot_list[row].show()
+            self.plot_list[row][0].show()
         else:
-            self.plot_list[row].hide()
+            self.plot_list[row][0].hide()
 
     def showHideWidget(self,items,show_bool = True):
         if show_bool:        
@@ -180,15 +182,6 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
         else:
             [item.hide() for item in items]
 
-    def updateGUI(self):
-        self.showHideWidget(self.ROI,not(self.showROI_checkBox.isChecked()))
-
-    def setupToolButton(self):        
-        tool_btn_menu= QMenu(self)
-        self.connect(tool_btn_menu.addAction("Add ROI (H)"),SIGNAL("triggered()"), self.addROIh_menuFunction) 
-        self.connect(tool_btn_menu.addAction("Add ROI (V)"),SIGNAL("triggered()"), self.addROIv_menuFunction) 
-        self.makeROI_toolButton.setMenu(tool_btn_menu)
-        self.makeROI_toolButton.setDefaultAction(tool_btn_menu.actions()[1])
 
     def updateView(self,view,xaxis,yaxis):
         offset_x = (xaxis[-1]-xaxis[0])/10
@@ -200,11 +193,21 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
         self.updateView(self.view_1D,x,y)
 
     ################################################## ROI functions ##########################################    
-    def addROIh_menuFunction(self):
-        self.addROI_linearRegionItem(self.view_1D.viewRange()[1],'horizontal')
 
-    def addROIv_menuFunction(self):        
-        self.addROI_linearRegionItem(self.view_1D.viewRange()[0],'vertical')
+    def addROI(self,toolButton,action):
+        if action.data() == 'IL_H':
+            ROI = self.addROI_infiniteLineItem(0,'y')
+        elif action.data() == 'IL_V':  
+            ROI = self.addROI_infiniteLineItem(90,'x')          
+        elif action.data() == 'LR_H':            
+            ROI = self.addROI_linearRegionItem(self.view_1D.viewRange()[1],'horizontal')
+        elif action.data() == 'LR_V':                        
+            ROI = self.addROI_linearRegionItem(self.view_1D.viewRange()[0],'vertical')            
+        self.ROI.append(ROI)
+        # Show ROI item in viewer
+        self.plot.addItem(self.ROI[-1])   
+        # Store ROI item in table
+        self.tableROI_tableWidget.addEntry(orientation=action.data())
 
     def addROI_linearRegionItem(self,edges,orientation):
         # Create ROI item
@@ -212,12 +215,13 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
         lr.leftDoubleClicked.connect(self.gotLeftDoubleClicked)
         lr.singleMiddleClicked.connect(self.gotMiddleSingleClicked)
         lr.setZValue(10)
-        # Store ROI item
-        self.ROI.append(lr)
-        # Show ROI item in viewer
-        self.plot.addItem(self.ROI[-1])   
-        # Store ROI item in table
-        self.tableROI_tableWidget.addEntry(orientation=orientation)
+        return lr
+
+    def addROI_infiniteLineItem(self,angle,label):
+        il = pg.InfiniteLine(movable=True, angle=angle, label=label+'={value:0.2f}', 
+                       labelOpts={'position':0.1, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': True})
+        il.setZValue(10)
+        return il
 
     def makeInitialShape(self,edges):      
         lengths = edges[0] + np.diff(edges)*np.array([2,3])/5
@@ -238,22 +242,22 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
                 return
 
     def removePlot(self,item):
-        self.plot.removeItem(item) 
+        self.plot.removeItem(item[0]) 
         self.plot_list.remove(item)
     def removePlotTree(self,child):
-        self.removePlot(self.plot_list[row])
+        removedItems = [plotItem for plotItem in self.plot_list if child == plotItem[1]]
+        [self.removePlot(item) for item in removedItems]
+        
 
-    def removePlotTableItem(self,row):
-        self.removePlot(self.plot_list[row])
     def updatePlotSelection(self,row,status):    
         if len(self.plot_list) > row:
+            plotDataItem =  self.plot_list[row][0]
             if status == 'unselected':   
-                self.plot_list[row].setShadowPen(None)
+                plotDataItem.setShadowPen(None)
             elif status == 'selected':
-                # self.plot_list[row].setShadowPen(pg.mkPen(self.tablePlot_tableWidget.getColorButton(row), width=2, cosmetic=True))
-                shadowpen = pg.mkPen(self.plot_list[row].opts['pen'])
+                shadowpen = pg.mkPen(plotDataItem.opts['pen'])
                 shadowpen.setWidth(shadowpen.width()+1)
-                self.plot_list[row].setShadowPen(shadowpen)
+                plotDataItem.setShadowPen(shadowpen)
 
     def removeROI(self,item):
         self.plot.removeItem(item) 

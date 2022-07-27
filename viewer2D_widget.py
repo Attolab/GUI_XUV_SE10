@@ -33,6 +33,7 @@ from CustomROI import CustomLinearRegionItem
 from viewer2D_widget_ui import Ui_Viewer2DWidget
 import numpy as np
 import matplotlib.pyplot as plt
+from viewer1D_widget import Viewer1DWidget
 
 
 class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
@@ -245,20 +246,26 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
     def getCOM(self):
         image_parameters = self.getImageTransformParameters()
         for row in self.tableROI_tableWidget.get_selectedRows():
+            name = self.tableROI_tableWidget.item(row,0).text()
             orientation = self.tableROI_tableWidget.item(row,1).text()
             image_ROI,axis_plot = self.getImageRegion(self.ROI[row].getRegion(),orientation,image_parameters)
             if orientation == 'H':
                 xAxis_plot = axis_plot[0]
-                max_ROI = axis_plot[1][np.argmax(image_ROI,axis=1)]
+                max_ROI = axis_plot[1][np.argmax(image_ROI,axis=1)]*axis_plot[0]
+                COM_ROI = np.matmul(image_ROI,axis_plot[1])/np.sum(image_ROI,axis = 1)                
             elif orientation == 'V':     
                 xAxis_plot = axis_plot[1]       
                 max_ROI = axis_plot[0][np.argmax(image_ROI,axis=0)]
-            plt.plot(xAxis_plot,max_ROI,label=self.tableROI_tableWidget.item(row,0).text)
-        plt.show() 
-          
+                COM_ROI = np.matmul(axis_plot[0],image_ROI)/np.sum(image_ROI,axis = 0)                
+                # np.dot(image_ROI.T,axis_plot[0])/np.sum(image_ROI.T,axis = 1)
+        #     plt.plot(xAxis_plot,max_ROI,label=self.tableROI_tableWidget.item(row,0).text)
+        # plt.show() 
+            self.doPlot1D(xAxis_plot,COM_ROI,label=name+'_COM')
+
     def getMax(self) :
         image_parameters = self.getImageTransformParameters()        
         for row in self.tableROI_tableWidget.get_selectedRows():
+            name = self.tableROI_tableWidget.item(row,0).text()
             orientation = self.tableROI_tableWidget.item(row,1).text()
             image_ROI,axis_plot = self.getImageRegion(self.ROI[row].getRegion(),orientation,image_parameters)
             if orientation == 'H':
@@ -267,13 +274,15 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
             elif orientation == 'V':     
                 xAxis_plot = axis_plot[1]       
                 max_ROI = axis_plot[0][np.argmax(image_ROI,axis=0)]
-            plt.plot(xAxis_plot,max_ROI,label=self.tableROI_tableWidget.item(row,0).text)
-        plt.show()    
+        #     plt.plot(xAxis_plot,max_ROI,label=self.tableROI_tableWidget.item(row,0).text)
+        # plt.show()    
+            self.doPlot1D(xAxis_plot,max_ROI,label=name+'_max')
             
     def getSum(self) :
         image_parameters = self.getImageTransformParameters()
         for row in self.tableROI_tableWidget.get_selectedRows():
             orientation = self.tableROI_tableWidget.item(row,1).text()
+            name = self.tableROI_tableWidget.item(row,0).text()
             image_ROI,axis_plot = self.getImageRegion(self.ROI[row].getRegion(),orientation,image_parameters)
             if orientation == 'H':
                 xAxis_plot = axis_plot[0]                
@@ -281,9 +290,14 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
             elif orientation == 'V':    
                 xAxis_plot = axis_plot[1]        
                 sum_ROI = np.sum(image_ROI,axis=0)
-            plt.plot(xAxis_plot,sum_ROI,label=self.tableROI_tableWidget.item(row,0).text)
-        plt.show()
+            # plt.plot(xAxis_plot,sum_ROI,label=self.tableROI_tableWidget.item(row,0).text)
+            self.doPlot1D(xAxis_plot,sum_ROI,label=name+'_sum')
 
+    def doPlot1D(self,x,y,label='Plot'):
+        if not hasattr(self,'V'):
+            self.V = Viewer1DWidget()            
+        self.V.addPlot(name=label,x=x,y=y,)
+        self.V.show()
 
 def main():
     import sys

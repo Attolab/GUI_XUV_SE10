@@ -59,7 +59,7 @@ class Ui_Viewer2DWidget(object):
         self.toolBox.setLineWidth(1)
         self.page = QWidget()
         self.page.setObjectName(u"page")
-        self.page.setGeometry(QRect(0, 0, 76, 99))
+        self.page.setGeometry(QRect(0, 0, 76, 361))
         sizePolicy2.setHeightForWidth(self.page.sizePolicy().hasHeightForWidth())
         self.page.setSizePolicy(sizePolicy2)
         self.verticalLayout = QVBoxLayout(self.page)
@@ -131,7 +131,7 @@ class Ui_Viewer2DWidget(object):
 
         self.retranslateUi(Viewer2DWidget)
 
-        self.toolBox.setCurrentIndex(1)
+        self.toolBox.setCurrentIndex(0)
         self.toolBox.layout().setSpacing(6)
 
 
