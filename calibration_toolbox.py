@@ -118,7 +118,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.connect(tool_btn_menu.addAction("Load FT magnitude"),SIGNAL("triggered()"), self.importModuleFT_menuFunction) 
         self.connect(tool_btn_menu.addAction("Load custom signal"),SIGNAL("triggered()"), self.importCustomSignal_menuFunction)  
         self.loadSignal_toolButton.setMenu(tool_btn_menu)
-        self.loadSignal_toolButton.setDefaultAction(tool_btn_menu.actions()[1])
+        self.loadSignal_toolButton.setDefaultAction(tool_btn_menu.actions()[0])
 
         tool_btn_menu= QMenu(self)
         #Different calibration choices
@@ -235,7 +235,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
                                                             for row in range(self.listPeaks_tableWidget.rowCount())]).astype(float).T 
 
         #Using the scipy curve_fit calibration function 
-        self.p_opt, self.pcov = opt.curve_fit(af.ToF2eV, table_value[0], table_value[1], bounds = (-500,np.inf), p0 = (self.parameter_list["inputAxis0Mult_lineEdit_4"],self.parameter_list["inputAxis0Mult_lineEdit_5"],self.parameter_list["inputAxis0Mult_lineEdit_6"]))
+        self.p_opt, self.pcov = opt.curve_fit(af.ToF2eV, table_value[0], table_value[1], bounds = (-np.inf,np.inf), p0 = (self.parameter_list["inputAxis0Mult_lineEdit_4"],self.parameter_list["inputAxis0Mult_lineEdit_5"],self.parameter_list["inputAxis0Mult_lineEdit_6"]))
         #self.p_opt, self.pcov = opt.curve_fit(CalibrationToolBox.neweV2ToF, table_value[1], table_value[0], bounds = (1e15,np.inf))
         #print(self.p_opt[0])
         

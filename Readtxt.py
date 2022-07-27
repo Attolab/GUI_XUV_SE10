@@ -35,7 +35,7 @@ tof = [2.000000026702864e-10*i for i in range(10001)]
 # a = np.asarray([ [1,2,3], [4,5,6], [7,8,9] ])
 # np.savetxt("foo.csv", a, delimiter=",")
 
-with open("Ne-CH3i_20.csv") as file_name:
+with open("Ne-CH3i_20_Xe_calib.csv") as file_name:
     file_read = csv.reader(file_name)
     array = list(file_read)
     array = array[1:]
@@ -43,20 +43,33 @@ with open("Ne-CH3i_20.csv") as file_name:
     y = [float(array[i][1]) for i in range(len(array))]
 
 
-plt.plot(x,y)
+def gaussian(x,peak,sigma):
+    g=0
+    for i in range(5):
+        g += 0.2*norm.pdf(x, loc = peak+3.1*i, scale = sigma)
+        g += 0.4*norm.pdf(x, loc = peak+1.8+3.1*i, scale = sigma)
+    return g
 
 
-peak = 31.5
-sigma = 0.2
+
+
+peak = 55*1.54-58.4
+sigma = 0.3
 y_fit = np.zeros(len(y))
 
-for i in range(4):
-    for j in range(len(y_fit)):
-        y_fit[j] += 0.15*norm.pdf(x[j], loc = peak+3.4*i, scale = sigma)
-        y_fit[j] += 0.2*norm.pdf(x[j], loc = peak+1.8+3.4*i, scale = sigma)
+for j in range(len(y_fit)):
+    y_fit[j] = gaussian(x[j],peak,sigma)
 
+
+plt.figure()
+
+plt.plot(x,y)
 plt.plot(x,y_fit)
 
 plt.xlabel("Energie (eV)")
 plt.ylabel("Signal (mV)")
+
+plt.xlim(20, 50)
+plt.ylim(-1,2)
+
 plt.show()
