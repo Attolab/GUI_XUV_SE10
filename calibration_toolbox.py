@@ -228,7 +228,6 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
             print('Need at least three entries in table')
 
     def updateFit(self):
-        #Commented lines are for a calibration with a retarded potential of 10V
 
         #Fetching the time and energy values in the table widget
         table_value = np.array([[self.listPeaks_tableWidget.item(row,0).data(0),self.listPeaks_tableWidget.item(row,1).data(0)] 
@@ -236,9 +235,29 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
 
         #Using the scipy curve_fit calibration function 
         self.p_opt, self.pcov = opt.curve_fit(af.ToF2eV, table_value[0], table_value[1], bounds = (-np.inf,np.inf), p0 = (self.parameter_list["inputAxis0Mult_lineEdit_4"],self.parameter_list["inputAxis0Mult_lineEdit_5"],self.parameter_list["inputAxis0Mult_lineEdit_6"]))
-        #self.p_opt, self.pcov = opt.curve_fit(CalibrationToolBox.neweV2ToF, table_value[1], table_value[0], bounds = (1e15,np.inf))
-        #print(self.p_opt[0])
+
+        #Computation of R²
+        Ecal=[af.ToF2eV(t,self.p_opt[0],self.p_opt[1],self.p_opt[2]) for t in table_value[0]]
+
+        residuals = [table_value[1][i] - Ecal[i] for i in range(len(table_value[0]))]
+
+        ss_res = np.sum([residuals[i]**2 for i in range(len(residuals))])
+        ss_tot = np.sum((table_value[1]-np.mean(table_value[1]))**2)
+        r_squared = 1 - (ss_res / ss_tot)
+
+        #Update of the parameters table widget
+        self.addEntry(sender = self.coeffCalib_tableWidget,value=(self.p_opt[0],self.p_opt[1],self.p_opt[2],r_squared))
         
+        self.updateCalibration()
+
+       #This was once used to calibrate time on energy raher than energy on time, searching for a correspondance bewteen a time vector
+       #and an energy vector, since there is no inverse function to the one that links energy to time with no approximation.
+
+        # table_value = np.array([[self.listPeaks_tableWidget.item(row,0).data(0),self.listPeaks_tableWidget.item(row,1).data(0)] 
+        #                                                     for row in range(self.listPeaks_tableWidget.rowCount())]).astype(float).T
+        #self.p_opt, self.pcov = opt.curve_fit(CalibrationToolBox.neweV2ToF, table_value[1], table_value[0], bounds = (1e15,np.inf))
+        #print(self.p_opt[0]) 
+
         #l_list = [i*1e15 for i in range(1,1000)]
         #l_min = 1e15
         #tcal_min=[CalibrationToolBox.neweV2ToF(E,l_min) for E in table_value[1]]
@@ -257,29 +276,8 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
                 #l_min=l
         #print(l_min)
 
-        #Computation of R²
-        Ecal=[af.ToF2eV(t,self.p_opt[0],self.p_opt[1],self.p_opt[2]) for t in table_value[0]]
-
-        residuals = [table_value[1][i] - Ecal[i] for i in range(len(table_value[0]))]
-
-        ss_res = np.sum([residuals[i]**2 for i in range(len(residuals))])
-        ss_tot = np.sum((table_value[1]-np.mean(table_value[1]))**2)
-        r_squared = 1 - (ss_res / ss_tot)
-
-        #Update of the parameters table widget
-        self.addEntry(sender = self.coeffCalib_tableWidget,value=(self.p_opt[0],self.p_opt[1],self.p_opt[2],r_squared))
-        
-        self.updateCalibration()
-
         #self.updateCalibrationPotential(l_min)
 
-    def neweV2ToF(E,l):
-        t0 = 63.75584484048288
-        alpha = 18013482.633733194
-        beta = -8.281556118297484
-        V = -20
-        L = np.sqrt(2*alpha/9.1e-31)
-        return t0 + np.sqrt(9.1e-31/2)*(l/np.sqrt(E-beta) + (L-l)/np.sqrt(E-beta+V))
 
     def getCalibration(self):
         #Returns the calibration parameters
@@ -299,6 +297,8 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.y_fit = self.y_fit[mask]
         #Plotting with certain limits
         self.plotCalib_plot.setData(x=self.x_fit,y=self.y_fit)
+
+    #The following two functions are used exclusively for the forementioned calibration, which in the end failed.
     
     def updateCalibrationPotential(self,l):
     
@@ -352,6 +352,14 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
 
         #Plotting with certain limits
         self.plotCalib_plot.setData(x=self.x_fit,y=self.y_fit)
+    
+    def neweV2ToF(E,l):
+        t0 = 63.75584484048288
+        alpha = 18013482.633733194
+        beta = -8.281556118297484
+        V = -20
+        L = np.sqrt(2*alpha/9.1e-31)
+        return t0 + np.sqrt(9.1e-31/2)*(l/np.sqrt(E-beta) + (L-l)/np.sqrt(E-beta+V))
 
 
 ###################################### Show Peaks Widget #############################################################
