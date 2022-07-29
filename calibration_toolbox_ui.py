@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'calibration_toolbox.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.3.0
+## Created by: Qt User Interface Compiler version 6.2.4
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -27,11 +27,12 @@ class Ui_CalibrationToolbox(object):
         if not CalibrationToolbox.objectName():
             CalibrationToolbox.setObjectName(u"CalibrationToolbox")
         CalibrationToolbox.resize(853, 520)
+        CalibrationToolbox.setLocale(QLocale(QLocale.C, QLocale.AnyTerritory))
         self.horizontalLayout_5 = QHBoxLayout(CalibrationToolbox)
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.verticalLayout.setSizeConstraint(QLayout.SetFixedSize)
+        self.verticalLayout.setSizeConstraint(QLayout.SetDefaultConstraint)
         self.loadSignal_toolButton = QToolButton(CalibrationToolbox)
         self.loadSignal_toolButton.setObjectName(u"loadSignal_toolButton")
         sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)

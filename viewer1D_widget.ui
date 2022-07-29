@@ -19,6 +19,9 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="locale">
+   <locale language="C" country="AnyTerritory"/>
+  </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <widget class="GraphicsLayoutWidget" name="viewer_GraphicsLayoutWidget">

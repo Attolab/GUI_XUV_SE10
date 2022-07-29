@@ -13,11 +13,14 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="locale">
+   <locale language="C" country="AnyTerritory"/>
+  </property>
   <layout class="QHBoxLayout" name="horizontalLayout_5">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <property name="sizeConstraint">
-      <enum>QLayout::SetFixedSize</enum>
+      <enum>QLayout::SetDefaultConstraint</enum>
      </property>
      <item>
       <widget class="QToolButton" name="loadSignal_toolButton">

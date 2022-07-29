@@ -54,6 +54,9 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
         self.proxy = pg.SignalProxy(self.view_1D.scene().sigMouseMoved, rateLimit=60, slot=self.mouseMoved)     
         self.connectSignals()
         self.addPlot_pushButton.clicked.connect(self.addPlot)
+    def connectSignals(self):     
+        self.makeROI_toolButton.toolButtonClicked_signal.connect(self.addROI)
+        self.tableROI_tableWidget.removeItem_signal.connect(self.removeROITableItem)        
     def setupTreeParameterWidget(self):
         contextMenu = {'Expand/Collapse':
                         [
@@ -85,6 +88,7 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
 
         self.viewerGroupParameter = Viewer1DGroupParameter(name="viewer_options",title="Viewer settings", tip='',
                      children=[],context=contextActions,menu= contextMenu,expanded = False)
+        self.viewerGroupParameter.valueChanging_signal.connect(self.updatePlotWidget)
 
         self.settings_ParameterTree.setParameters(self.viewerGroupParameter)
 
@@ -137,6 +141,16 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
         print('Got clicked')
         # self.tablePlot_tableWidget.setCurrentCell([i for i in range(len(self.plot_list)) if self.plot_list[i] == ev][0],0)
 
+        
+    def updatePlotWidget(self,param,value):
+        self.label.show()
+        self.label.hide()
+        self.plot.showGrid(x = param.childs[1]['x_grid'], y = param.childs[1]['y_grid'], alpha = param.childs[1]['alpha_grid'])                                                
+        self.plot.setTitle(title = param['title'])
+        self.plot.setLabel('bottom', text=param.childs[2]['x_label'])
+        self.plot.setLabel('left', text=param.childs[3]['y_label'])
+
+
     def setupPlotWidget(self,layout,title = '', row = None, col = None):
         plot = layout.addPlot(title=title,labels={'bottom': ('x axis title'), 'left': ('y axis title')}
                                 ,row = row, col = col,enableMenu = True)
@@ -151,9 +165,7 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
         mousePoint = self.plot.vb.mapSceneToView(evt[0])
         self.label.setText("<span style='font-size: 14pt; color: white'> x = %0.2f, <span style='color: white'> y = %0.2f</span>" % (mousePoint.x(), mousePoint.y()))
 
-    def connectSignals(self):     
-        self.makeROI_toolButton.toolButtonClicked_signal.connect(self.addROI)
-        self.tableROI_tableWidget.removeItem_signal.connect(self.removeROITableItem)
+
 
     def selectPlot(self,row):        
         if row in self.plot_ParameterTree.get_selectedRows():
@@ -181,16 +193,6 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
             [item.show() for item in items]
         else:
             [item.hide() for item in items]
-
-
-    def updateView(self,view,xaxis,yaxis):
-        offset_x = (xaxis[-1]-xaxis[0])/10
-        offset_y = (yaxis[-1]-yaxis[0])/10
-        view.setLimits(xMin = xaxis[0]-offset_x,xMax = xaxis[-1]+offset_x,yMin = yaxis[0]-offset_y,yMax = yaxis[-1]+offset_y)
-        view.autoRange()
-
-    def updateViewerWidget(self,x,y):
-        self.updateView(self.view_1D,x,y)
 
     ################################################## ROI functions ##########################################    
 

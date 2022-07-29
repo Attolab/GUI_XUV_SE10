@@ -357,6 +357,7 @@ class Ui_main_panel(object):
         self.retranslateUi(main_panel)
 
         self.toolBox.setCurrentIndex(2)
+        self.oscillationUnits_comboBox.setCurrentIndex(3)
 
 
         QMetaObject.connectSlotsByName(main_panel)
@@ -431,7 +432,7 @@ class Ui_main_panel(object):
         self.oscillationUnits_comboBox.setItemText(3, QCoreApplication.translate("main_panel", u"Angular frequency (PHz)", None))
 
         self.label_9.setText(QCoreApplication.translate("main_panel", u"Oscillation frequency", None))
-        self.oscillationFrequency_lineEdit.setText(QCoreApplication.translate("main_panel", u"400", None))
+        self.oscillationFrequency_lineEdit.setText(QCoreApplication.translate("main_panel", u"4.7", None))
         self.unwrapPhase_checkBox.setText(QCoreApplication.translate("main_panel", u"Unwrapped", None))
         self.showPhase_pushButton.setText(QCoreApplication.translate("main_panel", u"Show phase", None))
         self.toolBox.setItemText(self.toolBox.indexOf(self.page_7), QCoreApplication.translate("main_panel", u"RABBIT", None))

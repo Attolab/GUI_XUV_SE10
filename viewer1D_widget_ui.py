@@ -35,6 +35,7 @@ class Ui_Viewer1DWidget(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(Viewer1DWidget.sizePolicy().hasHeightForWidth())
         Viewer1DWidget.setSizePolicy(sizePolicy)
+        Viewer1DWidget.setLocale(QLocale(QLocale.C, QLocale.AnyTerritory))
         self.horizontalLayout = QHBoxLayout(Viewer1DWidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.viewer_GraphicsLayoutWidget = GraphicsLayoutWidget(Viewer1DWidget)

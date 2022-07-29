@@ -56,7 +56,6 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.setupPlotWidget()
         self.x = 1.
         self.y = 1.
-        self.isNotUpdating = True         
         self.path_calib = 'Calibration/'
         self.parameter_list = dict([("inputAxis0Mult_lineEdit_2",0.05),("inputAxis0Mult_lineEdit",5),("inputAxis0Mult_lineEdit_3",0.5), ("inputAxis0Mult_lineEdit_4",1e8), ("inputAxis0Mult_lineEdit_5",0), ("inputAxis0Mult_lineEdit_6",0)])
 
@@ -74,7 +73,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         self.fitPeaks_pushButton.pressed.connect(self.press_fitButton_function)
         self.listPeaks_tableWidget.itemChanged.connect(self.updateListPeaksTable)
         self.considerSBs_checkBox.stateChanged.connect(self.updateListPeaksTable)
-        self.centraFrequency_doubleSpinBox.valueChanged.connect(self.updateListPeaksTable)
+        # self.centraFrequency_doubleSpinBox.valueChanged.connect(self.updateListPeaksTable)
         self.showPeaks_ToF_checkBox.stateChanged.connect(self.showPeaksPlot)
         self.showPeaks_KE_checkBox.stateChanged.connect(self.showPeaksEnergy)
         self.parametersButton.clicked.connect(self.openParameters)
@@ -413,15 +412,17 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         if isinstance(item,int):
             # If a row is given, extract column value
             item = self.listPeaks_tableWidget.item(self.listPeaks_tableWidget.currentRow(),1)
-        if np.logical_and(self.autoFillTable_checkBox.isChecked(), self.isNotUpdating):
+        if self.autoFillTable_checkBox.isChecked():
             if item.column() == 1:            
                 if item.text():        
-                    self.isNotUpdating = False     
+                    self.listPeaks_tableWidget.itemChanged.disconnect(self.updateListPeaksTable)
                     n_row = self.listPeaks_tableWidget.rowCount()    
                     energy = self.makeEnergyList(n_row,item.row(),float(item.text().replace(',', '.')))
                     [self.listPeaks_tableWidget.item(row,1).setData(0,energy[row]) for row in range(n_row)]
                     [self.listPeaks_tableWidget.item(row,1).setText(f'{energy[row]:.3f}') for row in range(n_row)]
-                    self.isNotUpdating = True       
+                    # self.isNotUpdating = True       
+                    self.listPeaks_tableWidget.itemChanged.connect(self.updateListPeaksTable)
+
 
     def makeEnergyList(self,n_index,starting_index,starting_value):
         # Make an energy array from a starting index

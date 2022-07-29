@@ -15,8 +15,10 @@ from analysis_functions import AnalysisFunctions as af
 import numpy as np
 from usefulclass import Filter
 from convertinator_class import Convertinator as C
-
+from viewer1D_widget import Viewer1DWidget
 import matplotlib.pyplot as plt
+from variable_panel import VariablePanel
+
 class MainPanel(Ui_main_panel,QWidget):
     def __init__(self,parent=None):
         super(MainPanel, self).__init__(parent)
@@ -41,6 +43,7 @@ class MainPanel(Ui_main_panel,QWidget):
     def setupGUI(self):
         self.calibration_toolbox = CalibrationToolBox()
         self.plotPreview_panel = PreviewPlot_Panel()
+        self.fileData_panel = VariablePanel()
         self.main_layout.insertWidget(1,self.plotPreview_panel)
         self.connectSignals_widgets()
         self.updateGUI()
@@ -140,10 +143,11 @@ class MainPanel(Ui_main_panel,QWidget):
         return currentRow
 
     def getData_energySpace(self,axis1,signal):    
+        signal-=np.mean(signal[0])
         axis1,signal = Filter.ApplyFilter(axis1,signal,start = self.calibration[2]) # Remove unphysical counts
         axis1,signal = af.goFromTimeToEnergy(axis1,signal,self.calibration[0],self.calibration[1],self.calibration[2]) # Convert from time to energy
         axis1,signal = Filter.ApplyFilter(axis1,signal,start = float(self.energyMin_lineEdit.text()), end = float(self.energyMax_lineEdit.text())) # Select energy subset
-        axis1,signal = af.linearizeData(axis1,signal,C.str2float(self.energyMin_lineEdit.text()),C.str2float(self.energyMax_lineEdit.text()),C.str2float(self.energySteps_lineEdit.text())) # Linearize energy space
+        axis1,signal = af.linearizeData(axis1,signal,C.str2float(self.energyMin_lineEdit.text()),C.str2float(self.energyMax_lineEdit.text()),C.str2float(self.energySteps_lineEdit.text())) # Linearize energy space       
         return axis1,signal
 
 
@@ -178,6 +182,8 @@ class MainPanel(Ui_main_panel,QWidget):
         self.listMenu= QMenu(self)
         self.connect(self.listMenu.addAction("Remove Item(s)"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_listPeaksRemoveItemClicked(who)) 
         self.connect(self.listMenu.addAction("Clear all"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_listPeaksClearClicked(who)) 
+        self.connect(self.listMenu.addAction("Extract data"),SIGNAL("triggered()"), lambda who=sender: self.Qmenu_listExtractData(who)) 
+
         parentPosition = sender.mapToGlobal(QPoint(0, 0))        
         self.listMenu.move(parentPosition + QPos)
         self.listMenu.show()
@@ -194,7 +200,13 @@ class MainPanel(Ui_main_panel,QWidget):
         # Remove all items    
         [self.removeEntry(sender.item(row),sender) for row in np.flip(np.arange(sender.count()))]    
 
+    # def removeSelectedItems(self,sender):
+    #     # Remove all selected items
+    #     [self.removeEntry(item,sender) for item in sender.selectedItems()]     
     ################################################## Context menu functions ##########################################    
+    # def Qmenu_listExtractData(self,sender):        
+    #     self.fileData_panel.show()
+
     def Qmenu_listPeaksRemoveItemClicked(self,sender):
         self.removeSelectedItems(sender)
 
@@ -246,34 +258,17 @@ class MainPanel(Ui_main_panel,QWidget):
 
             if self.unwrapPhase_checkBox.isChecked():
                 data = np.unwrap(data)
-            plt.plot(y_axis,data)
-            plt.show()
+            self.doPlot1D(y_axis,data,label=f'\u03C9={oscillation_frequency}PHz')
+
         else:
-            print('No data has been loaded')
+            print('No data has been loaded')            
 
-    # def plotRabbitPhase(self):
-    #     if self.isDataLoaded:
-    #         frequency_axis,y_axis = self.plotPreview_panel.outputPhaseViewerWidget.getAxis()
-    #         oscillation_frequency = C.str2float(self.oscillationFrequency_lineEdit.text())
-    #         oscillation_units = self.oscillationUnits_comboBox.currentIndex()
-    #         if oscillation_units == 0:
-    #             oscillation_frequency = C.wavelength2omega(oscillation_frequency)
-    #         elif oscillation_units == 1:
-    #             oscillation_frequency = C.energy2omega(oscillation_frequency)
-    #         elif oscillation_units == 2:
-    #             oscillation_frequency = 2*np.pi*(oscillation_frequency)
-    #         elif oscillation_units == 3:                
-    #             oscillation_frequency = oscillation_frequency
+    def doPlot1D(self,x,y,label='Plot'):
+        if not hasattr(self,'V'):
+            self.V = Viewer1DWidget()            
+        self.V.addPlot(name=label,x=x,y=y,)
+        self.V.show()
 
-    #         data = self.plotPreview_panel.outputPhaseViewerWidget.getImageData()
-    #         data = data[np.argmin(np.abs(frequency_axis - oscillation_frequency)),:]
-
-    #         if self.unwrapPhase_checkBox.isChecked():
-    #             data = np.unwrap(data)
-    #         plt.plot(y_axis,data)
-    #         plt.show()
-    #     else:
-    #         print('No data has been loaded')
 
 def main():
     import sys
