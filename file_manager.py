@@ -14,7 +14,7 @@ import sys, traceback
 import numpy as np
 import os
 import re
-
+import time
 
 class FileManager:
     def __init__(self, filename = None):
@@ -44,11 +44,8 @@ class FileManager:
         return group.keys()
 # Create a list containing all the keys
 
-    def list_keys(self,group):
-        return group.keys()
-
     def get_dataset_keys(self,f):
-        keys = []
+        keys = []        
         f.visit(lambda key: keys.append(key) if isinstance(f[key], h5py.Dataset) else None)
         return keys
 
@@ -104,7 +101,7 @@ class FileManager:
         return self.convert_h5(data,position,parameters)
 
     def convert_h5(self,data,position,parameters):
-        delay = position * 0.635 / ( 2 * np.pi * 0.299792458)        
+        delay = position * 0.633 / ( 2 * np.pi * 0.299792458)        
         t_vol = parameters[-2] * 1e9 * np.arange(data[0].shape[0])
         indexing = np.argsort(delay)
         delay = delay[indexing]
@@ -166,15 +163,15 @@ def get_key_parameters(keys):
 
 
 def main():
-    from file_manager import FileReader as F
+    from file_manager import FileManager as F
     import matplotlib.pyplot as plt
     p = F()
     folder = "/mnt/Q_drive/LIDyL/Atto/ATTOLAB/SE1/Data_Experiments/SE1_2022/2022-03-24/"
     filename = "scan_Neon_Neon_voltage_Voltage 1950V.h5"
     folder ='/home/cs268225/Documents/Python/GUI/FourierGUI/TestData/Dataset_20220415_002/'
     filename = 'Dataset_20220415_002.h5'
-    folder = '/home/cs268225/Atto/ATTOLAB/SE1/Data_Experiments/SE1_2022/2022-04-20/'
-    filename = 'test phase scan_2.h5'
+    folder = '/home/cs268225/Atto/ATTOLAB/SE1/Data_Experiments/SE1_2022/2022-07-12/'
+    filename = 'Ne-Ne_calibration_ZrFilter_1.h5'
     # fileReader = F(folder + filename).Read_h5()
     signal, position, parameters = F(folder + filename).Read_h5()
     delay = 2 * (position / 0.299792458)

@@ -10,8 +10,8 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QMenu, QMenuBar, QDial
     QSizePolicy, QStatusBar, QTabWidget, QWidget,QDockWidget,QFileDialog,QTableWidgetItem,QHBoxLayout)
 from variable_panel_ui import Ui_VariablePanel
 from variable_item_ui import Ui_VariableItem
-
-
+from pyqtgraph import DataTreeWidget
+from CustomDataTreeWidget import CustomDataTreeWidget
 
 class VariablePanel(Ui_VariablePanel,QWidget):
     signal_closetab = Signal(int)
@@ -147,28 +147,41 @@ class VariableItemTable(Ui_VariableItem,QWidget):
 #         self.setLayout(self.mainlayout)
 #         self.show()
 def main():
+    import numpy as np
     app = QApplication([])
     widget = VariablePanel()
     widget.show()
-    widget_item = VariableItemTable(name = '0')
+    d = {
+        'a list': [1,2,3,4,5,6, {'nested1': 'aaaaa', 'nested2': 'bbbbb'}, "seven"],
+        'a dict': {
+            'x': 1,
+            'y': 2,
+            'z': 'three'
+        },
+        'an array': np.random.randint(10, size=(40,40,5)),
+    }
+    d = {'test':{'title':'test2','value':np.random.randint(10, size=(40,5,40))}}    
+    widget_item = CustomDataTreeWidget(parent = widget,name ='test',data = d)
     widget.variablePanel_tabWidget.insertTab(0,widget_item,'0')  
-    widget_item2 = VariableItemTable(name = '1')
+    widget_item2 = CustomDataTreeWidget(parent = widget,name ='test',data = d)
+    widget.variablePanel_tabWidget.insertTab(0,widget_item2,'0')      
+    # widget_item2 = VariableItemTable(name = '1')
   
-    widget.variablePanel_tabWidget.insertTab(1,widget_item2,'1')   
-    widget_item3 = VariableItemTable(name = '1')
+    # widget.variablePanel_tabWidget.insertTab(1,widget_item2,'1')   
+    # widget_item3 = VariableItemTable(name = '1')
   
-    widget.variablePanel_tabWidget.insertTab(2,widget_item3,'2')       
-    widget_item = QTableWidgetItem('0')
+    # widget.variablePanel_tabWidget.insertTab(2,widget_item3,'2')       
+    # widget_item = QTableWidgetItem('0')
 
-    widget_item = VariableItemTable(name = '0')
-    widget.variablePanel_tabWidget.insertTab(0,widget_item,'0')  
-    widget_item2 = VariableItemTable(name = '1')
+    # widget_item = VariableItemTable(name = '0')
+    # widget.variablePanel_tabWidget.insertTab(0,widget_item,'0')  
+    # widget_item2 = VariableItemTable(name = '1')
   
-    widget.variablePanel_tabWidget.insertTab(1,widget_item2,'1')   
-    widget_item3 = VariableItemTable(name = '1')
+    # widget.variablePanel_tabWidget.insertTab(1,widget_item2,'1')   
+    # widget_item3 = VariableItemTable(name = '1')
   
-    widget.variablePanel_tabWidget.insertTab(2,widget_item3,'2')       
-    widget_item = QTableWidgetItem('0')
+    # widget.variablePanel_tabWidget.insertTab(2,widget_item3,'2')       
+    # widget_item = QTableWidgetItem('0')
 
     app.exec()
 if __name__=="__main__":

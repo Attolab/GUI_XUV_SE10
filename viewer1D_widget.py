@@ -142,7 +142,7 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
         # self.tablePlot_tableWidget.setCurrentCell([i for i in range(len(self.plot_list)) if self.plot_list[i] == ev][0],0)
 
         
-    def updatePlotWidget(self,param,value):
+    def updatePlotWidget(self,param):
         self.label.show()
         self.label.hide()
         self.plot.showGrid(x = param.childs[1]['x_grid'], y = param.childs[1]['y_grid'], alpha = param.childs[1]['alpha_grid'])                                                
