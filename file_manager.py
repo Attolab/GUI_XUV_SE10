@@ -17,12 +17,15 @@ import re
 import time
 
 class FileManager:
-    def __init__(self, filename = None):
+    def __init__(self, filename = None,format = None):
         self.filename = filename
+        self.format = format
         self.dataset_list= []
-        # if filename:
-        #     with h5py.File(self.filename, 'r') as file:
-        #         self.keys = self.extractKeys(file)
+        if not self.format:
+            self.filename,self.format = os.path.splitext(self.filename)
+    def readFile(self):
+        if self.format == 'MBES':
+            return self.Read_h5()
         
         
     def print_grp_name(self,grp_name, object):        

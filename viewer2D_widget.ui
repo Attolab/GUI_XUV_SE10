@@ -19,6 +19,9 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="locale">
+   <locale language="C" country="AnyTerritory"/>
+  </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <widget class="QSplitter" name="splitter">
@@ -124,7 +127,7 @@
          <x>0</x>
          <y>0</y>
          <width>274</width>
-         <height>361</height>
+         <height>347</height>
         </rect>
        </property>
        <attribute name="label">

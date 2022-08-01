@@ -26,7 +26,7 @@ class Ui_main_panel(object):
         if not main_panel.objectName():
             main_panel.setObjectName(u"main_panel")
         main_panel.resize(602, 767)
-        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(main_panel.sizePolicy().hasHeightForWidth())
@@ -37,29 +37,32 @@ class Ui_main_panel(object):
         self.v_optionLayout.setObjectName(u"v_optionLayout")
         self.toolBox = QToolBox(main_panel)
         self.toolBox.setObjectName(u"toolBox")
-        sizePolicy.setHeightForWidth(self.toolBox.sizePolicy().hasHeightForWidth())
-        self.toolBox.setSizePolicy(sizePolicy)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.toolBox.sizePolicy().hasHeightForWidth())
+        self.toolBox.setSizePolicy(sizePolicy1)
         self.page_5 = QWidget()
         self.page_5.setObjectName(u"page_5")
-        self.page_5.setGeometry(QRect(0, 0, 582, 320))
+        self.page_5.setGeometry(QRect(0, 0, 582, 380))
         self.verticalLayout_2 = QVBoxLayout(self.page_5)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.label = QLabel(self.page_5)
         self.label.setObjectName(u"label")
-        sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
-        self.label.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
+        self.label.setSizePolicy(sizePolicy1)
 
         self.horizontalLayout_3.addWidget(self.label)
 
         self.folderBase_lineEdit = QLineEdit(self.page_5)
         self.folderBase_lineEdit.setObjectName(u"folderBase_lineEdit")
-        sizePolicy1 = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.folderBase_lineEdit.sizePolicy().hasHeightForWidth())
-        self.folderBase_lineEdit.setSizePolicy(sizePolicy1)
+        sizePolicy2 = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.folderBase_lineEdit.sizePolicy().hasHeightForWidth())
+        self.folderBase_lineEdit.setSizePolicy(sizePolicy2)
 
         self.horizontalLayout_3.addWidget(self.folderBase_lineEdit)
 
@@ -73,8 +76,8 @@ class Ui_main_panel(object):
 
         self.fileSelection_listWidget = QListWidget(self.page_5)
         self.fileSelection_listWidget.setObjectName(u"fileSelection_listWidget")
-        sizePolicy.setHeightForWidth(self.fileSelection_listWidget.sizePolicy().hasHeightForWidth())
-        self.fileSelection_listWidget.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.fileSelection_listWidget.sizePolicy().hasHeightForWidth())
+        self.fileSelection_listWidget.setSizePolicy(sizePolicy1)
         self.fileSelection_listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
         self.verticalLayout_2.addWidget(self.fileSelection_listWidget)
@@ -124,18 +127,18 @@ class Ui_main_panel(object):
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.makeCalibration_pushButton = QPushButton(self.page_6)
         self.makeCalibration_pushButton.setObjectName(u"makeCalibration_pushButton")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.makeCalibration_pushButton.sizePolicy().hasHeightForWidth())
-        self.makeCalibration_pushButton.setSizePolicy(sizePolicy2)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.makeCalibration_pushButton.sizePolicy().hasHeightForWidth())
+        self.makeCalibration_pushButton.setSizePolicy(sizePolicy3)
 
         self.horizontalLayout_2.addWidget(self.makeCalibration_pushButton)
 
         self.loadCalibration_pushButton = QPushButton(self.page_6)
         self.loadCalibration_pushButton.setObjectName(u"loadCalibration_pushButton")
-        sizePolicy2.setHeightForWidth(self.loadCalibration_pushButton.sizePolicy().hasHeightForWidth())
-        self.loadCalibration_pushButton.setSizePolicy(sizePolicy2)
+        sizePolicy3.setHeightForWidth(self.loadCalibration_pushButton.sizePolicy().hasHeightForWidth())
+        self.loadCalibration_pushButton.setSizePolicy(sizePolicy3)
 
         self.horizontalLayout_2.addWidget(self.loadCalibration_pushButton)
 
@@ -146,45 +149,45 @@ class Ui_main_panel(object):
         self.gridLayout.setObjectName(u"gridLayout")
         self.t0Calib_label = QLabel(self.page_6)
         self.t0Calib_label.setObjectName(u"t0Calib_label")
-        sizePolicy.setHeightForWidth(self.t0Calib_label.sizePolicy().hasHeightForWidth())
-        self.t0Calib_label.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.t0Calib_label.sizePolicy().hasHeightForWidth())
+        self.t0Calib_label.setSizePolicy(sizePolicy1)
 
         self.gridLayout.addWidget(self.t0Calib_label, 1, 2, 1, 1)
 
         self.label_7 = QLabel(self.page_6)
         self.label_7.setObjectName(u"label_7")
-        sizePolicy.setHeightForWidth(self.label_7.sizePolicy().hasHeightForWidth())
-        self.label_7.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.label_7.sizePolicy().hasHeightForWidth())
+        self.label_7.setSizePolicy(sizePolicy1)
         self.label_7.setAlignment(Qt.AlignCenter)
 
         self.gridLayout.addWidget(self.label_7, 0, 2, 1, 1)
 
         self.label_6 = QLabel(self.page_6)
         self.label_6.setObjectName(u"label_6")
-        sizePolicy.setHeightForWidth(self.label_6.sizePolicy().hasHeightForWidth())
-        self.label_6.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.label_6.sizePolicy().hasHeightForWidth())
+        self.label_6.setSizePolicy(sizePolicy1)
         self.label_6.setAlignment(Qt.AlignCenter)
 
         self.gridLayout.addWidget(self.label_6, 0, 1, 1, 1)
 
         self.alphaCalib_label = QLabel(self.page_6)
         self.alphaCalib_label.setObjectName(u"alphaCalib_label")
-        sizePolicy.setHeightForWidth(self.alphaCalib_label.sizePolicy().hasHeightForWidth())
-        self.alphaCalib_label.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.alphaCalib_label.sizePolicy().hasHeightForWidth())
+        self.alphaCalib_label.setSizePolicy(sizePolicy1)
 
         self.gridLayout.addWidget(self.alphaCalib_label, 1, 0, 1, 1)
 
         self.betaCalib_label = QLabel(self.page_6)
         self.betaCalib_label.setObjectName(u"betaCalib_label")
-        sizePolicy.setHeightForWidth(self.betaCalib_label.sizePolicy().hasHeightForWidth())
-        self.betaCalib_label.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.betaCalib_label.sizePolicy().hasHeightForWidth())
+        self.betaCalib_label.setSizePolicy(sizePolicy1)
 
         self.gridLayout.addWidget(self.betaCalib_label, 1, 1, 1, 1)
 
         self.label_5 = QLabel(self.page_6)
         self.label_5.setObjectName(u"label_5")
-        sizePolicy.setHeightForWidth(self.label_5.sizePolicy().hasHeightForWidth())
-        self.label_5.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.label_5.sizePolicy().hasHeightForWidth())
+        self.label_5.setSizePolicy(sizePolicy1)
         self.label_5.setAlignment(Qt.AlignCenter)
 
         self.gridLayout.addWidget(self.label_5, 0, 0, 1, 1)
@@ -196,19 +199,19 @@ class Ui_main_panel(object):
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.time_radioButton = QRadioButton(self.page_6)
         self.time_radioButton.setObjectName(u"time_radioButton")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.time_radioButton.sizePolicy().hasHeightForWidth())
-        self.time_radioButton.setSizePolicy(sizePolicy3)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy4.setHorizontalStretch(0)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.time_radioButton.sizePolicy().hasHeightForWidth())
+        self.time_radioButton.setSizePolicy(sizePolicy4)
 
         self.horizontalLayout.addWidget(self.time_radioButton)
 
         self.energy_radioButton = QRadioButton(self.page_6)
         self.energy_radioButton.setObjectName(u"energy_radioButton")
         self.energy_radioButton.setEnabled(True)
-        sizePolicy3.setHeightForWidth(self.energy_radioButton.sizePolicy().hasHeightForWidth())
-        self.energy_radioButton.setSizePolicy(sizePolicy3)
+        sizePolicy4.setHeightForWidth(self.energy_radioButton.sizePolicy().hasHeightForWidth())
+        self.energy_radioButton.setSizePolicy(sizePolicy4)
 
         self.horizontalLayout.addWidget(self.energy_radioButton)
 
@@ -217,60 +220,60 @@ class Ui_main_panel(object):
         self.energyMax_lineEdit = QLineEdit(self.page_6)
         self.energyMax_lineEdit.setObjectName(u"energyMax_lineEdit")
         self.energyMax_lineEdit.setEnabled(False)
-        sizePolicy3.setHeightForWidth(self.energyMax_lineEdit.sizePolicy().hasHeightForWidth())
-        self.energyMax_lineEdit.setSizePolicy(sizePolicy3)
+        sizePolicy4.setHeightForWidth(self.energyMax_lineEdit.sizePolicy().hasHeightForWidth())
+        self.energyMax_lineEdit.setSizePolicy(sizePolicy4)
 
         self.gridLayout_2.addWidget(self.energyMax_lineEdit, 2, 3, 1, 1)
 
         self.label_2 = QLabel(self.page_6)
         self.label_2.setObjectName(u"label_2")
-        sizePolicy.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
-        self.label_2.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
+        self.label_2.setSizePolicy(sizePolicy1)
 
         self.gridLayout_2.addWidget(self.label_2, 0, 1, 1, 1)
 
         self.label_3 = QLabel(self.page_6)
         self.label_3.setObjectName(u"label_3")
-        sizePolicy.setHeightForWidth(self.label_3.sizePolicy().hasHeightForWidth())
-        self.label_3.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.label_3.sizePolicy().hasHeightForWidth())
+        self.label_3.setSizePolicy(sizePolicy1)
 
         self.gridLayout_2.addWidget(self.label_3, 0, 3, 1, 1)
 
         self.energyStepsNumber_lineEdit = QLineEdit(self.page_6)
         self.energyStepsNumber_lineEdit.setObjectName(u"energyStepsNumber_lineEdit")
         self.energyStepsNumber_lineEdit.setEnabled(False)
-        sizePolicy3.setHeightForWidth(self.energyStepsNumber_lineEdit.sizePolicy().hasHeightForWidth())
-        self.energyStepsNumber_lineEdit.setSizePolicy(sizePolicy3)
+        sizePolicy4.setHeightForWidth(self.energyStepsNumber_lineEdit.sizePolicy().hasHeightForWidth())
+        self.energyStepsNumber_lineEdit.setSizePolicy(sizePolicy4)
 
         self.gridLayout_2.addWidget(self.energyStepsNumber_lineEdit, 2, 5, 1, 1)
 
         self.label_8 = QLabel(self.page_6)
         self.label_8.setObjectName(u"label_8")
-        sizePolicy.setHeightForWidth(self.label_8.sizePolicy().hasHeightForWidth())
-        self.label_8.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.label_8.sizePolicy().hasHeightForWidth())
+        self.label_8.setSizePolicy(sizePolicy1)
 
         self.gridLayout_2.addWidget(self.label_8, 0, 5, 1, 1)
 
         self.energySteps_lineEdit = QLineEdit(self.page_6)
         self.energySteps_lineEdit.setObjectName(u"energySteps_lineEdit")
         self.energySteps_lineEdit.setEnabled(False)
-        sizePolicy3.setHeightForWidth(self.energySteps_lineEdit.sizePolicy().hasHeightForWidth())
-        self.energySteps_lineEdit.setSizePolicy(sizePolicy3)
+        sizePolicy4.setHeightForWidth(self.energySteps_lineEdit.sizePolicy().hasHeightForWidth())
+        self.energySteps_lineEdit.setSizePolicy(sizePolicy4)
 
         self.gridLayout_2.addWidget(self.energySteps_lineEdit, 2, 4, 1, 1)
 
         self.energyMin_lineEdit = QLineEdit(self.page_6)
         self.energyMin_lineEdit.setObjectName(u"energyMin_lineEdit")
         self.energyMin_lineEdit.setEnabled(False)
-        sizePolicy3.setHeightForWidth(self.energyMin_lineEdit.sizePolicy().hasHeightForWidth())
-        self.energyMin_lineEdit.setSizePolicy(sizePolicy3)
+        sizePolicy4.setHeightForWidth(self.energyMin_lineEdit.sizePolicy().hasHeightForWidth())
+        self.energyMin_lineEdit.setSizePolicy(sizePolicy4)
 
         self.gridLayout_2.addWidget(self.energyMin_lineEdit, 2, 1, 1, 1)
 
         self.label_4 = QLabel(self.page_6)
         self.label_4.setObjectName(u"label_4")
-        sizePolicy.setHeightForWidth(self.label_4.sizePolicy().hasHeightForWidth())
-        self.label_4.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.label_4.sizePolicy().hasHeightForWidth())
+        self.label_4.setSizePolicy(sizePolicy1)
 
         self.gridLayout_2.addWidget(self.label_4, 0, 4, 1, 1)
 
@@ -287,9 +290,9 @@ class Ui_main_panel(object):
         self.toolBox.addItem(self.page_6, u"Calibration")
         self.page_7 = QWidget()
         self.page_7.setObjectName(u"page_7")
-        self.page_7.setGeometry(QRect(0, 0, 582, 278))
-        sizePolicy.setHeightForWidth(self.page_7.sizePolicy().hasHeightForWidth())
-        self.page_7.setSizePolicy(sizePolicy)
+        self.page_7.setGeometry(QRect(0, 0, 582, 331))
+        sizePolicy1.setHeightForWidth(self.page_7.sizePolicy().hasHeightForWidth())
+        self.page_7.setSizePolicy(sizePolicy1)
         self.verticalLayout_3 = QVBoxLayout(self.page_7)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.gridLayout_3 = QGridLayout()
@@ -310,6 +313,8 @@ class Ui_main_panel(object):
 
         self.oscillationFrequency_lineEdit = QLineEdit(self.page_7)
         self.oscillationFrequency_lineEdit.setObjectName(u"oscillationFrequency_lineEdit")
+        sizePolicy2.setHeightForWidth(self.oscillationFrequency_lineEdit.sizePolicy().hasHeightForWidth())
+        self.oscillationFrequency_lineEdit.setSizePolicy(sizePolicy2)
 
         self.gridLayout_3.addWidget(self.oscillationFrequency_lineEdit, 1, 0, 1, 1)
 
@@ -320,8 +325,8 @@ class Ui_main_panel(object):
 
         self.showPhase_pushButton = QPushButton(self.page_7)
         self.showPhase_pushButton.setObjectName(u"showPhase_pushButton")
-        sizePolicy2.setHeightForWidth(self.showPhase_pushButton.sizePolicy().hasHeightForWidth())
-        self.showPhase_pushButton.setSizePolicy(sizePolicy2)
+        sizePolicy3.setHeightForWidth(self.showPhase_pushButton.sizePolicy().hasHeightForWidth())
+        self.showPhase_pushButton.setSizePolicy(sizePolicy3)
 
         self.gridLayout_3.addWidget(self.showPhase_pushButton, 2, 0, 1, 1)
 

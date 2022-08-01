@@ -20,6 +20,8 @@ from pyqtgraph.dockarea.DockArea import DockArea
 from pyqtgraph.parametertree import Parameter
 from pyqtgraph.parametertree import ParameterTree
 from signal_processing_toolbox import SignalProcessingToolbox
+from fileDetails_tabWidget_ui import Ui_fileDetails_tabwidget
+from CustomQMenu import FileSelectionQMenu
 import sys, traceback
 import h5py
 import numpy as np
@@ -46,14 +48,6 @@ class MainWindow(QMainWindow,Ui_MainWindow):
         self.workspace[workspace_name] = data
     
     def setupWindows(self):       
-        self.fileSelection_tree = ParameterTree()
-        self.fileSelection_tree.setHeaderHidden(True)
-        self.fileSelection_ParameterTree = Parameter.create(name ='file_list',title='File List',type='group',expandable=True,)
-        self.fileSelection_tree.addParameters(self.fileSelection_ParameterTree,showTop=False)
-        self.fileSelection_dock2 = QDockWidget('File Selection Dock Widget',self)
-        self.fileSelection_dock2.setWidget(self.fileSelection_tree)
-        self.addDockWidget(Qt.LeftDockWidgetArea,self.fileSelection_dock2)
-
         self.fileSelection_dock = QDockWidget('File Selection',self)
         self.fileSelection_widget = FileSelectionPanel()
         self.fileSelection_dock.setWidget(self.fileSelection_widget)
@@ -62,68 +56,13 @@ class MainWindow(QMainWindow,Ui_MainWindow):
         self.setCentralWidget(self.mainPanelwidget)
         self.showMaximized()
 
-    def transmissionReceived(self):
-        print('Got data')
-
-    def loadFile(self):
-        print('File loaded') 
-
-
-    # def press_loadButton_function(self):    
-        # self.path_filenames = QFileDialog.getOpenFileNames(self, 'Choose file',self.path_folder)[0]            
-        # self.path = self.path_filenames[0]            
-        # self.
-        # try:
-        #     self.loadData(self.path)
-        #     [self.addFileToList(filename= path) for path in self.path_filenames if path]
-        #     self.fileSelection_listWidget.setCurrentRow(self.fileSelection_listWidget.count())      
-        # except:
-        #     print('Error loading file') 
     
-
     def loadData(self):
         self.path_filenames = QFileDialog.getOpenFileNames(self, 'Choose file',self.path_folder)[0]            
         head_tail = os.path.split(self.path_filenames[0])         
         self.path_folder = head_tail[0]
         self.loadData_signal.emit(self.path_filenames)
 
-        # P = Parameter.create(name ='file',title=self.path_filenames[0],type='group',expandable=True,children =)
-        
-        # [P.addChild(self.storeFile(filename)) for filename in self.path_filenames]
-        # Parameter.create(name ='file',title=self.path_filenames[0],type='group',)
-        [self.fileSelection_ParameterTree.addChild(self.storeFile(filename)) for filename in self.path_filenames]
-        # self.fileSelection_tree.addParameters(Parameter.create(name ='file',title=self.path_filenames[0],type='group',))
-
-
-    def storeFile(self,filename_fullpath):
-        folder,filename_withext = os.path.split(filename_fullpath)
-        filename,ext = os.path.splitext(filename_withext)
-        size = os.path.getsize(filename_fullpath)
-        file_params =  {
-                'dir': {
-                    'title': 'folder',                                        
-                    'type': 'str',
-                    'value': folder,
-                    'editable':False,
-                    },   
-                'ext': {
-                    'title':'ext',                                        
-                    'type': 'str',
-                    'value': ext,
-                    'editable':False,                    
-                    },    
-                'size': {
-                    'title':'size',                                        
-                    'type': 'int',
-                    'value': size,
-                    'editable':False,                    
-                    },      
-        }                      
-        return Parameter.create(name=filename, type='group',expanded = False,children = file_params,removable = True,renamable=False)
-
-    def resetGUI_function(self):
-        self.close()
-        self.__init__()
     def restore(self):
         self.fileSelection_dock.setFloating(False)
         self.fileSelection_dock.show()
@@ -142,11 +81,14 @@ class MainWindow(QMainWindow,Ui_MainWindow):
         self.restoreState_action.setShortcut(QKeySequence(Qt.CTRL + Qt.Key_R))
 
         # CONNECT FILE SELECTION PANEL #
-        self.loadData_signal.connect(self.fileSelection_widget.addEntries)
+        self.loadData_signal.connect(self.fileSelection_widget.storeFiles)
 
         # CONNECT DATA #
         self.sendData_signal.connect(self.storeData)
         self.sendData_signal.connect(self.storeDataInWorkspace)
+
+        #
+        self.fileSelection_widget.sendData_signal.connect(self.mainPanelwidget.showData)
 
         print('Connecting signal')
 
