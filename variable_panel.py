@@ -11,7 +11,6 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QMenu, QMenuBar, QDial
 from variable_panel_ui import Ui_VariablePanel
 from variable_item_ui import Ui_VariableItem
 from pyqtgraph import DataTreeWidget
-from CustomDataTreeWidget import CustomDataTreeWidget
 
 class VariablePanel(Ui_VariablePanel,QWidget):
     signal_closetab = Signal(int)
@@ -160,10 +159,11 @@ def main():
         },
         'an array': np.random.randint(10, size=(40,40,5)),
     }
-    d = {'test':{'title':'test2','value':np.random.randint(10, size=(40,5,40))}}    
-    widget_item = CustomDataTreeWidget(parent = widget,name ='test',data = d)
-    widget.variablePanel_tabWidget.insertTab(0,widget_item,'0')  
-    widget_item2 = CustomDataTreeWidget(parent = widget,name ='test',data = d)
+    # d = {'test':{'title':'test2','value':np.random.randint(10, size=(40,5,40))}}    
+    widget_item = DataTreeWidget(parent = widget,data = d)
+    widget.variablePanel_tabWidget.insertTab(0,widget_item,'0')
+    widget_item  
+    widget_item2 = DataTreeWidget(parent = widget,data = d)
     widget.variablePanel_tabWidget.insertTab(0,widget_item2,'0')      
     # widget_item2 = VariableItemTable(name = '1')
   
