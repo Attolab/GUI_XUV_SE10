@@ -44,6 +44,7 @@ class Ui_FileSelectionPanel(object):
         self.fileSelection_listWidget.setDefaultDropAction(Qt.MoveAction)
         self.fileSelection_listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.fileSelection_listWidget.setMovement(QListView.Free)
+        self.fileSelection_listWidget.setLayoutMode(QListView.SinglePass)
 
         self.verticalLayout.addWidget(self.fileSelection_listWidget)
 
@@ -88,7 +89,7 @@ class Ui_FileSelectionPanel(object):
 
         self.retranslateUi(FileSelectionPanel)
 
-        self.fileDetails_tabwidget.setCurrentIndex(2)
+        self.fileDetails_tabwidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(FileSelectionPanel)

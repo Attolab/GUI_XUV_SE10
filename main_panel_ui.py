@@ -297,6 +297,18 @@ class Ui_main_panel(object):
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.gridLayout_3 = QGridLayout()
         self.gridLayout_3.setObjectName(u"gridLayout_3")
+        self.showPhase_pushButton = QPushButton(self.page_7)
+        self.showPhase_pushButton.setObjectName(u"showPhase_pushButton")
+        sizePolicy3.setHeightForWidth(self.showPhase_pushButton.sizePolicy().hasHeightForWidth())
+        self.showPhase_pushButton.setSizePolicy(sizePolicy3)
+
+        self.gridLayout_3.addWidget(self.showPhase_pushButton, 2, 0, 1, 1)
+
+        self.label_9 = QLabel(self.page_7)
+        self.label_9.setObjectName(u"label_9")
+
+        self.gridLayout_3.addWidget(self.label_9, 0, 0, 1, 1)
+
         self.oscillationUnits_comboBox = QComboBox(self.page_7)
         self.oscillationUnits_comboBox.addItem("")
         self.oscillationUnits_comboBox.addItem("")
@@ -306,10 +318,10 @@ class Ui_main_panel(object):
 
         self.gridLayout_3.addWidget(self.oscillationUnits_comboBox, 1, 1, 1, 1)
 
-        self.label_9 = QLabel(self.page_7)
-        self.label_9.setObjectName(u"label_9")
+        self.unwrapPhase_checkBox = QCheckBox(self.page_7)
+        self.unwrapPhase_checkBox.setObjectName(u"unwrapPhase_checkBox")
 
-        self.gridLayout_3.addWidget(self.label_9, 0, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.unwrapPhase_checkBox, 2, 1, 1, 1)
 
         self.oscillationFrequency_lineEdit = QLineEdit(self.page_7)
         self.oscillationFrequency_lineEdit.setObjectName(u"oscillationFrequency_lineEdit")
@@ -318,17 +330,10 @@ class Ui_main_panel(object):
 
         self.gridLayout_3.addWidget(self.oscillationFrequency_lineEdit, 1, 0, 1, 1)
 
-        self.unwrapPhase_checkBox = QCheckBox(self.page_7)
-        self.unwrapPhase_checkBox.setObjectName(u"unwrapPhase_checkBox")
+        self.customUnwrapPhase_checkBox = QCheckBox(self.page_7)
+        self.customUnwrapPhase_checkBox.setObjectName(u"customUnwrapPhase_checkBox")
 
-        self.gridLayout_3.addWidget(self.unwrapPhase_checkBox, 2, 1, 1, 1)
-
-        self.showPhase_pushButton = QPushButton(self.page_7)
-        self.showPhase_pushButton.setObjectName(u"showPhase_pushButton")
-        sizePolicy3.setHeightForWidth(self.showPhase_pushButton.sizePolicy().hasHeightForWidth())
-        self.showPhase_pushButton.setSizePolicy(sizePolicy3)
-
-        self.gridLayout_3.addWidget(self.showPhase_pushButton, 2, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.customUnwrapPhase_checkBox, 3, 1, 1, 1)
 
 
         self.verticalLayout_3.addLayout(self.gridLayout_3)
@@ -431,15 +436,16 @@ class Ui_main_panel(object):
 #endif // QT_CONFIG(tooltip)
         self.label_4.setText(QCoreApplication.translate("main_panel", u"dE", None))
         self.toolBox.setItemText(self.toolBox.indexOf(self.page_6), QCoreApplication.translate("main_panel", u"Calibration", None))
+        self.showPhase_pushButton.setText(QCoreApplication.translate("main_panel", u"Show phase", None))
+        self.label_9.setText(QCoreApplication.translate("main_panel", u"Oscillation frequency", None))
         self.oscillationUnits_comboBox.setItemText(0, QCoreApplication.translate("main_panel", u"Wavelength (nm)", None))
         self.oscillationUnits_comboBox.setItemText(1, QCoreApplication.translate("main_panel", u"Energy (eV)", None))
         self.oscillationUnits_comboBox.setItemText(2, QCoreApplication.translate("main_panel", u"Frequency (THz)", None))
         self.oscillationUnits_comboBox.setItemText(3, QCoreApplication.translate("main_panel", u"Angular frequency (PHz)", None))
 
-        self.label_9.setText(QCoreApplication.translate("main_panel", u"Oscillation frequency", None))
-        self.oscillationFrequency_lineEdit.setText(QCoreApplication.translate("main_panel", u"4.7", None))
         self.unwrapPhase_checkBox.setText(QCoreApplication.translate("main_panel", u"Unwrapped", None))
-        self.showPhase_pushButton.setText(QCoreApplication.translate("main_panel", u"Show phase", None))
+        self.oscillationFrequency_lineEdit.setText(QCoreApplication.translate("main_panel", u"4.7", None))
+        self.customUnwrapPhase_checkBox.setText(QCoreApplication.translate("main_panel", u"CustomUnwrapped", None))
         self.toolBox.setItemText(self.toolBox.indexOf(self.page_7), QCoreApplication.translate("main_panel", u"RABBIT", None))
     # retranslateUi
 

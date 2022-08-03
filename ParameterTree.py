@@ -131,10 +131,11 @@ class PlotGroupParameter(pTypes.GroupParameter):
         i = 0
         while not hasFoundName:
             name = baseName+"_%d" % i
-            i = i+1
             if not(np.any([name == child.name() for child in self.childs])):
                 hasFoundName=True
                 return name
+            i = i+1
+
 
     def valueChanging(self,param, value):
         self.valueChanging_signal.emit(param, value)
@@ -237,3 +238,95 @@ class Viewer1DGroupParameter(pTypes.GroupParameter):
     def valueChanging(self,param, value):
         self.valueChanging_signal.emit(param, value)    
 
+
+
+class Viewer1DGroupParameter(pTypes.GroupParameter):
+    valueChanging_signal = Signal(object,object)
+
+    def __init__(self, **opts):
+        pTypes.GroupParameter.__init__(self, **opts)
+        
+        title_params =  {
+                    'name': 'title',
+                    'title':'Plot title',
+                    'type': 'str',
+                    'value': 'Viewer 1D'
+        }
+
+        grid_params =  {
+                    'x_grid': {
+                        'title':'x',                                        
+                        'type': 'bool',
+                        'value': True,
+                        },   
+                    'y_grid': {
+                        'title':'y',                                        
+                        'type': 'bool',
+                        'value': True,
+                        },    
+                    'alpha_grid': {
+                        'title':'alpha',                                        
+                        'type': 'slider',
+                        'span': np.linspace(0,1.0,11),
+                        'value': 0.3,
+                        },                            
+                }                      
+        xAxis_params =  {
+                'x_label': {
+                    'title':'label',
+                    'type': 'str',
+                    'value': '{x axis title}'
+                    },
+                'x_flipped': {
+                    'title':'flipped'                    ,
+                    'type': 'bool',
+                    'value': True
+                    },
+                    
+                'x_autorange': {
+                    'title':'autorange',                                        
+                    'type': 'bool',
+                    'value': True,
+                    'enabled': False
+                    },                        
+        }
+        yAxis_params =  {
+                'y_label': {
+                    'title':'label',
+                    'type': 'str',
+                    'value': '{y axis title}'
+                    },
+                'y_flipped': {
+                    'title':'flipped',                                        
+                    'type': 'bool',
+                    'value': True
+                    },               
+                'y_autorange': {
+                    'title':'autorange',                                        
+                    'type': 'bool',
+                    'value': True,
+                    'enabled': False
+                    },                    
+        }
+
+        params_title = Parameter.create(**title_params)
+        params_x = Parameter.create(name='x_axis',title='x-axis', type='group',expanded = False,children = xAxis_params)
+        params_y = Parameter.create(name='y_axis',title='y-axis', type='group',expanded = False,children = yAxis_params)
+        params_grid = Parameter.create(name='grid',title='Grid', type='group',expanded = False,children = grid_params)
+
+        self.addChildren(
+            [params_title,params_grid,params_x,params_y])
+
+        self.sigTreeStateChanged.connect(self.valueChanging)
+        # self.connectSignal(self.childs)
+
+
+
+    def connectSignal(self,childs):
+        for child in childs:
+            if child.childs:
+                self.connectSignal(child)
+            else:
+                child.sigValueChanged.connect(self.valueChanging)        
+    def valueChanging(self,param, value):
+        self.valueChanging_signal.emit(param, value)    

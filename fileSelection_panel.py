@@ -26,90 +26,68 @@ class FileSelectionPanel(Ui_FileSelectionPanel,QWidget):
     signal_deleteButton = Signal()
     signal_removeEntry = Signal(object)
     sendData_signal = Signal(object)
-    
+    sendData_signal = Signal(object)
+
     def __init__(self,parent=None):
         super(FileSelectionPanel, self).__init__(parent)                
         self.setupUi(self)  # Generate UI
         self.connectSignal() # Connect signals
         # self.widget_data = WidgetData(self,variableItemParameters= True) # Gives method WidgetData to FileSelectionPanel
         self.setupWindows() 
+        # File list stored in a Parameter
         self.fileList_Parameters = Parameter.create(name='file_list',title='File List',type='group',children=[])
 
+    def connectQMenu(self):
+        self.fileListSelection_QMenu.removeItem_signal.connect(self.removeSelectedItems)
+        self.fileListSelection_QMenu.clearTable_signal.connect(self.fileSelection_listClearItemClicked)
+        self.fileListSelection_QMenu.QActionOperation_signal.connect(self.readQMenuSignal)        
 
     def setupWindows(self):
-        # Initialize a VariablePanelWidget to read entry in FileSelectionPanel (given as Data_listItem)
         self.variableTable_panel = VariablePanel()  # Create VariablePanel
         self.connectVariablePanelSignal()
+        # ContextQMenu for fileSelection_listWidget (Should be moved in a subclass of listWidget)
         self.fileSelection_listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.fileSelection_listWidget.connect(self.fileSelection_listWidget,SIGNAL("customContextMenuRequested(QPoint)" ), self.listItemRightClicked)
-        # self.fileSelection_ParameterTree = Parameter.create(name ='file_list',title='File List',type='group',expandable=True,)
-        # self.fileSelection_tree.setHeaderHidden(True)
-        # self.fileSelection_tree.addParameters(self.fileSelection_ParameterTree,showTop=False)        
-    def getData(self,format):        
-        data = self.importDataFromFile(format)
-        self.sendData_signal.emit(data)
+        self.fileListSelection_QMenu = FileSelectionQMenu(selection=self.fileSelection_listWidget.selectedItems())        
+        self.connectQMenu()
 
+    def getData(self,format,function):        
+        data = self.importDataFromFile(format)        
+        self.sendData_signal.emit(data,function)
+            
     def importDataFromFile(self,format):
-        return [FM(self.fileList_Parameters.child(item.text())['fullpath'],format).readFile() for item in self.fileSelection_listWidget.selectedItems()]
-
+        for item in self.fileSelection_listWidget.selectedItems():
+            data = FM(self.fileList_Parameters.child(item.text())['fullpath'],format).readFile()
+            return Parameter.create(name=item.text(),value=data)
 
     def storeFiles(self,filename_list):
         [self.storeFile(filename) for filename in filename_list]              
 
     def storeFile(self,filename_fullpath):
-        folder,filename_withext = os.path.split(filename_fullpath)
-        filename,ext = os.path.splitext(filename_withext)
-        size = os.path.getsize(filename_fullpath)
-        file_params =  {
-                'fullpath':{
-                    'title': 'filename',
-                    'type': 'str',
-                    'value': filename_fullpath,
-                    'editable':False,
-                    },               
-                'dir': {
-                    'title': 'folder',                                        
-                    'type': 'str',
-                    'value': folder,
-                    'editable':False,
-                    },   
-                'ext': {
-                    'title':'ext',                                        
-                    'type': 'str',
-                    'value': ext,
-                    'editable':False,                    
-                    },    
-                'size': {
-                    'title':'size',                                        
-                    'type': 'int',
-                    'value': size,
-                    'editable':False,                    
-                    },      
-        }
+        P = FM(filename_fullpath).makeParameter()
         # Add entry to list
-        self.addEntry(QListWidgetItem(filename_withext))
+        self.addEntry(QListWidgetItem(P.name()))
         # Add child to parameter
-        self.fileList_Parameters.addChild(Parameter.create(name=filename_withext, type='group',expanded = False,children = file_params,removable = True,renamable=False))
+        self.fileList_Parameters.addChild(P)
 
 
     ################################################## Context menu ##########################################    
     def listItemRightClicked(self, QPos): 
-        self.fileListSelection_QMenu = FileSelectionQMenu(selection=self.fileSelection_listWidget.selectedItems())        
-        self.fileListSelection_QMenu.removeItem_signal.connect(self.removeSelectedItems)
-        self.fileListSelection_QMenu.clearTable_signal.connect(self.fileSelection_listClearItemClicked)
-        self.fileListSelection_QMenu.QActionOperation_signal.connect(self.readQMenuSignal)
+        self.fileListSelection_QMenu.updateSelection(self.fileSelection_listWidget.selectedItems())
         parentPosition = self.fileSelection_listWidget.mapToGlobal(QPoint(0, 0))        
         self.fileListSelection_QMenu.move(parentPosition + QPos)
         self.fileListSelection_QMenu.show() 
     ################################################## Read Context menu ##########################################    
     def readQMenuSignal(self,input):
-        if input  == 'ExtractMBES':
-            self.getData('MBES')
+        if input  == 'OpenMBES':
+            self.getData('MBES','open')
+        elif input  == 'ExtractMBES':
+            self.getData('MBES','store')            
         elif input == 'SaveData':
             print('Saving data... or not')
         elif input == 'RemoveItems':
             self.removeSelectedItems()
-        elif input == 'clearList':                        
+        elif input == 'ClearList':                        
             self.fileSelection_listClearItemClicked()
     ################################################## Context menu functions ##########################################    
     def fileSelection_listShowItemClicked(self):
@@ -147,11 +125,8 @@ class FileSelectionPanel(Ui_FileSelectionPanel,QWidget):
         self.fileSelection_listWidget.setCurrentItem(item)
 
     def removeEntry(self,item):
-        # Remove entry to FileSelectionPanel + send signal to remove associated tab in VariablePanelWidget
-        # self.signal_removeEntry.emit(item.get_widgetDataVariableItem())
         self.fileList_Parameters.removeChild(self.fileList_Parameters.child(item.text())) # Remove item from parameters
         self.fileSelection_listWidget.takeItem(self.fileSelection_listWidget.row(item))  # Remove item from list
-        # self.fileSelection_listWidget.setCurrentRow(self.fileSelection_listWidget.count()-1)
 
     def removeSelectedItems(self):
         [self.removeEntry(item) for item in self.fileSelection_listWidget.selectedItems()]

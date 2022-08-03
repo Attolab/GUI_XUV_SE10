@@ -497,6 +497,26 @@
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
           <layout class="QGridLayout" name="gridLayout_3">
+           <item row="2" column="0">
+            <widget class="QPushButton" name="showPhase_pushButton">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Show phase</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>Oscillation frequency</string>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="1">
             <widget class="QComboBox" name="oscillationUnits_comboBox">
              <property name="currentIndex">
@@ -524,10 +544,10 @@
              </item>
             </widget>
            </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_9">
+           <item row="2" column="1">
+            <widget class="QCheckBox" name="unwrapPhase_checkBox">
              <property name="text">
-              <string>Oscillation frequency</string>
+              <string>Unwrapped</string>
              </property>
             </widget>
            </item>
@@ -544,23 +564,10 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <widget class="QCheckBox" name="unwrapPhase_checkBox">
+           <item row="3" column="1">
+            <widget class="QCheckBox" name="customUnwrapPhase_checkBox">
              <property name="text">
-              <string>Unwrapped</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QPushButton" name="showPhase_pushButton">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Show phase</string>
+              <string>CustomUnwrapped</string>
              </property>
             </widget>
            </item>

@@ -23,34 +23,47 @@ class FileSelectionQMenu(QMenu):
         super(FileSelectionQMenu, self).__init__(parent)
         
         self.data_menu = QMenu("Data",self)        
+        self.addMenu(self.data_menu)
+
+        self.openData_menu = QMenu("Open with ...",self)        
+        self.openDataMBESE_action = QAction("MBES...",self.openData_menu)
+        self.data_menu.addMenu(self.openData_menu)
+
         self.extractData_menu = QMenu("Extract as ...",self)        
         self.extractDataMBESE_action = QAction("MBES...",self.extractData_menu)
-        self.addMenu(self.data_menu)
+        self.data_menu.addMenu(self.extractData_menu)
         self.addSeparator()
 
 
-        self.data_menu.addMenu(self.extractData_menu)
+
+
         self.extractData_menu.addAction(self.extractDataMBESE_action)
         self.extractData_menu.addSeparator()
         self.saveData_action = QAction("Save Data",self)
         self.removeItem_action = QAction("Remove Item(s)",self)
         self.clearTable_action = QAction("Clear all",self)
 
+        self.addAction(self.saveData_action)
         self.addAction(self.removeItem_action)
-        self.addAction(self.clearTable_action)          
+        self.addAction(self.clearTable_action)      
+        self.openDataMBESE_action.setData('OpenMBES')
         self.extractDataMBESE_action.setData('ExtractMBES')
         self.saveData_action.setData('SaveData')
         self.removeItem_action.setData('RemoveItems')
         self.clearTable_action.setData('ClearList')
 
+        self.openDataMBESE_action.triggered.connect(self.QAction_function)
         self.extractDataMBESE_action.triggered.connect(self.QAction_function)
         self.saveData_action.triggered.connect(self.QAction_function)
         self.removeItem_action.triggered.connect(self.QAction_function)
         self.clearTable_action.triggered.connect(self.QAction_function)
-        if not selection:
-            self.data_menu.setEnabled(False)
-            self.removeItem_action.setEnabled(False)
-            
+        self.updateSelection(selection)
+
+    def updateSelection(self,selection = None):
+        status = bool(selection)
+        self.data_menu.setEnabled(status)
+        self.removeItem_action.setEnabled(status)
+
     def QAction_function(self,):
         self.QActionOperation_signal.emit(self.sender().data())    
         # self.data_menu.addMenu(self.extractData_menu)

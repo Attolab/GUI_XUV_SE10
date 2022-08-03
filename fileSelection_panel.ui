@@ -40,6 +40,9 @@
      <property name="movement">
       <enum>QListView::Free</enum>
      </property>
+     <property name="layoutMode">
+      <enum>QListView::SinglePass</enum>
+     </property>
     </widget>
    </item>
    <item>
@@ -80,7 +83,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <property name="movable">
       <bool>true</bool>

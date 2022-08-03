@@ -198,9 +198,9 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
 
     def addROI(self,toolButton,action):
         if action.data() == 'IL_H':
-            ROI = self.addROI_infiniteLineItem(0,'y')
+            ROI = self.addROI_infiniteLineItem(np.sum(self.view_1D.viewRange()[1])/2,0,'y')
         elif action.data() == 'IL_V':  
-            ROI = self.addROI_infiniteLineItem(90,'x')          
+            ROI = self.addROI_infiniteLineItem(np.sum(self.view_1D.viewRange()[0])/2,90,'x')          
         elif action.data() == 'LR_H':            
             ROI = self.addROI_linearRegionItem(self.view_1D.viewRange()[1],'horizontal')
         elif action.data() == 'LR_V':                        
@@ -219,8 +219,10 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
         lr.setZValue(10)
         return lr
 
-    def addROI_infiniteLineItem(self,angle,label):
-        il = pg.InfiniteLine(movable=True, angle=angle, label=label+'={value:0.2f}', 
+    def addROI_infiniteLineItem(self,pos,angle,label):
+        # self.view_1D.viewRange()[1]
+        # pos = np.sum(self.view_1D.viewRange()[0])/2
+        il = pg.InfiniteLine(pos = pos,movable=True, angle=angle, label=label+'={value:0.2f}', 
                        labelOpts={'position':0.1, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': True})
         il.setZValue(10)
         return il

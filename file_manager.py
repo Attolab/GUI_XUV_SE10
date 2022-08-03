@@ -7,6 +7,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QGridLayout, QSizePolicy, QTabWidget,
     QWidget,QFileDialog)
+
+from pyqtgraph.parametertree import Parameter
 import pathlib
 import h5py
 from numpy import array as npa
@@ -22,10 +24,44 @@ class FileManager:
         self.format = format
         self.dataset_list= []
         if not self.format:
-            self.filename,self.format = os.path.splitext(self.filename)
+            filename,self.format = os.path.splitext(self.filename)
     def readFile(self):
         if self.format == 'MBES':
             return self.Read_h5()
+
+
+    def makeParameter(self):
+        folder,filename_withext = os.path.split(self.filename)
+        filename,ext = os.path.splitext(filename_withext)
+        size = os.path.getsize(self.filename )
+        file_params =  {
+                'fullpath':{
+                    'title': 'filename',
+                    'type': 'str',
+                    'value': self.filename,
+                    'editable':False,
+                    },               
+                'dir': {
+                    'title': 'folder',                                        
+                    'type': 'str',
+                    'value': folder,
+                    'editable':False,
+                    },   
+                'ext': {
+                    'title':'ext',                                        
+                    'type': 'str',
+                    'value': ext,
+                    'editable':False,                    
+                    },    
+                'size': {
+                    'title':'size',                                        
+                    'type': 'int',
+                    'value': size,
+                    'editable':False,                    
+                    },      
+        }
+        return Parameter.create(name=filename_withext, type='group',expanded = False,children = file_params,removable = True,renamable=False)
+
         
         
     def print_grp_name(self,grp_name, object):        

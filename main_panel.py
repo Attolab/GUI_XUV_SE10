@@ -263,6 +263,9 @@ class MainPanel(Ui_main_panel,QWidget):
 
             if self.unwrapPhase_checkBox.isChecked():
                 data = np.unwrap(data)
+            if self.customUnwrapPhase_checkBox.isChecked():
+                data = wrap2pmpi(data)
+
             self.doPlot1D(y_axis,data,label=f'\u03C9={oscillation_frequency}PHz')
 
         else:
@@ -274,7 +277,9 @@ class MainPanel(Ui_main_panel,QWidget):
         self.V.addPlot(name=label,x=x,y=y,)
         self.V.show()
 
-
+def wrap2pmpi(phasedata):
+    """It wraps phase from -pi, pi"""
+    return (phasedata + np.pi) % (2*np.pi) -np.pi
 def main():
     import sys
     app = QApplication([])
