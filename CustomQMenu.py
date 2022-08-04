@@ -15,48 +15,55 @@ import numpy as np
 
 import pyqtgraph as pg
 
-class FileSelectionQMenu(QMenu):
-    removeItem_signal = Signal()
-    clearTable_signal = Signal()    
+
+
+class baseQMenu(QMenu):
+    QActionOperation_signal = Signal(str)
+    def __init__(self,parent=None):
+        super(baseQMenu, self).__init__(parent)
+        self.removeItem_action = QAction("Remove Item(s)",self)
+        self.removeItem_action.setData('removeItems')
+        self.clearTable_action = QAction("Clear all",self)
+        self.clearTable_action.setData('clearList')
+        self.addAction(self.removeItem_action)
+        self.addAction(self.clearTable_action) 
+
+
+        self.removeItem_action.triggered.connect(self.QAction_function)
+        self.clearTable_action.triggered.connect(self.QAction_function)   
+
+    def QAction_function(self,):
+        self.QActionOperation_signal.emit(self.sender().data())    
+
+class FileSelectionQMenu(baseQMenu):
     QActionOperation_signal = Signal(str)
     def __init__(self,parent=None,selection=None):
         super(FileSelectionQMenu, self).__init__(parent)
         
+        self.addSeparator()
         self.data_menu = QMenu("Data",self)        
-        self.addMenu(self.data_menu)
 
         self.openData_menu = QMenu("Open with ...",self)        
         self.openDataMBESE_action = QAction("MBES...",self.openData_menu)
+        self.openDataMBESE_action.setData('openMBES')
         self.data_menu.addMenu(self.openData_menu)
 
         self.extractData_menu = QMenu("Extract as ...",self)        
         self.extractDataMBESE_action = QAction("MBES...",self.extractData_menu)
-        self.data_menu.addMenu(self.extractData_menu)
-        self.addSeparator()
-
-
-
-
+        self.extractDataMBESE_action.setData('extractMBES')
         self.extractData_menu.addAction(self.extractDataMBESE_action)
-        self.extractData_menu.addSeparator()
+        self.data_menu.addMenu(self.extractData_menu)
+
+        self.insertMenu(self.removeItem_action,self.data_menu)        
+
         self.saveData_action = QAction("Save Data",self)
-        self.removeItem_action = QAction("Remove Item(s)",self)
-        self.clearTable_action = QAction("Clear all",self)
-
+        self.saveData_action.setData('saveData')
+        
         self.addAction(self.saveData_action)
-        self.addAction(self.removeItem_action)
-        self.addAction(self.clearTable_action)      
-        self.openDataMBESE_action.setData('OpenMBES')
-        self.extractDataMBESE_action.setData('ExtractMBES')
-        self.saveData_action.setData('SaveData')
-        self.removeItem_action.setData('RemoveItems')
-        self.clearTable_action.setData('ClearList')
-
+    
         self.openDataMBESE_action.triggered.connect(self.QAction_function)
         self.extractDataMBESE_action.triggered.connect(self.QAction_function)
         self.saveData_action.triggered.connect(self.QAction_function)
-        self.removeItem_action.triggered.connect(self.QAction_function)
-        self.clearTable_action.triggered.connect(self.QAction_function)
         self.updateSelection(selection)
 
     def updateSelection(self,selection = None):
@@ -64,20 +71,22 @@ class FileSelectionQMenu(QMenu):
         self.data_menu.setEnabled(status)
         self.removeItem_action.setEnabled(status)
 
-    def QAction_function(self,):
-        self.QActionOperation_signal.emit(self.sender().data())    
-        # self.data_menu.addMenu(self.extractData_menu)
-        # self.extractAllData_menu = QMenu("Extract all",self)
-        # self.data_menu.addMenu(self.extractData_menu)
-        # self.extractAllData_menu.addSeparator()
-        # self.extractData_GlobalWorkspace_action = QAction("in global workspace",self)
-        # self.extractData_NewWorkspace_action = QAction("in new workspace",self)
-        # self.extractData_ExistingWorkSpace_menu = QMenu("in workspace ...",self) #         
-        # # ADD ACTION FOR EACH EXISTING WORKSPACE
-        # self.extractData_menu.addAction(self.extractData_GlobalWorkspace_action)  
-        # self.extractData_menu.addAction(self.extractData_NewWorkspace_action)        
-        # self.extractData_menu.addMenu(self.extractData_ExistingWorkSpace_menu)        
 
+class DataSelectionQMenu(baseQMenu):
+    QActionOperation_signal = Signal(str)
+    def __init__(self,parent=None,selection=None):
+        super(DataSelectionQMenu, self).__init__(parent)
+        
+        self.addSeparator()
+        self.copyData_action = QAction("Copy",self)
+        self.copyData_action.setData('copy')
+        self.copyData_action.triggered.connect(self.QAction_function)
+
+        self.insertAction(self.removeItem_action,self.copyData_action)        
+
+    def updateSelection(self,selection = None):
+        status = bool(selection)
+        self.removeItem_action.setEnabled(status)        
 
 class CustomQMenu(QMenu):
     removeItem_signal = Signal()

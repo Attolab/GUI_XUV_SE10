@@ -29,6 +29,9 @@ class FileManager:
         if self.format == 'MBES':
             return self.Read_h5()
 
+    # Parameter.create(name='signal',title='Signal',type='group')
+
+    # Parameter.create(name='signal',title='Signal',type='group')
 
     def makeParameter(self):
         folder,filename_withext = os.path.split(self.filename)
@@ -119,7 +122,8 @@ class FileManager:
             values = self.get_values(self, file, keys)
             shape = values.shape
             dtype = values.dtype
-        return keys,values,shape,dtype        
+        return keys,values,shape,dtype       
+
     def convertInput(self,inputs):
         return [input.decode('ISO-8859-1)') if input[0] == 80 else input for input in inputs]
 
@@ -194,11 +198,43 @@ def get_key_parameters(keys):
     return npa([key for key in keys if "Scan_parameters" in key])
 
    
-    # static_key = []
-    # for key in keys:
-    #     if "Static spectra/shots on" in key or "Static spectra/shots off" in key:
-    #         static_key.append(key)
-    # return npa(static_key)
+
+# class FileReadMBES():
+#     def __init__(self, filename = None):
+#         self.filename = filename
+#         self.parameter = Parameter()
+#         self.makeParameter()
+    
+#     def makeParameter(self):
+#         Parameter.create(name='signal',title='Signal',type='group',children = [])
+#         Parameter.create(name='signal',title='Signal',type='group')
+
+#         Parameter.create(name='signal',title='Signal',type='group')
+
+
+
+    
+    def readFile(self):
+        if self.format == 'MBES':
+            return self.Read_h5()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def main():

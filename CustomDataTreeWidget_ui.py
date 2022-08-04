@@ -36,7 +36,7 @@ class Ui_CustomDataTreeWidget(object):
         self.data_treeWidget.setDragDropOverwriteMode(False)
         self.data_treeWidget.setDragDropMode(QAbstractItemView.NoDragDrop)
         self.data_treeWidget.setDefaultDropAction(Qt.MoveAction)
-        self.data_treeWidget.setSelectionMode(QAbstractItemView.ContiguousSelection)
+        self.data_treeWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
         self.verticalLayout.addWidget(self.data_treeWidget)
 

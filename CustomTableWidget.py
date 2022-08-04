@@ -160,14 +160,51 @@ class ROITableWidget(CustomTableWidget):
     def QMenu_function(self,command):
         self.QMenu_signal.emit(command)    
 
+class fileSelectionTableWidget(TableWidget):
 
+    QMenu_signal = Signal(str)
+    def __init__(self,parent=None):
+        super(fileSelectionTableWidget, self).__init__(parent)
+        # Connect QContextMenu
+        # self.setContextMenuPolicy(Qt.CustomContextMenu)
+        # self.connect(self,SIGNAL("customContextMenuRequested(QPoint)" ), self.tableItemRightClicked)    
+        # Method to add an entry to the table
+    def addEntry(self,name=None,orientation='H',type='LRI'):
+        nRow = self.rowCount()        
+        self.insertRow(nRow)
+        if not(name):
+            name = f'{nRow}'          
+        if orientation == 'horizontal':
+            orientation ='H'
+        elif orientation == 'vertical':
+            orientation ='V'
+        item = QTableWidgetItem(name)
+        item.setFlags(item.flags() | Qt.ItemIsEditable)    
+        self.setItem(nRow,0,item)
+        item = QTableWidgetItem(orientation)
+        item.setFlags(item.flags() & ~Qt.ItemIsEditable)        
+        self.setItem(nRow,1,item)
+        self.clearSelection()
+        self.setCurrentItem(item)   
+
+        # Method when user rightclicked on table
+    def tableItemRightClicked(self, QPos): 
+        sender = self.sender()
+        parentPosition = sender.mapToGlobal(QPoint(0, 0))                
+        self.Qmenu = FileSelectionQMenu('Menu',)
+        self.Qmenu.removeItem_signal.connect(self.removeSelectedItems_table)
+        self.Qmenu.clearTable_signal.connect(self.clearTable)
+        self.Qmenu.move(parentPosition + QPos)
+        self.Qmenu.show()  
+
+    def QMenu_function(self,command):
+        self.QMenu_signal.emit(command)    
 
 def main():
     import sys
     app = QApplication([])
     # test = ROITableWidget()
-    test = PlotTableWidget()
-    test.addEntry('test')
+    test = fileSelectionTableWidget()
     test.addEntry('test')
     test.show()
     app.exec()
