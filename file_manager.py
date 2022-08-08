@@ -31,8 +31,6 @@ class FileManager:
 
     # Parameter.create(name='signal',title='Signal',type='group')
 
-    # Parameter.create(name='signal',title='Signal',type='group')
-
     def makeParameter(self):
         folder,filename_withext = os.path.split(self.filename)
         filename,ext = os.path.splitext(filename_withext)
@@ -43,41 +41,33 @@ class FileManager:
                     'type': 'str',
                     'value': self.filename,
                     'editable':False,
+                    'readonly':True,
                     },               
                 'dir': {
                     'title': 'folder',                                        
                     'type': 'str',
                     'value': folder,
                     'editable':False,
+                    'readonly':True,                    
                     },   
                 'ext': {
                     'title':'ext',                                        
                     'type': 'str',
                     'value': ext,
-                    'editable':False,                    
+                    'editable':False,
+                    'readonly':True,                                        
                     },    
                 'size': {
                     'title':'size',                                        
                     'type': 'int',
                     'value': size,
-                    'editable':False,                    
+                    'editable':False,
+                    'readonly':True,                                        
                     },      
         }
         return Parameter.create(name=filename_withext, type='group',expanded = False,children = file_params,removable = True,renamable=False)
 
-        
-        
-    def print_grp_name(self,grp_name, object):        
-        # print ('object = ' , object)
-        # print ('Group =', object.name)
-        dataset_list = []
-        try:
-            n_subgroups = len(object.keys())
-            print ('Object is a Group')
-        except:
-            n_subgroups = 0
-            print ('Object is a Dataset')
-            dataset_list.append (object.name)            
+               
 
     def get_keys(self,f):
         return [key for key in f.keys()]
@@ -151,9 +141,6 @@ class FileManager:
         data = data[:,:,indexing]
         return data,delay,t_vol
 
-    def order_data(self,data,indexing):
-        return data[indexing,:].T
-
     def readCalibration(self):
         with open(self.filename, "r") as f:  
             file_content = f.read().split()
@@ -175,7 +162,6 @@ class FileManager:
                 [f.write(letter+'\t') for letter in ['A','B','t0','R2']]
                 f.write('\n') 
                 [f.write(item.text()+'\t') for item in calibration_inputs]
-                # [f.write(str(coeff)) for coeff in self.getCalibration()]
             print(f'Calibration saved as {self.filename}')
 
 

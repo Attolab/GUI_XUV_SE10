@@ -28,7 +28,6 @@ class baseQMenu(QMenu):
         self.addAction(self.removeItem_action)
         self.addAction(self.clearTable_action) 
 
-
         self.removeItem_action.triggered.connect(self.QAction_function)
         self.clearTable_action.triggered.connect(self.QAction_function)   
 
@@ -77,16 +76,65 @@ class DataSelectionQMenu(baseQMenu):
     def __init__(self,parent=None,selection=None):
         super(DataSelectionQMenu, self).__init__(parent)
         
-        self.addSeparator()
         self.copyData_action = QAction("Copy",self)
         self.copyData_action.setData('copy')
         self.copyData_action.triggered.connect(self.QAction_function)
 
         self.insertAction(self.removeItem_action,self.copyData_action)        
+        self.insertSeparator(self.removeItem_action)
+
+        self.operation_menu = QMenu('Operation',self)
+        self.sumData_menu = QMenu('Sum',self.operation_menu)
+        self.substractData_menu = QMenu('Substract',self.operation_menu)
+        self.normalizeData_menu = QMenu('Normalize',self.operation_menu)
+
+        self.sumData2_action = QAction('along axis 2',self.sumData_menu)
+        self.sumData2_action.setData('sum2')        
+        self.sumData1_action = QAction('along axis 1',self.sumData_menu)
+        self.sumData1_action.setData('sum1')        
+        self.sumData0_action = QAction('along all axis',self.sumData_menu)
+        self.sumData0_action.setData('sum0')
+        self.sumData_menu.addAction(self.sumData0_action)
+        self.sumData_menu.addAction(self.sumData1_action)
+        self.sumData_menu.addAction(self.sumData2_action)
+
+        self.substractData_menu = QMenu('Substract',self.operation_menu)
+        self.substractData2_action = QAction('along axis 2',self.sumData_menu)
+        self.sumData2_action.setData('sum2')        
+        self.sumData1_action = QAction('along axis 1',self.sumData_menu)
+        self.sumData1_action.setData('sum1')        
+        self.sumData0_action = QAction('along all axis',self.sumData_menu)
+        self.sumData0_action.setData('sum0')
+        self.sumData_menu.addAction(self.sumData0_action)
+        self.sumData_menu.addAction(self.sumData1_action)
+        self.sumData_menu.addAction(self.sumData2_action)
+
+
+        self.normalizeData_menu = QMenu('Normalize',self.operation_menu)
+        self.normalizeData2_action = QAction('along axis 2',self.normalizeData_menu)
+        self.normalizeData2_action.setData('normalize2')        
+        self.normalizeData1_action = QAction('along axis 1',self.normalizeData_menu)
+        self.normalizeData1_action.setData('normalize1')        
+        self.normalizeData0_action = QAction('along all axis',self.normalizeData_menu)
+        self.normalizeData0_action.setData('normalize0')
+        self.normalizeData_menu.addAction(self.normalizeData0_action)
+        self.normalizeData_menu.addAction(self.normalizeData1_action)
+        self.normalizeData_menu.addAction(self.normalizeData2_action)
+
+
+
+        self.operation_menu.addMenu(self.sumData_menu)
+        self.operation_menu.addMenu(self.normalizeData_menu)
+        self.insertMenu(self.copyData_action,self.operation_menu)
+        self.insertSeparator(self.copyData_action)
 
     def updateSelection(self,selection = None):
         status = bool(selection)
         self.removeItem_action.setEnabled(status)        
+
+
+
+
 
 class CustomQMenu(QMenu):
     removeItem_signal = Signal()

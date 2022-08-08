@@ -20,7 +20,6 @@ from pyqtgraph.dockarea.DockArea import DockArea
 from pyqtgraph.parametertree import Parameter
 from pyqtgraph.parametertree import ParameterTree
 from signal_processing_toolbox import SignalProcessingToolbox
-from fileDetails_tabWidget_ui import Ui_fileDetails_tabwidget
 from CustomQMenu import FileSelectionQMenu
 import sys, traceback
 import h5py
@@ -34,28 +33,41 @@ class MainWindow(QMainWindow,Ui_MainWindow):
     sendData_signal = Signal(object,object)
     def __init__(self,parent=None):
         super(MainWindow, self).__init__(parent)                
-        self.setupUi(self)        
-        self.setupWindows()
-        self.connectSignal()    
+        self.setupUi(self)          
         self.path_folder = '' 
-        self.workspace = dict() # Create a workspace instance to store data
-        self.data = dict() # Temporary array for containing data
+        self._workspace = dict() # Create a workspace instance to store data
+        self._data = dict() # Temporary array for containing data
+        self._dock = dict()
+        self._widgets = dict()
+        self.setupWindows()
+        self.connectSignal()          
 
     def storeData(self,data_name,data):
-        self.data[data_name] = data
+        self._data[data_name] = data
+
+    # def data(self,data_name):
+    #     return self._data[data_name]
     
     def storeDataInWorkspace(self,data_name,data,workspace_name):
         self.workspace[workspace_name] = data
     
     def setupWindows(self):       
-        self.fileSelection_dock = QDockWidget('File Selection',self)
-        self.fileSelection_widget = FileSelectionPanel()
-        self.fileSelection_dock.setWidget(self.fileSelection_widget)
-        self.addDockWidget(Qt.LeftDockWidgetArea,self.fileSelection_dock)
-        self.mainPanelwidget = MainPanel()
-        self.setCentralWidget(self.mainPanelwidget)
-        self.showMaximized()
+        dock = QDockWidget('File Selection',self)
+        widget = FileSelectionPanel()
+        dock.setWidget(widget)
+        self.addDockWidget(Qt.LeftDockWidgetArea,dock)
+        self._dock['fileSelection_dock'] = dock
+        self._widgets['fileSelection_widget'] = widget        
+        self.openMBES()
+        self.showMaximized() 
 
+    def openMBES(self):
+        dock = QDockWidget('MBES Panel',self,floating=False)
+        widget = MainPanel()        
+        dock.setWidget(widget)
+        self.addDockWidget(Qt.RightDockWidgetArea,dock)
+        self._dock['MBES_dock'] = dock        
+        self._widgets['MBES_widget'] = widget
     
     def loadData(self):
         self.path_filenames = QFileDialog.getOpenFileNames(self, 'Choose file',self.path_folder)[0]            
@@ -64,8 +76,9 @@ class MainWindow(QMainWindow,Ui_MainWindow):
         self.loadData_signal.emit(self.path_filenames)
 
     def restore(self):
-        self.fileSelection_dock.setFloating(False)
-        self.fileSelection_dock.show()
+        for dock in self._dock:
+            dock.setFloating(False)
+            dock.show()
 
     def connectSignal(self):
         # CONNECT ACTIONS #
@@ -81,14 +94,14 @@ class MainWindow(QMainWindow,Ui_MainWindow):
         self.restoreState_action.setShortcut(QKeySequence(Qt.CTRL + Qt.Key_R))
 
         # CONNECT FILE SELECTION PANEL #
-        self.loadData_signal.connect(self.fileSelection_widget.storeFiles)
+        self.loadData_signal.connect(self._widgets['fileSelection_widget'].storeFiles)
 
         # CONNECT DATA #
         self.sendData_signal.connect(self.storeData)
         self.sendData_signal.connect(self.storeDataInWorkspace)
 
         #
-        self.fileSelection_widget.sendData_signal.connect(self.mainPanelwidget.showData)
+        self._widgets['fileSelection_widget'].sendData_signal.connect(self._widgets['MBES_widget'].showData)
 
         print('Connecting signal')
 

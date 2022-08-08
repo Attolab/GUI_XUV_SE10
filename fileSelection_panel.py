@@ -27,12 +27,11 @@ class FileSelectionPanel(Ui_FileSelectionPanel,QWidget):
         super(FileSelectionPanel, self).__init__(parent)                
         self.setupUi(self)  # Generate UI
         self.connectSignal() # Connect signals
-        # self.widget_data = WidgetData(self,variableItemParameters= True) # Gives method WidgetData to FileSelectionPanel
-        self.setupWindows() 
+        self.setupContextMenu() 
         # File list stored in a Parameter
         self._fileList_Parameters = Parameter.create(name='file_list',title='File List',type='group',children=[])
 
-    def setupWindows(self):
+    def setupContextMenu(self):
         # ContextQMenu for fileSelection_listWidget (Should be moved in a subclass of listWidget)
         self.fileSelection_listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.fileSelection_listWidget.connect(self.fileSelection_listWidget,SIGNAL("customContextMenuRequested(QPoint)" ), self.listItemRightClicked)
@@ -51,19 +50,21 @@ class FileSelectionPanel(Ui_FileSelectionPanel,QWidget):
     def storeFiles(self,filename_list):
         [self.storeFile(filename) for filename in filename_list]              
 
+
+    def updateParameterTree(self,):
+    
+        P = self._fileList_Parameters.child(self.fileSelection_listWidget.currentItem().text())
+        self.fileDes_parameterTree.clear()
+        [self.fileDes_parameterTree.addParameters(child,showTop=True) for child in P.childs]        
+        # self.fileAttr_parameterTree.setParameters(P,showTop=False)
+        # self.filePrev_parameterTree.setParameters(P,showTop=True)
+
     def storeFile(self,filename_fullpath):
         P = FM(filename_fullpath).makeParameter()
         # Add child to parameter
         self._fileList_Parameters.addChild(P)
         # Add entry to list
         self.addEntry(QListWidgetItem(P.name()))
-    
-
-    def showfileDetails(self):
-        if self.showDetails_checkBox.isChecked():
-            self.fileDetails_tabwidget.show()
-        else:
-            self.fileDetails_tabwidget.hide()
 
     def showfileDetails(self):
         if self.showDetails_checkBox.isChecked():
@@ -102,7 +103,7 @@ class FileSelectionPanel(Ui_FileSelectionPanel,QWidget):
         self.makeInput_pushButton.clicked.connect(self.press_makeButton_function)
         self.fileSelection_listWidget.itemDoubleClicked.connect(self.doubleClicked_listWidget_function)
         self.showDetails_checkBox.stateChanged.connect(self.showfileDetails)
-
+        self.fileSelection_listWidget.itemSelectionChanged.connect(self.updateParameterTree)
     ################################################## Functions ##########################################    
 
     def addEntry(self,item):
