@@ -9,12 +9,13 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,QShortcut,
 from PySide6.QtWidgets import (QApplication, QTreeWidget,QTreeWidgetItem,QStyledItemDelegate,
     QVBoxLayout, QWidget,QTableWidgetItem,QFileDialog,QDockWidget,QMainWindow,QHeaderView)
 from CustomDataTreeWidget_ui import Ui_CustomDataTreeWidget
-from CustomTableWidget import CustomTableWidget,fileSelectionTableWidget
-from pyqtgraph import DataTreeWidget
 import numpy as np
 from CustomQMenu import DataSelectionQMenu
 import copy
 from editableTreeModel import TreeModel,NoEditDelegate
+
+
+
 class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
     showVariable_signal = Signal(object)
     operation_signal = Signal(object)
@@ -38,7 +39,7 @@ class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
         self.connectSignals()  
     def connectSignals(self):
         self.add_pushButton.pressed.connect(self.addEntry_pushButton)
-        # self.data_treeWidget.itemDoubleClicked.connect(self.doubleClicked_treeWidget_function)
+        self.treeView.doubleClicked.connect(self.doubleClicked_treeWidget_function)
         self.removeSelectedRows_signal.connect(self.model.removeNodesEntry)
         self.model.dataChanged.connect(self.updateDataName)        
     def makeBinding(self):
@@ -68,7 +69,7 @@ class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
         parentPosition = self.treeView.mapToGlobal(QPoint(0, 0))        
         self.dataTreeView_QMenu.move(parentPosition + QPos)
         self.dataTreeView_QMenu.show() 
-        
+
 
     def addEntry_pushButton(self):
         data = {'Type':{"Project A": np.ones((5,1)),
@@ -83,9 +84,16 @@ class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
         self.treeView.expandAll()
         self.treeView.resizeColumnToContents(0)        
         
-    # def doubleClicked_treeWidget_function(self,item):
-    #     self.showVariable_signal.emit(item.text(0))
-    #     print(item.text(0))
+    def doubleClicked_treeWidget_function(self,index):
+        # Need to subclass tree view to disable rename of variables
+#     class TreeView(QtGui.QTreeView):    
+        # def edit(self, index, trigger, event):
+        #     if trigger == QtGui.QAbstractItemView.DoubleClicked:
+        #         print 'DoubleClick Killed!'
+        #         return False
+        #     return QtGui.QTreeView.edit(self, index, trigger, event)
+        self.showVariable_signal.emit(index)
+        print(self.model.getItem(index).data(0))
 
  ################################################## Read Context menu ##########################################    
     def readQMenuSignal(self,input):
@@ -181,7 +189,6 @@ class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
         self.nodes = {}
         self._data = {}
         self.model.clear()
-
 
 
 def main():
