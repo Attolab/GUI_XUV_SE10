@@ -24,6 +24,7 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(491, 328)
+        MainWindow.setDockNestingEnabled(True)
         self.menuFile_restartAction = QAction(MainWindow)
         self.menuFile_restartAction.setObjectName(u"menuFile_restartAction")
         self.quit_action = QAction(MainWindow)

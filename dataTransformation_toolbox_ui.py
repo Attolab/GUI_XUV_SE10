@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'dataTransformation_toolbox.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.1
+## Created by: Qt User Interface Compiler version 6.2.4
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -26,13 +26,15 @@ class Ui_dataTransformationToolbox(object):
     def setupUi(self, dataTransformationToolbox):
         if not dataTransformationToolbox.objectName():
             dataTransformationToolbox.setObjectName(u"dataTransformationToolbox")
-        dataTransformationToolbox.resize(673, 286)
+        dataTransformationToolbox.resize(856, 561)
         self.horizontalLayout_5 = QHBoxLayout(dataTransformationToolbox)
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.gridLayout_4 = QGridLayout()
         self.gridLayout_4.setObjectName(u"gridLayout_4")
         self.groupBox = QGroupBox(dataTransformationToolbox)
         self.groupBox.setObjectName(u"groupBox")
+        self.groupBox.setFlat(False)
+        self.groupBox.setCheckable(False)
         self.verticalLayout_5 = QVBoxLayout(self.groupBox)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.verticalLayout_5.setSizeConstraint(QLayout.SetMinimumSize)
@@ -128,15 +130,15 @@ class Ui_dataTransformationToolbox(object):
 
         self.gridLayout.addWidget(self.filterStartBelongTo_comboBox, 2, 2, 1, 1)
 
-        self.filterEnd__doubleSpinBox = QDoubleSpinBox(self.filterOperation_tab)
-        self.filterEnd__doubleSpinBox.setObjectName(u"filterEnd__doubleSpinBox")
-        sizePolicy2.setHeightForWidth(self.filterEnd__doubleSpinBox.sizePolicy().hasHeightForWidth())
-        self.filterEnd__doubleSpinBox.setSizePolicy(sizePolicy2)
-        self.filterEnd__doubleSpinBox.setKeyboardTracking(False)
-        self.filterEnd__doubleSpinBox.setMinimum(-10000000.000000000000000)
-        self.filterEnd__doubleSpinBox.setMaximum(10000000.000000000000000)
+        self.filterEnd_doubleSpinBox = QDoubleSpinBox(self.filterOperation_tab)
+        self.filterEnd_doubleSpinBox.setObjectName(u"filterEnd_doubleSpinBox")
+        sizePolicy2.setHeightForWidth(self.filterEnd_doubleSpinBox.sizePolicy().hasHeightForWidth())
+        self.filterEnd_doubleSpinBox.setSizePolicy(sizePolicy2)
+        self.filterEnd_doubleSpinBox.setKeyboardTracking(False)
+        self.filterEnd_doubleSpinBox.setMinimum(-10000000.000000000000000)
+        self.filterEnd_doubleSpinBox.setMaximum(10000000.000000000000000)
 
-        self.gridLayout.addWidget(self.filterEnd__doubleSpinBox, 2, 4, 1, 1)
+        self.gridLayout.addWidget(self.filterEnd_doubleSpinBox, 2, 4, 1, 1)
 
         self.filterFlip_comboBox = QComboBox(self.filterOperation_tab)
         self.filterFlip_comboBox.addItem("")
@@ -374,8 +376,8 @@ class Ui_dataTransformationToolbox(object):
         QWidget.setTabOrder(self.basicOperationChoice_comboBox, self.basicOperationPredef_comboBox)
         QWidget.setTabOrder(self.basicOperationPredef_comboBox, self.basicOperation_doubleSpinBox)
         QWidget.setTabOrder(self.basicOperation_doubleSpinBox, self.filterStart_doubleSpinBox)
-        QWidget.setTabOrder(self.filterStart_doubleSpinBox, self.filterEnd__doubleSpinBox)
-        QWidget.setTabOrder(self.filterEnd__doubleSpinBox, self.interpolationType_comboBox)
+        QWidget.setTabOrder(self.filterStart_doubleSpinBox, self.filterEnd_doubleSpinBox)
+        QWidget.setTabOrder(self.filterEnd_doubleSpinBox, self.interpolationType_comboBox)
         QWidget.setTabOrder(self.interpolationType_comboBox, self.interpolationNumberOfPoints_spinBox)
 
         self.retranslateUi(dataTransformationToolbox)

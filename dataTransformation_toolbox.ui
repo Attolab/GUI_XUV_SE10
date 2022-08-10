@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>673</width>
-    <height>286</height>
+    <width>856</width>
+    <height>561</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,6 +20,12 @@
       <widget class="QGroupBox" name="groupBox">
        <property name="title">
         <string>Operation</string>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+       <property name="checkable">
+        <bool>false</bool>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <property name="sizeConstraint">
@@ -189,7 +195,7 @@
                </widget>
               </item>
               <item row="2" column="4">
-               <widget class="QDoubleSpinBox" name="filterEnd__doubleSpinBox">
+               <widget class="QDoubleSpinBox" name="filterEnd_doubleSpinBox">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -600,7 +606,7 @@
   <tabstop>basicOperationPredef_comboBox</tabstop>
   <tabstop>basicOperation_doubleSpinBox</tabstop>
   <tabstop>filterStart_doubleSpinBox</tabstop>
-  <tabstop>filterEnd__doubleSpinBox</tabstop>
+  <tabstop>filterEnd_doubleSpinBox</tabstop>
   <tabstop>interpolationType_comboBox</tabstop>
   <tabstop>interpolationNumberOfPoints_spinBox</tabstop>
  </tabstops>

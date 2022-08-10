@@ -38,9 +38,9 @@ class FileSelectionPanel(Ui_FileSelectionPanel,QWidget):
         self.fileListSelection_QMenu = FileSelectionQMenu(selection=bool(self.fileSelection_listWidget.selectedItems()))        
         self.fileListSelection_QMenu.QActionOperation_signal.connect(self.readQMenuSignal)        
 
-    def getData(self,format,function):        
+    def getData(self,format):        
         data = self.importDataFromFile(format)        
-        self.sendData_signal.emit(data,function)
+        self.sendData_signal.emit(data)
             
     def importDataFromFile(self,format):
         for item in self.fileSelection_listWidget.selectedItems():
@@ -71,6 +71,8 @@ class FileSelectionPanel(Ui_FileSelectionPanel,QWidget):
             self.fileDetails_tabwidget.show()
         else:
             self.fileDetails_tabwidget.hide()
+
+
     ################################################## Context menu ##########################################    
     def listItemRightClicked(self, QPos): 
         self.fileListSelection_QMenu.updateSelection(self.fileSelection_listWidget.selectedItems())
@@ -80,9 +82,9 @@ class FileSelectionPanel(Ui_FileSelectionPanel,QWidget):
     ################################################## Read Context menu ##########################################    
     def readQMenuSignal(self,input):
         if input  == 'openMBES':
-            self.getData('MBES','open')
-        elif input  == 'oxtractMBES':
-            self.getData('MBES','store')            
+            self.getData('MBES')
+        elif input  == 'extractMBES':
+            self.getData('MBES')            
         elif input == 'saveData':
             print('Saving data... or not')
         elif input == 'removeItems':

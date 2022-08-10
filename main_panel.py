@@ -153,23 +153,25 @@ class MainPanel(Ui_main_panel,QWidget):
 
     def getDataType(self):
         if self.transient_radioButton.isChecked():
-            return 0
+            return 'signal_transient'
         elif self.dressingOn_radioButton.isChecked():
-            return 1
+            return 'signal_statOn'
         elif self.dressingOff_radioButton.isChecked():
-            return 2
+            return 'signal_statOff'
         else:
-            return 0
+            return 'signal_transient'
 
     def loadData(self,filename):
         signal = FM(filename,'MBES').readFile()     
         self.isDataLoaded = True  
         self.showData(signal)
 
-    def showData(self,data):        
+    def showData(self,data):         
         if len(data) == 1:
-            data = data[0]            
-        signal, delay, t_vol = data
+            data = data[0]           
+        signal = data['signal']
+        t_vol = data['t_vol']
+        delay = data['delay']
         signal = signal[self.getDataType()] 
         if len(delay) < 2:
             delay = np.append(delay,-delay)

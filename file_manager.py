@@ -1,3 +1,4 @@
+from typing import OrderedDict
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
@@ -28,8 +29,6 @@ class FileManager:
     def readFile(self):
         if self.format == 'MBES':
             return self.Read_h5()
-
-    # Parameter.create(name='signal',title='Signal',type='group')
 
     def makeParameter(self):
         folder,filename_withext = os.path.split(self.filename)
@@ -131,7 +130,46 @@ class FileManager:
                 data_statOn = np.zeros_like(data_transient)
                 data_statOff = np.zeros_like(data_transient)
             data = npa([data_transient,data_statOn,data_statOff])
-        return self.convert_h5(data,position,parameters)
+        
+
+        delay = position * 0.633 / ( 2 * np.pi * 0.299792458)
+        t_vol = parameters[-2] * 1e9 * np.arange(data[0].shape[0])
+        indexing = np.argsort(delay)
+        delay = delay[indexing]
+        data_statOn = data_statOn[:,indexing]
+        data_statOff = data_statOff[:,indexing]
+        data_transient = data_transient[:,indexing]   
+
+        # signal_params = {
+        #             'signal_transient':{
+        #             'title': 'Transient',
+        #             'value': data_transient,
+        #             'readonly':True,
+        #             },   
+        #             'signal_statOn':{
+        #             'title': 'pulseOn',                        
+        #             'value': data_statOn,
+        #             'readonly':True,
+        #             },
+        #             'signal_statOff':{
+        #             'title': 'pulseOff',                        
+        #             'value': data_statOff,
+        #             'readonly':True,
+        #             }                                        
+        # }     
+        signal_params = {'signal':{
+                    'signal_transient':data_transient ,'signal_statOn': data_statOn,'signal_statOff': data_statOff,
+                    },
+                    't_vol':t_vol,
+                    'delay':delay
+                    }                                        
+        # P_sig = Parameter.create(name='signal',title='Signal',type='group',children=signal_params)
+        # P_vol = Parameter.create(name='t_vol',title='Flight time',value=parameters[-2] * 1e9 * np.arange(data[0].shape[0]))
+        # P_delay = Parameter.create(name='delay',title='Delay',value=position * 0.633 / ( 2 * np.pi * 0.299792458))
+        # P = Parameter.create(name='Data',type='group',children = [P_sig,P_vol,P_delay])
+        # return self.convert_h5(data,position,parameters)
+        # return self.convert_h5(data,position,parameters)
+        return signal_params
 
     def convert_h5(self,data,position,parameters):
         delay = position * 0.633 / ( 2 * np.pi * 0.299792458)        
@@ -139,6 +177,8 @@ class FileManager:
         indexing = np.argsort(delay)
         delay = delay[indexing]
         data = data[:,:,indexing]
+
+
         return data,delay,t_vol
 
     def readCalibration(self):

@@ -25,12 +25,13 @@ import sys, traceback
 import h5py
 import numpy as np
 import os
+from CustomDataTreeWidget import CustomDataTreeWidget
 from pyqtgraph import DataTreeWidget
 
 #for i in *.ui; do pyside6-uic ${i%.ui}.ui > ${i%.ui}_ui.py; done
 class MainWindow(QMainWindow,Ui_MainWindow):
     loadData_signal = Signal(object)
-    sendData_signal = Signal(object,object)
+    sendData_signal = Signal(object)
     def __init__(self,parent=None):
         super(MainWindow, self).__init__(parent)                
         self.setupUi(self)          
@@ -42,14 +43,22 @@ class MainWindow(QMainWindow,Ui_MainWindow):
         self.setupWindows()
         self.connectSignal()          
 
-    def storeData(self,data_name,data):
-        self._data[data_name] = data
+    def storeData(self,data):
+        self.extractDictEntry(data.value())
+        self.sendData_signal.emit(self._data)
 
-    # def data(self,data_name):
-    #     return self._data[data_name]
-    
+
+    def extractDictEntry(self,entry):
+        for key,value in entry.items():
+            if type(value) is dict:
+                self.extractDictEntry(value)
+            else:
+                self._data[key] = value
+
+
+
     def storeDataInWorkspace(self,data_name,data,workspace_name):
-        self.workspace[workspace_name] = data
+        self._workspace[workspace_name] = data
     
     def setupWindows(self):       
         dock = QDockWidget('File Selection',self)
@@ -60,6 +69,14 @@ class MainWindow(QMainWindow,Ui_MainWindow):
         self._widgets['fileSelection_widget'] = widget        
         self.openMBES()
         self.showMaximized() 
+
+        dock = QDockWidget('Data Browser',self)
+        widget = CustomDataTreeWidget()
+        dock.setWidget(widget)
+        self.addDockWidget(Qt.BottomDockWidgetArea,dock)
+        self._dock['dataBrowser_dock'] = dock
+        self._widgets['dataBrowser_widget'] = widget        
+
 
     def openMBES(self):
         dock = QDockWidget('MBES Panel',self,floating=False)
@@ -76,7 +93,7 @@ class MainWindow(QMainWindow,Ui_MainWindow):
         self.loadData_signal.emit(self.path_filenames)
 
     def restore(self):
-        for dock in self._dock:
+        for dock in self._dock.values():
             dock.setFloating(False)
             dock.show()
 
@@ -97,11 +114,13 @@ class MainWindow(QMainWindow,Ui_MainWindow):
         self.loadData_signal.connect(self._widgets['fileSelection_widget'].storeFiles)
 
         # CONNECT DATA #
-        self.sendData_signal.connect(self.storeData)
-        self.sendData_signal.connect(self.storeDataInWorkspace)
+        # self._widgets['fileSelection_widget'].sendData_signal.connect(self._widgets['dataBrowser_widget'].addEntry)
+        # self.sendData_signal.connect(self.storeDataInWorkspace)
+        # self.sendData_signal.connect(self._widgets['dataBrowser_widget'].addData)
+        self._widgets['fileSelection_widget'].sendData_signal.connect(self._widgets['dataBrowser_widget'].storeData)
 
         #
-        self._widgets['fileSelection_widget'].sendData_signal.connect(self._widgets['MBES_widget'].showData)
+        # self._widgets['fileSelection_widget'].sendData_signal.connect(self._widgets['MBES_widget'].showData)
 
         print('Connecting signal')
 

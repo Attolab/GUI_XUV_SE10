@@ -34,6 +34,7 @@ class baseQMenu(QMenu):
     def QAction_function(self,):
         self.QActionOperation_signal.emit(self.sender().data())    
 
+
 class FileSelectionQMenu(baseQMenu):
     QActionOperation_signal = Signal(str)
     def __init__(self,parent=None,selection=None):
@@ -79,7 +80,6 @@ class DataSelectionQMenu(baseQMenu):
         self.copyData_action = QAction("Copy",self)
         self.copyData_action.setData('copy')
         self.copyData_action.triggered.connect(self.QAction_function)
-
         self.insertAction(self.removeItem_action,self.copyData_action)        
         self.insertSeparator(self.removeItem_action)
 
@@ -98,16 +98,15 @@ class DataSelectionQMenu(baseQMenu):
         self.sumData_menu.addAction(self.sumData1_action)
         self.sumData_menu.addAction(self.sumData2_action)
 
-        self.substractData_menu = QMenu('Substract',self.operation_menu)
         self.substractData2_action = QAction('along axis 2',self.sumData_menu)
-        self.sumData2_action.setData('sum2')        
-        self.sumData1_action = QAction('along axis 1',self.sumData_menu)
-        self.sumData1_action.setData('sum1')        
-        self.sumData0_action = QAction('along all axis',self.sumData_menu)
-        self.sumData0_action.setData('sum0')
-        self.sumData_menu.addAction(self.sumData0_action)
-        self.sumData_menu.addAction(self.sumData1_action)
-        self.sumData_menu.addAction(self.sumData2_action)
+        self.substractData2_action.setData('substract2')        
+        self.substractData1_action = QAction('along axis 1',self.sumData_menu)
+        self.substractData1_action.setData('substract1')        
+        self.substractData0_action = QAction('along all axis',self.sumData_menu)
+        self.substractData0_action.setData('substract0')
+        self.substractData_menu.addAction(self.substractData0_action)
+        self.substractData_menu.addAction(self.substractData1_action)
+        self.substractData_menu.addAction(self.substractData2_action)
 
 
         self.normalizeData_menu = QMenu('Normalize',self.operation_menu)
@@ -124,6 +123,8 @@ class DataSelectionQMenu(baseQMenu):
 
 
         self.operation_menu.addMenu(self.sumData_menu)
+        self.operation_menu.addMenu(self.substractData_menu)
+
         self.operation_menu.addMenu(self.normalizeData_menu)
         self.insertMenu(self.copyData_action,self.operation_menu)
         self.insertSeparator(self.copyData_action)

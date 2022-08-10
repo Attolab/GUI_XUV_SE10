@@ -16,8 +16,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QHBoxLayout, QHeaderView,
-    QPushButton, QSizePolicy, QTreeWidget, QTreeWidgetItem,
-    QVBoxLayout, QWidget)
+    QPushButton, QSizePolicy, QTreeView, QVBoxLayout,
+    QWidget)
 
 class Ui_CustomDataTreeWidget(object):
     def setupUi(self, CustomDataTreeWidget):
@@ -26,19 +26,12 @@ class Ui_CustomDataTreeWidget(object):
         CustomDataTreeWidget.resize(400, 300)
         self.verticalLayout = QVBoxLayout(CustomDataTreeWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.data_treeWidget = QTreeWidget(CustomDataTreeWidget)
-        self.data_treeWidget.setObjectName(u"data_treeWidget")
-        sizePolicy = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.data_treeWidget.sizePolicy().hasHeightForWidth())
-        self.data_treeWidget.setSizePolicy(sizePolicy)
-        self.data_treeWidget.setDragDropOverwriteMode(False)
-        self.data_treeWidget.setDragDropMode(QAbstractItemView.NoDragDrop)
-        self.data_treeWidget.setDefaultDropAction(Qt.MoveAction)
-        self.data_treeWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.treeView = QTreeView(CustomDataTreeWidget)
+        self.treeView.setObjectName(u"treeView")
+        self.treeView.setDefaultDropAction(Qt.MoveAction)
+        self.treeView.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
-        self.verticalLayout.addWidget(self.data_treeWidget)
+        self.verticalLayout.addWidget(self.treeView)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -73,10 +66,6 @@ class Ui_CustomDataTreeWidget(object):
 
     def retranslateUi(self, CustomDataTreeWidget):
         CustomDataTreeWidget.setWindowTitle(QCoreApplication.translate("CustomDataTreeWidget", u"Form", None))
-        ___qtreewidgetitem = self.data_treeWidget.headerItem()
-        ___qtreewidgetitem.setText(2, QCoreApplication.translate("CustomDataTreeWidget", u"Shape", None));
-        ___qtreewidgetitem.setText(1, QCoreApplication.translate("CustomDataTreeWidget", u"Type", None));
-        ___qtreewidgetitem.setText(0, QCoreApplication.translate("CustomDataTreeWidget", u"Name", None));
         self.add_pushButton.setText(QCoreApplication.translate("CustomDataTreeWidget", u"Add", None))
         self.save_pushButton.setText(QCoreApplication.translate("CustomDataTreeWidget", u"Save", None))
         self.copy_pushButton.setText(QCoreApplication.translate("CustomDataTreeWidget", u"Copy", None))

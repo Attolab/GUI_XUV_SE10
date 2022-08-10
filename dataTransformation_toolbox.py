@@ -29,17 +29,24 @@ class DataTransformationWidget(Ui_dataTransformationToolbox,QWidget):
 
     def initializeParameterTree(self):
         # Create Parameters
-        self._operationList = Parameter.create(name='Operation list',type='group',removable=True,showTop = False)
+        self._operationList = Parameter.create(name='Operation list',type='group',showTop = False)
         self.operationList_parameterTree.setParameters(self._operationList)
         self.operationList_parameterTree.setHeaderHidden(True)
     def updateOperationList(self):
         print('Update List')
 
-
+    def getOperationList(self):
+        a = 1
     def addOperation(self,operation_parameter):
         self._operationList.addChild(operation_parameter)
-        # self._operationList.insertChild(0,operation_parameter)
         self.updateOperationList()
+
+    def moveOperation(self,start_row,end_row):
+        child = self._operationList.children()[start_row]
+        self._operationList.removeChild(child)
+        self._operationList.insertChild(end_row,child)                
+        self.operationList_parameterTree.setCurrentItem(self.operationList_parameterTree.itemAt(0,0).child(end_row))
+        
     def moveOperationUp(self):
         topLevel = self.operationList_parameterTree.topLevelItem(0)
         parent = self.operationList_parameterTree.currentItem().parent()
@@ -47,11 +54,8 @@ class DataTransformationWidget(Ui_dataTransformationToolbox,QWidget):
             start_row = self.operationList_parameterTree.currentIndex().row()    
             if start_row > 0:
                 end_row = start_row-1
-                child = self._operationList.children()[start_row]
-                item = self.operationList_parameterTree.currentItem()
-                self._operationList.removeChild(child)
-                self._operationList.insertChild(end_row,child)
-                self.operationList_parameterTree.setCurrentItem(child.makeTreeItem(0))
+                self.moveOperation(start_row,end_row)
+
     def moveOperationDown(self):
         topLevel = self.operationList_parameterTree.topLevelItem(0)
         parent = self.operationList_parameterTree.currentItem().parent()
@@ -59,33 +63,8 @@ class DataTransformationWidget(Ui_dataTransformationToolbox,QWidget):
             start_row = self.operationList_parameterTree.currentIndex().row()
             if start_row < len(self._operationList.children())-1:
                 end_row = start_row + 1
-                child = self._operationList.children()[start_row]
-                self._operationList.removeChild(child)
-                self._operationList.insertChild(end_row,child)
-                item = self.operationList_parameterTree.currentItem()
-                self.operationList_parameterTree.setCurrentItem(item)            
-            # children[start_row],children[end_row] = children[end_row],children[start_row]
+                self.moveOperation(start_row,end_row)
 
-            # self._operationList.addChildren(children)
-        # item = self.operationList_parameterTree.currentItem()
-        # if bool(item) & (self.operationList_parameterTree.currentIndex().row() > 0):
-        #     self._operationList.removeChild()
-        #     self._operationList.addChildren
-        #     # isExpanded = item.isExpanded()            
-        #     parent = item.parent()
-        #     index = parent.indexOfChild(item)
-        #     child = parent.takeChild(index)           
-        #     parent.insertChild(index-1,child)
-        #     # child.setExpanded(isExpanded)
-        #     self.operationList_parameterTree.setCurrentItem(child)
-    # def moveOperationDown(self):
-    #     item = self.operationList_parameterTree.currentItem()
-    #     if bool(item) & (self.operationList_parameterTree.currentIndex().row() < len(self._operationList.children())-1):
-    #         parent = item.parent()
-    #         index = parent.indexOfChild(item)
-    #         child = parent.takeChild(index)
-    #         parent.insertChild(index+1,child)
-    #         self.operationList_parameterTree.setCurrentItem(child)
 
     def connectSignals(self):
         self.makeOperation_pushButton.pressed.connect(self.makeOperation)
@@ -98,8 +77,7 @@ class DataTransformationWidget(Ui_dataTransformationToolbox,QWidget):
         self.operationList_parameterTree.clear()
         self.initializeParameterTree()
 
-    def getOperationList(self):
-        a = 1
+
     def makeOperation(self):
         index = self.tabWidget.currentIndex()
         if index == 0:
@@ -137,65 +115,56 @@ class DataTransformationWidget(Ui_dataTransformationToolbox,QWidget):
         }
         self.addOperation(Parameter.create(name=self.makeOperationName('Basic'), type='group',expanded = True,children = operation_params,removable = True,renamable=False))        
     
-
     def makeInterpolationOperation(self):
         print('Making interpolation operation:')
     def makeFilterOperation(self):
-        print('Making filter:')
-        name = self.basicOperationChoice_comboBox.currentText()
-        name = self.basicOperationChoice_comboBox.currentText()
-        value = self.basicOperation_doubleSpinBox.value()
+        print('Making filter:')        
         operation_params =  {
-                'operationType':{
-                    'title': 'operationType',
-                    'type': 'list',
-                    'limits': ['Add','Substract','Multiply','Divide'],
-                    'value': name,
-                    },               
-                'operationFactor': {
-                    'title':'operationFactor',                                        
-                    'type': 'float',
-                    'value': value,
-                    'editable':True,
-                    },    
-                'status': {
-                    'title':'Status',                                        
+                'Filter':{
+                    'title': 'Flip filter',
                     'type': 'bool',
-                    'value': True,
-                    'readonly':True,                                        
-                    },      
+                    'value': np.mod(self.filterFlip_comboBox.currentIndex(),2),
+                    },  
+                'startFilter':{
+                    'title': 'Start',
+                    'type':'group',
+                    'children':{
+                        'filterStart': {
+                            'title':' Start',                                        
+                            'type': 'float',
+                            'value': self.filterStart_doubleSpinBox.value(),
+                            'editable':True,
+                            },    
+                        'isfilterStartin': {
+                            'title':'Belongs to',                                        
+                            'type': 'bool',
+                            'value': np.mod(self.filterStartBelongTo_comboBox.currentIndex(),2),
+                            'editable':True,
+                            },
+                        }                         
+                },
+                'endFilter':{
+                    'title': 'End',
+                    'type':'group',
+                    'children':{                
+                        'filterEnd': {
+                            'title':'filter End',                                        
+                            'type': 'float',
+                            'value': self.filterEnd_doubleSpinBox.value(),
+                            'editable':True,
+                            },      
+                        'isfilterEndin': {
+                            'title':'Belongs to',                                        
+                            'type': 'bool',
+                            'value': np.mod(self.filterEndBelongTo_comboBox.currentIndex(),2),
+                            'editable':True,
+                            },     
+                        },
+                } 
+                                         
         }
         self.addOperation(Parameter.create(name=self.makeOperationName('Filter'), type='group',expanded = True,children = operation_params,removable = True,renamable=False))        
         
-    # def makeBasicOperation(self):
-    #     print('Making basic operation:')
-    #     name = self.basicOperationChoice_comboBox.currentText()
-    #     value = self.basicOperation_doubleSpinBox.value()
-    #     operation_params =  {
-    #             'operationType':{
-    #                 'title': 'operationType',
-    #                 'type': 'list',
-    #                 'limits': ['Add','Substract','Multiply','Divide'],
-    #                 # 'editable':True,
-    #                 # 'readonly':True,
-    #                 },               
-    #             'operationFactor': {
-    #                 'title':'operationFactor',                                        
-    #                 'type': 'float',
-    #                 'value': value,
-    #                 'editable':True,
-    #                 'readonly':True,                                        
-    #                 },    
-    #             'status': {
-    #                 'title':'Status',                                        
-    #                 'type': 'bool',
-    #                 'value': True,
-    #                 'editable':False,
-    #                 'readonly':True,                                        
-    #                 },      
-    #     }
-    #     self.makeOperation(Parameter.create(name=self.makeOperationName('Basic'), type='group',expanded = False,children = operation_params,removable = True,renamable=False))        
-
 
 
 def main():
