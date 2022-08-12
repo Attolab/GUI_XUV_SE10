@@ -31,6 +31,11 @@ class TreeItem(object):
         self.parentItem = parent
         self.itemData = data
         self.childItems = []
+    def getDepth(self,):       
+        if self.parentItem:            
+            return 1 + self.parentItem.getDepth()
+        else:
+            return 0
 
     def child(self, row):
         return self.childItems[row]
@@ -106,6 +111,8 @@ class TreeItem(object):
 
 
 class TreeModel(QtCore.QAbstractItemModel):
+    nodeKeyChanged_signal = QtCore.Signal(object)
+    nodeKeyRemoved_signal = QtCore.Signal(object)
     def __init__(self, headers, data, parent=None):
         super(TreeModel, self).__init__(parent)
 
@@ -253,9 +260,6 @@ class TreeModel(QtCore.QAbstractItemModel):
                 node.setData(2, desc)    
             else:
                 node = self.nodes[path]
-
-                   
-            
         # recurse to children
         for key, data in childs.items():
             self.buildTree(data, node, str(key), path=path+(key,))
@@ -292,30 +296,40 @@ class TreeModel(QtCore.QAbstractItemModel):
         else:
             parent = item        
         return parent
-    def dataChanged_slot(self,index):
-        item = self.getItem(index)
-        self.updateNodesKey(item)    
 
+    def dataChanged_slot(self,index):
+        self.updateNodesKey(self.getItem(index))    
+
+
+    def getAdress(self,item,path = ()):
+            if item.parentItem != self.rootItem:
+                path += self.getAdress(item.parentItem,)
+            path += (item.data(0),)
+            return path
+            
     def updateNodesKey(self,item):
         for k,v in self.nodes.items():
             if v == item:
-                if item.parentItem != self.rootItem:
-                    self.nodes[(item.parentItem.data(0),)+(item.data(0),)] = self.nodes.pop(k)
-                else:
-                    self.nodes[(item.data(0),)] = self.nodes.pop(k)
-                [self.updateNodesKey(item.child(i)) for i in np.arange(item.childCount())]
-                return
+                break
+        [self.updateNodesKey(childItem) for childItem in item.childItems] # Apply to all children
+        new_key = self.getAdress(item,())
+        self.nodeKeyChanged_signal.emit((k,new_key))
+        self.nodes[new_key] = self.nodes.pop(k)
+
     def removeNodesEntry(self,item):
-        childItems = item.childItems            
-        if childItems:
-            [self.removeNodesEntry(childItem) for childItem in childItems]
-        self.nodes.pop([k for k, v in self.nodes.items() if v == item][0])
+        for k,v in self.nodes.items():
+            if v == item:
+                break
+        [self.removeNodesEntry(childItem) for childItem in item.childItems] # Apply to all children
+        self.nodeKeyRemoved_signal.emit(k)
+        self.nodes.pop(k)
 
     def clear(self):
         self.beginResetModel()
         self.removeRows(0,self.rowCount())
         self.nodes = {}
         self.endResetModel()
+
 class NoEditDelegate(QtWidgets.QStyledItemDelegate):
     def __init__(self, parent=None):
         QtWidgets.QStyledItemDelegate.__init__(self, parent)
