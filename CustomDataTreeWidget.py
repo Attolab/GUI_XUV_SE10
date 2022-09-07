@@ -11,11 +11,9 @@ from PySide6.QtWidgets import (QApplication, QTreeWidget,QTreeWidgetItem,QStyled
 from CustomDataTreeWidget_ui import Ui_CustomDataTreeWidget
 import numpy as np
 from CustomQMenu import DataSelectionQMenu
-import copy
 from editableTreeModel import TreeModel,NoEditDelegate
 from dataContainer import DataContainer
-import re
-
+import copy
 class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
     showVariable_signal = Signal(object)
     operation_signal = Signal(object)
@@ -46,9 +44,10 @@ class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
         self.model.nodeKeyRemoved_signal.connect(self.DC.removeEntry)
 
     def makeBinding(self):
-        # QShortcut(QKeySequence(Qt.Key_Paste),self.treeView).activated.connect(self.pasteSelectedItems)
-        QShortcut(QKeySequence(Qt.CTRL + Qt.Key_C),self.treeView).activated.connect(self.storeSelectedItemsKeys)
-        QShortcut(QKeySequence(Qt.Key_Delete),self.treeView).activated.connect(self.removeSelectedItems)
+        self.shortcut = []
+        self.shortcut.append(QShortcut(QKeySequence(Qt.CTRL + Qt.Key_V),self.treeView).activated.connect(self.pasteSelectedItems))
+        self.shortcut.append(QShortcut(QKeySequence(Qt.CTRL + Qt.Key_C),self.treeView).activated.connect(self.storeSelectedItemsKeys))
+        self.shortcut.append(QShortcut(QKeySequence(Qt.Key_Delete),self.treeView).activated.connect(self.removeSelectedItems))
 
     def setupWindows(self):
         self.treeView.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -57,15 +56,18 @@ class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
         self.dataTreeView_QMenu.QActionOperation_signal.connect(self.readQMenuSignal)        
 
     def storeData(self,data):
-        self.extractDictEntry(data.value())
-        self.addData(self._data)
+        data = self.extractDictEntry(data.value())
+        self.addData(data)
 
     def extractDictEntry(self,entry):
+        data = {}
         for key,value in entry.items():
             if type(value) is dict:
-                self.extractDictEntry(value)
+                data[key] = self.extractDictEntry(value)
             else:
-                self._data[key] = value
+                # self._data[key] = value
+                data[key] = value
+        return data
 
     def listItemRightClicked(self,QPos):
         self.dataTreeView_QMenu.updateSelection(self.treeView.selectedIndexes())
@@ -73,15 +75,6 @@ class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
         self.dataTreeView_QMenu.move(parentPosition + QPos)
         self.dataTreeView_QMenu.show() 
 
-
-
-    # def makeDicKey(self,dic,path=()):                
-    #     for key in dic.keys():
-    #         print(path + (key,))
-    #         if type(dic[key]) is dict:
-    #             self.makeDicKey(dic[key],path + (key,))
-    #         else:
-    #             self.K.append(path + (key,))
 
     def addEntry_pushButton(self):
         data = {'Type':{"Project A": np.ones((5,1)),
@@ -92,20 +85,11 @@ class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
 
     def addData(self,data,hideRoot=True):  
         self.DC.addData(data)
-        # self.makeDicKey(data,())    
-        # self._data.update(data)
         self.model.buildTree(data,self.model.rootItem,hideRoot = hideRoot)        
         self.treeView.expandAll()
         self.treeView.resizeColumnToContents(0)        
         
     def doubleClicked_treeWidget_function(self,index):
-        # Need to subclass tree view to disable rename of variables
-#     class TreeView(QtGui.QTreeView):    
-        # def edit(self, index, trigger, event):
-        #     if trigger == QtGui.QAbstractItemView.DoubleClicked:
-        #         print 'DoubleClick Killed!'
-        #         return False
-        #     return QtGui.QTreeView.edit(self, index, trigger, event)
         self.showVariable_signal.emit(index)
         print(self.model.getItem(index).data(0))
 
@@ -127,53 +111,23 @@ class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
 
 #  ################################################## Functions ##########################################    
 
-    def updateDataName(self,index):
-        item = self.model.getItem(index)
-        new_key = item.data(0)
-        parent = item.parentItem
-        if parent != self.model.rootItem:
-            parent_key = parent.data(0)            
-            for current_key in self._data[parent_key].keys():            
-                if (parent_key,) + (current_key,) not in self.model.nodes.keys():
-                    self._data[parent_key][new_key] = self._data[parent_key].pop(current_key)
-                    return print(f'Variable: {current_key} ======> Variable: {new_key}')    
-        else:
-            for current_key in self._data.keys():            
-                if (current_key,) not in self.model.nodes.keys():
-                    self._data[new_key] = self._data.pop(current_key)
-                    return print(f'Workspace: {current_key} ======> Workspace: {new_key}')
-
-
-
     def getSelectedItems(self):
         selected_items = []
         [selected_items.append(self.model.getItem(index)) for index in self.treeView.selectedIndexes() 
                                                                 if self.model.getItem(index) not in selected_items]
         return selected_items
-        
+
     def storeSelectedItemsKeys(self):
-        self.storedKeys = []
-        for item in self.getSelectedItems():
-            for k,v in self.model.nodes.items():
-                if item == v:
-                    key_node = k
-                    key = item.data(0)
-                    parent = item.parentItem
-                    if parent != self.model.rootItem:
-                        parent_key = parent.data(0)
-                        if key in self._data[parent_key]:            
-                            key_data = [parent_key,key]
-                    else:
-                        if key in self._data:
-                            key_data = [key]
-                    self.storedKeys.append((key_node,key_data))
-                    break
+        self.storedItems = self.getSelectedItems()
 
-
+    def pasteSelectedItems(self):
+        [self.copyItem(item) for item in self.storedItems]
+        
     def copySelectedItems(self):        
         [self.copyItem(item) for item in self.getSelectedItems()]
         
     def getSelectedKeys(self,item):
+        # Store keys of item and of its children
         for k,v in self.model.nodes.items():
             if item == v:
                 break
@@ -184,6 +138,7 @@ class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
             self.selected_keys.append((k,item))
 
     def copyItem(self,item):
+        # Copy item and its children
         for k,v in self.model.nodes.items():
             if item == v:
                 break
@@ -191,18 +146,19 @@ class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
         new_key = k[key_pos]+'_copy'
         self.selected_keys = []
         self.getSelectedKeys(item)
-
         temp_dicList = []
         for k_sel,item_sel in self.selected_keys:
             key_dic = (new_key,) + k_sel[key_pos+1::1] #Prepare dic entry
-            temp_dicList.append(self.makeDict(key_dic[-1::-1],self.DC.data(k_sel))) #Make dic
+            data = copy.deepcopy(self.DC.data(k_sel))
+            temp_dicList.append(self.makeDict(key_dic[-1::-1],data)) #Make dic
         combined = {}
         for record in temp_dicList: #Reorder dic
             self.combine_into(record, combined)     
         self.addData(combined)
 
 
-    def combine_into(self,d: dict, combined: dict) -> None: #Merge nested dics with similar keys
+    def combine_into(self,d: dict, combined: dict) -> None:
+        #Merge nested dics with similar keys
         for k, v in d.items():
             if isinstance(v, dict):
                 self.combine_into(v, combined.setdefault(k, {}))
@@ -210,14 +166,15 @@ class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
                 combined[k] = v
 
 
-    # print(combined)
     def makeDict(self,tuple,data):
+        # Fast build of dic from a tuple
         tree_dict = data
         for key in tuple:
             tree_dict = {key: tree_dict}        
         return tree_dict
 
     def removeSelectedItems(self):
+        # Remove selected items from tree (and its childs)
         while self.treeView.selectedIndexes():
             index = self.treeView.selectedIndexes()[0]
             item = self.model.getItem(index)
@@ -226,10 +183,8 @@ class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
 
 
     def clearAll(self):
-        self.nodes = {}
-        self._data = {}
         self.model.clear()
-
+        self.DC.clearData()
 
 def main():
     import numpy as np

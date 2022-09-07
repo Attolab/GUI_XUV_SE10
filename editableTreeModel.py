@@ -313,7 +313,8 @@ class TreeModel(QtCore.QAbstractItemModel):
                 break
         [self.updateNodesKey(childItem) for childItem in item.childItems] # Apply to all children
         new_key = self.getAdress(item,())
-        self.nodeKeyChanged_signal.emit((k,new_key))
+        if not item.childItems: #┘Only send signal to update data
+            self.nodeKeyChanged_signal.emit((k,new_key))
         self.nodes[new_key] = self.nodes.pop(k)
 
     def removeNodesEntry(self,item):

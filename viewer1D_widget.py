@@ -54,6 +54,8 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
         self.proxy = pg.SignalProxy(self.view_1D.scene().sigMouseMoved, rateLimit=60, slot=self.mouseMoved)     
         self.connectSignals()
         self.addPlot_pushButton.clicked.connect(self.addPlot)
+        if parent:
+            self.setParent(parent)
     def connectSignals(self):     
         self.makeROI_toolButton.toolButtonClicked_signal.connect(self.addROI)
         self.tableROI_tableWidget.removeItem_signal.connect(self.removeROITableItem)        
