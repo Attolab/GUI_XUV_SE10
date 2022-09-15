@@ -110,6 +110,11 @@ class Ui_main_panel(object):
 
         self.horizontalLayout_5.addLayout(self.verticalLayout_4)
 
+        self.normalizeSpectrum_checkbox = QCheckBox(self.page_5)
+        self.normalizeSpectrum_checkbox.setObjectName(u"normalizeSpectrum_checkbox")
+
+        self.horizontalLayout_5.addWidget(self.normalizeSpectrum_checkbox)
+
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_5)
 
@@ -290,7 +295,7 @@ class Ui_main_panel(object):
         self.toolBox.addItem(self.page_6, u"Calibration")
         self.page_7 = QWidget()
         self.page_7.setObjectName(u"page_7")
-        self.page_7.setGeometry(QRect(0, 0, 582, 331))
+        self.page_7.setGeometry(QRect(0, 0, 582, 360))
         sizePolicy1.setHeightForWidth(self.page_7.sizePolicy().hasHeightForWidth())
         self.page_7.setSizePolicy(sizePolicy1)
         self.verticalLayout_3 = QVBoxLayout(self.page_7)
@@ -366,7 +371,7 @@ class Ui_main_panel(object):
 
         self.retranslateUi(main_panel)
 
-        self.toolBox.setCurrentIndex(2)
+        self.toolBox.setCurrentIndex(0)
         self.oscillationUnits_comboBox.setCurrentIndex(3)
 
 
@@ -387,6 +392,7 @@ class Ui_main_panel(object):
         self.transient_radioButton.setText(QCoreApplication.translate("main_panel", u"Transient", None))
         self.dressingOn_radioButton.setText(QCoreApplication.translate("main_panel", u"Dressing On", None))
         self.dressingOff_radioButton.setText(QCoreApplication.translate("main_panel", u"Dressing off", None))
+        self.normalizeSpectrum_checkbox.setText(QCoreApplication.translate("main_panel", u"Normalize spectrum", None))
         self.toolBox.setItemText(self.toolBox.indexOf(self.page_5), QCoreApplication.translate("main_panel", u"File selection", None))
 #if QT_CONFIG(tooltip)
         self.makeCalibration_pushButton.setToolTip(QCoreApplication.translate("main_panel", u"<html><head/><body><p>Create a panel to make a calibration from the current signal/FT or from a custom input</p></body></html>", None))

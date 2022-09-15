@@ -62,6 +62,7 @@ class MainPanel(Ui_main_panel,QWidget):
         self.folderBase_lineEdit.editingFinished.connect(self.updateBaseFolder)
         self.forderSelection_toolButton.pressed.connect(self.press_selectFolder_function)
         self.fileSelection_listWidget.itemDoubleClicked.connect(self.loadDatafromItem)
+        self.normalizeSpectrum_checkbox.stateChanged.connect(self.loadCurrentItem)
         self.energyMax_lineEdit.editingFinished.connect(self.updateEnergyAxis)
         self.energyMin_lineEdit.editingFinished.connect(self.updateEnergyAxis)
         self.energySteps_lineEdit.editingFinished.connect(self.updateEnergyAxis)        
@@ -173,7 +174,10 @@ class MainPanel(Ui_main_panel,QWidget):
         t_vol = data['t_vol']
         delay = data['delay']
         signal = signal[self.getDataType()] 
-        if len(delay) < 2:
+        if self.normalizeSpectrum_checkbox.isChecked():
+            signal = signal/np.sum(data['signal']['signal_statOff'],axis=0)
+            
+        if len(delay) < 2: # hack when there is only one point
             delay = np.append(delay,-delay)
             signal = np.append(signal,signal,axis = 1)        
         if self.time_radioButton.isChecked():

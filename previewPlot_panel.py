@@ -141,9 +141,9 @@ class PreviewPlot_Panel(Ui_previewPlot_Panel,QWidget):
                             ('interpolation_spinBox', int(self.n_sample)),
                             ('removeBackground_comboBox', 0),
                             ('removeBackground_doubleSpinBox', np.mean(self.signal_input)),
-                            ('FT_window_comboBox', 0),
-                            ('FT_zeropadding_comboBox', 0),
-                            ('FT_zeropaddingpower2_spinBox',11),
+                            ('FT_window_comboBox', 2),
+                            ('FT_zeropadding_comboBox', 1),
+                            ('FT_zeropaddingpower2_spinBox',12),
                             ('FT_zeropadding_spinBox', FourierTransform.next_power_of_2(self.n_sample)),
                             ('outputAxisStart_doubleSpinBox', 0),
                             ('outputAxisEnd_doubleSpinBox', np.pi/(self.axis0_input[1]-self.axis0_input[0])),
@@ -236,23 +236,28 @@ class PreviewPlot_Panel(Ui_previewPlot_Panel,QWidget):
         [self.axis0_inputPlot,self.signal_inputPlot] = Filter.ApplyFilter(self.axis0_input,self.signal_input,
                                                             start=self.parameter_list_signal_toolbox['inputAxis0Start_doubleSpinBox'],
                                                             end=self.parameter_list_signal_toolbox['inputAxis0End_doubleSpinBox'],axis = 1)  
-        self.axis0_inputPlot += self.parameter_list_signal_toolbox['inputAxis0Add_doubleSpinBox']   
-        self.axis0_inputPlot *= self.parameter_list_signal_toolbox['inputAxis0Mult_lineEdit']        
+        if self.parameter_list_signal_toolbox['inputAxis0Add_doubleSpinBox'] != 0.:            
+            self.axis0_inputPlot += self.parameter_list_signal_toolbox['inputAxis0Add_doubleSpinBox']   
+        if self.parameter_list_signal_toolbox['inputAxis0Mult_lineEdit'] != 1.:
+            self.axis0_inputPlot *= self.parameter_list_signal_toolbox['inputAxis0Mult_lineEdit']        
 
 
     def updateInputAxis1(self):
         [self.axis1_inputPlot,self.signal_inputPlot] = Filter.ApplyFilter(self.axis1_input,self.signal_inputPlot,
                                                             start=self.parameter_list_signal_toolbox['inputAxis1Start_doubleSpinBox'],
                                                             end=self.parameter_list_signal_toolbox['inputAxis1End_doubleSpinBox'],axis = 0) 
-        self.axis1_inputPlot += self.parameter_list_signal_toolbox['inputAxis1Add_doubleSpinBox']   
-        self.axis1_inputPlot *= self.parameter_list_signal_toolbox['inputAxis1Mult_lineEdit']  
+        if self.parameter_list_signal_toolbox['inputAxis1Add_doubleSpinBox'] != 0.:
+            self.axis1_inputPlot += self.parameter_list_signal_toolbox['inputAxis1Add_doubleSpinBox']   
+        if self.parameter_list_signal_toolbox['inputAxis1Mult_lineEdit'] != 1.:
+            self.axis1_inputPlot *= self.parameter_list_signal_toolbox['inputAxis1Mult_lineEdit']  
 
     def updateOutputAxis0(self):
         self.signal_sendParameterAxis.emit(['outputAxisStart_doubleSpinBox','outputAxisEnd_doubleSpinBox',self.axis0_outputPlot])
         [self.axis0_outputPlot,self.signal_outputPlot] = Filter.ApplyFilter(self.axis0_outputPlot,self.signal_outputPlot,
                                                             start=self.parameter_list_signal_toolbox['outputAxisStart_doubleSpinBox'],
                                                             end=self.parameter_list_signal_toolbox['outputAxisEnd_doubleSpinBox'],axis = 1)                                                                 
-        self.axis0_outputPlot *= self.parameter_list_signal_toolbox['outputAxisMult_lineEdit']    
+        if self.parameter_list_signal_toolbox['outputAxisMult_lineEdit'] != 1.:                                                            
+            self.axis0_outputPlot *= self.parameter_list_signal_toolbox['outputAxisMult_lineEdit']    
 
     def _processParameters(self):
         self.updateInputAxis0()

@@ -31,7 +31,7 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="page_5">
         <property name="geometry">
@@ -135,6 +135,13 @@
               </widget>
              </item>
             </layout>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="normalizeSpectrum_checkbox">
+             <property name="text">
+              <string>Normalize spectrum</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -482,7 +489,7 @@
           <x>0</x>
           <y>0</y>
           <width>582</width>
-          <height>331</height>
+          <height>360</height>
          </rect>
         </property>
         <property name="sizePolicy">

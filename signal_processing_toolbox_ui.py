@@ -24,7 +24,7 @@ class Ui_SignalProcessingToolbox(object):
     def setupUi(self, SignalProcessingToolbox):
         if not SignalProcessingToolbox.objectName():
             SignalProcessingToolbox.setObjectName(u"SignalProcessingToolbox")
-        SignalProcessingToolbox.resize(635, 413)
+        SignalProcessingToolbox.resize(840, 513)
         self.verticalLayout_3 = QVBoxLayout(SignalProcessingToolbox)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.groupBox_7 = QGroupBox(SignalProcessingToolbox)
@@ -526,6 +526,9 @@ class Ui_SignalProcessingToolbox(object):
         QWidget.setTabOrder(self.FT_zeropadding_spinBox, self.FT_zeropaddingpower2_spinBox)
 
         self.retranslateUi(SignalProcessingToolbox)
+
+        self.FT_window_comboBox.setCurrentIndex(0)
+
 
         QMetaObject.connectSlotsByName(SignalProcessingToolbox)
     # setupUi
