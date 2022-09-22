@@ -13,6 +13,8 @@ from pyqtgraph.parametertree import Parameter
 import pathlib
 import h5py
 from numpy import array as npa
+from numpy import asarray as npaa
+
 import sys, traceback
 import numpy as np
 import os
@@ -26,9 +28,20 @@ class FileManager:
         self.dataset_list= []
         if not self.format:
             filename,self.format = os.path.splitext(self.filename)
+        self.makeKeyList()
+   
+    def makeKeyList(self):
+        with h5py.File(self.filename, 'r') as file:
+            # keys = self.get_dataset_keys(file)
+            # keys = self.convertInput(keys)
+            # self.parameter_key = get_key_parameters(keys)
+            self.position_key = ['StagePosition/Position_um']
+            self.data_key = [f"Data/Y_axis/Averaged_data_{index}" for index in np.arange(len(self.get_values(file,self.position_key)[0]))]
     def readFile(self):
         if self.format == 'MBES':
             return self.Read_h5()
+        elif self.format == 'VMI':
+            return self.ReadCamera_h5()
 
     def makeParameter(self):
         folder,filename_withext = os.path.split(self.filename)
@@ -81,7 +94,8 @@ class FileManager:
         return keys
 
     def get_values(self, f, keys):
-        return [npa(f[key][0]) if len(f[key].shape) > 1 else npa(f[key]) for key in keys]        
+        # return [npa(np.squeeze(f[key])) if len(f[key].shape) > 1 else npa(f[key]) for key in keys]        
+        return npaa([np.squeeze(npa(f[key])) for key in keys])
 
     def get_type(self, value):
         return value.dtype
@@ -116,23 +130,45 @@ class FileManager:
     def convertInput(self,inputs):
         return [input.decode('ISO-8859-1)') if input[0] == 80 else input for input in inputs]
 
+
+    def ReadCamera_h5(self):
+        with h5py.File(self.filename, 'r') as file:
+            keys = self.get_dataset_keys(file)
+            keys = self.convertInput(keys)
+            parameters = self.get_values(file, get_key_parameters(keys))
+            position = self.get_values(file, get_key_position(keys))[0]
+            data = npa(self.get_values(file, get_key_data(keys,"Data/Y_axis/Averaged_data"))).T        
+    def ExtractMetaData_h5(self):
+        with h5py.File(self.filename, 'r') as file:
+            keys = self.get_dataset_keys(file)
+            keys = self.convertInput(keys)
+            # dataFrame = len(get_key_data(keys,"Data/Y_axis/Averaged_data"))
+            # parameters = self.get_values(file, get_key_parameters(keys))
+            position = self.get_values(file, get_key_position(keys))[0]    
+        return position
+    def readVMIData_h5(self,index):
+        with h5py.File(self.filename, 'r') as file:
+            data = self.get_values(file,[self.data_key[index]])            
+        return data.T
+
     def Read_h5(self):
         with h5py.File(self.filename, 'r') as file:
             keys = self.get_dataset_keys(file)
             keys = self.convertInput(keys)
             position = self.get_values(file, get_key_position(keys))[0]
             parameters = self.get_values(file, get_key_parameters(keys))
-            data_transient = npa(self.get_values(file, get_key_data(keys,"Data/Y_axis/Averaged_data"))).T            
+            data_transient = self.get_values(file, get_key_data(keys,"Data/Y_axis/Averaged_data")).T            
             try:
-                data_statOn = npa(self.get_values(file,get_key_data(keys,"Static spectra/Averaged_on"))).T
-                data_statOff = npa(self.get_values(file,get_key_data(keys,"Static spectra/Averaged_off"))).T
+                data_statOn = self.get_values(file,get_key_data(keys,"Static spectra/Averaged_on")).T
+                data_statOff = self.get_values(file,get_key_data(keys,"Static spectra/Averaged_off")).T
             except:
                 data_statOn = np.zeros_like(data_transient)
                 data_statOff = np.zeros_like(data_transient)
-            data = npa([data_transient,data_statOn,data_statOff])
+            data = npaa([data_transient,data_statOn,data_statOff])
         
 
         delay = position * 0.633 / ( 2 * np.pi * 0.299792458)
+        # delay = 2 * position / ( 0.299792458)
         t_vol = parameters[-2] * 1e9 * np.arange(data[0].shape[0])
         indexing = np.argsort(delay)
         delay = delay[indexing]
@@ -239,13 +275,6 @@ def get_key_parameters(keys):
 
 
 
-    
-    def readFile(self):
-        if self.format == 'MBES':
-            return self.Read_h5()
-
-
-
 
 
 
@@ -266,23 +295,24 @@ def get_key_parameters(keys):
 def main():
     from file_manager import FileManager as F
     import matplotlib.pyplot as plt
-    p = F()
-    folder = "/mnt/Q_drive/LIDyL/Atto/ATTOLAB/SE1/Data_Experiments/SE1_2022/2022-03-24/"
-    filename = "scan_Neon_Neon_voltage_Voltage 1950V.h5"
-    folder ='/home/cs268225/Documents/Python/GUI/FourierGUI/TestData/Dataset_20220415_002/'
-    filename = 'Dataset_20220415_002.h5'
-    folder = '/home/cs268225/Atto/ATTOLAB/SE1/Data_Experiments/SE1_2022/2022-07-12/'
-    filename = 'Ne-Ne_calibration_ZrFilter_1.h5'
-    # fileReader = F(folder + filename).Read_h5()
-    signal, position, parameters = F(folder + filename).Read_h5()
-    delay = 2 * (position / 0.299792458)
-    t_vol = parameters[-2] * np.arange(signal.shape[1])*1e6    
-    # data, position, parameters = F(folder + filename)
-    delay = 2 * (position / 0.299792458)
-    t_vol = parameters[-1] * np.arange(signal.shape[1])
-    plt.imshow(np.transpose(signal), aspect='auto')
-    plt.show()
 
+    ############################# TEST #######################
+
+    # MBES
+    folder = '/home/cs268225/Atto/ATTOLAB/SE1/Data_Experiments/SE1_2022/2022-09-08/'
+    filename = 'Ne-Xe_1.h5'
+    file_format = 'MBES'
+
+    # VMI
+    # folder = '/home/cs268225/Atto/ATTOLAB/SE1/Data_Experiments/SE1_2022/2022-09-21/'
+    # filename = 'Slow rabbit test _good.h5'
+    # file_format = 'VMI'
+
+
+
+    a = F(folder+filename,file_format).readFile()    
+
+    a = 1
 
 if __name__ == "__main__":
     main()

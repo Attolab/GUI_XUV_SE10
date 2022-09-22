@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>762</width>
-    <height>443</height>
+    <width>929</width>
+    <height>494</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -22,7 +22,7 @@
   <property name="locale">
    <locale language="C" country="AnyTerritory"/>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
     <widget class="QSplitter" name="splitter">
      <property name="orientation">
@@ -38,7 +38,7 @@
      </widget>
      <widget class="QToolBox" name="toolBox">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -69,8 +69,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>76</width>
-         <height>361</height>
+         <width>121</width>
+         <height>412</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -84,40 +84,64 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QCheckBox" name="show2D_checkBox">
-          <property name="text">
-           <string>Data</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-          <property name="tristate">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="showHist_checkBox">
-          <property name="text">
-           <string>Hist</string>
-          </property>
-          <property name="checked">
-           <bool>false</bool>
-          </property>
-          <property name="tristate">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="showROI_checkBox">
-          <property name="text">
-           <string>ROI</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="showROI_checkBox">
+            <property name="text">
+             <string>ROI</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="autoRange_checkBox">
+            <property name="text">
+             <string>AutoRange</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QCheckBox" name="autoLevels_checkBox">
+            <property name="text">
+             <string>AutoLevels</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="showHist_checkBox">
+            <property name="text">
+             <string>Hist</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+            <property name="tristate">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="show2D_checkBox">
+            <property name="text">
+             <string>Data</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <property name="tristate">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
@@ -127,7 +151,7 @@
          <x>0</x>
          <y>0</y>
          <width>274</width>
-         <height>347</height>
+         <height>398</height>
         </rect>
        </property>
        <attribute name="label">

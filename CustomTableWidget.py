@@ -198,7 +198,41 @@ class fileSelectionTableWidget(TableWidget):
         self.Qmenu.show()  
 
     def QMenu_function(self,command):
-        self.QMenu_signal.emit(command)    
+        self.QMenu_signal.emit(command)   
+
+
+class imageSelectionTableWidget(QTableWidget):
+    QMenu_signal = Signal(str)
+    def __init__(self,parent=None):
+        super(imageSelectionTableWidget, self).__init__(parent)
+        # Connect QContextMenu
+        # self.setContextMenuPolicy(Qt.CustomContextMenu)
+        # self.connect(self,SIGNAL("customContextMenuRequested(QPoint)" ), self.tableItemRightClicked)    
+        # Method to add an entry to the table
+    def addEntry(self,index=0,parameter=0):
+        nRow = self.rowCount()        
+        self.insertRow(nRow)
+        item = QTableWidgetItem(index)
+        item.setFlags(item.flags() & ~Qt.ItemIsEditable)        
+        self.setItem(nRow,0,item)
+        item = QTableWidgetItem(parameter)
+        item.setFlags(item.flags() & ~Qt.ItemIsEditable)        
+        self.setItem(nRow,1,item)
+        self.clearSelection()
+        self.setCurrentItem(item)   
+
+        # Method when user rightclicked on table
+    def tableItemRightClicked(self, QPos): 
+        sender = self.sender()
+        parentPosition = sender.mapToGlobal(QPoint(0, 0))                
+        self.Qmenu = FileSelectionQMenu('Menu',)
+        self.Qmenu.removeItem_signal.connect(self.removeSelectedItems_table)
+        self.Qmenu.clearTable_signal.connect(self.clearTable)
+        self.Qmenu.move(parentPosition + QPos)
+        self.Qmenu.show()  
+
+    def QMenu_function(self,command):
+        self.QMenu_signal.emit(command)             
 
 def main():
     import sys

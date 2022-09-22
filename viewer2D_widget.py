@@ -138,7 +138,7 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         return Q
 
     def updateImage(self,item,data,xaxis,yaxis):
-        item.setImage(data,autoRange=False)
+        item.setImage(data,autoRange = self.autoRange_checkBox.isChecked(), autoLevels=self.autoLevels_checkBox.isChecked())        
         item.setTransform(self.makeTransform(data,xaxis,yaxis))
 
     def updateView(self,view,xaxis,yaxis):
@@ -147,9 +147,14 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         view.setLimits(xMin = xaxis[0]-offset_x,xMax = xaxis[-1]+offset_x,yMin = yaxis[0]-offset_y,yMax = yaxis[-1]+offset_y)
         view.autoRange()
 
-    def updateViewerWidget(self,mat_2D,x,y):
+    def updateViewerWidget(self,mat_2D,x=None,y=None):
+        if x is None:
+            x = np.arange(mat_2D.shape[0])
+        if y is None:
+            y = np.arange(mat_2D.shape[1])
         self.updateImage(self.imageItem,mat_2D.T,x,y)
-        self.updateView(self.view_2D,x,y)
+        if self.autoRange_checkBox.isChecked():
+            self.updateView(self.view_2D,x,y)
         self.histLUT_2D._updateView()
 
     def getImageData(self):
