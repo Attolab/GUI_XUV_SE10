@@ -18,6 +18,8 @@ from convertinator_class import Convertinator as C
 from viewer1D_widget import Viewer1DWidget
 import matplotlib.pyplot as plt
 from variable_panel import VariablePanel
+from viewer2D_widget import Viewer2DWidget
+from usefulclass import FourierTransform
 
 class MainPanel(Ui_main_panel,QWidget):
     def __init__(self,parent=None):
@@ -164,17 +166,16 @@ class MainPanel(Ui_main_panel,QWidget):
             return 'signal_transient'
 
     def loadScanList(self, filename):
-        print('loading')
+        print('Loading scans')
         self.scanList = FM(filename, 'SE10').makeScanList()
-        print(self.scanList)
 
     def loadScan(self, scan):
         self.signal = FM(self.filename, 'SE10').readScan(scan)
         self.showData()
+        self.isDataLoaded = True
 
         self.HWP_Slider.setMaximum(len(self.signal['angle_HWP'])-1)
         self.HWP_Slider.setValue(0)
-        print(len(self.signal['angle_HWP'])-1)
         self.Update_HWPSlider()
 
     def loadScanFromItem(self, item):
@@ -190,11 +191,7 @@ class MainPanel(Ui_main_panel,QWidget):
         signal = self.signal['signal'][self.HWP_Slider.value()].transpose()
         t_vol = self.signal['t_vol']
         delay = self.signal['delay'][self.HWP_Slider.value()]
-
-        print(np.shape(signal))
-        print(np.shape(t_vol))
-        print(np.shape(delay))
-
+    
         if self.normalizeSpectrum_checkbox.isChecked():
             signal = signal/np.sum(signal,axis=0)
             
@@ -325,10 +322,27 @@ class MainPanel(Ui_main_panel,QWidget):
             if self.customUnwrapPhase_checkBox.isChecked():
                 data = wrap2pmpi(data)
 
-            self.doPlot1D(y_axis,data,label=f'\u03C9={oscillation_frequency}PHz')
+            # self.doPlot1D(y_axis,data,label=f'\u03C9={oscillation_frequency}PHz')
+            x = self.signal['angle_HWP']
+            y = self.signal['t_vol']
+            delay = self.signal['delay'][0]
+
+            freqs, TF_signal = self.doFourierTransform(delay, self.signal['signal'], windowchoice=0, axis=1)
+            self.doPlot2D(TF_signal[:,(np.abs(freqs-oscillation_frequency)).argmin()], x, y)
 
         else:
             print('No data has been loaded')            
+
+    def doFourierTransform(self,x,y,N=None,windowchoice = 0, axis=-1) -> np.array:    
+        # window = FourierTransform.do_Window(len(x),windowchoice)
+        # y = np.swapaxes(np.swapaxes(y, axis, -1) * window, -1, axis)
+        return FourierTransform.do_Fourier(x,y,N, axis=axis) #Windowed Signal,N = npad) #Fourier transform of Signal  
+
+    def doPlot2D(self, data, x, y):
+        if not hasattr(self,'V'):
+            self.V = Viewer2DWidget()
+        self.V.updateViewerWidget(np.angle(data.transpose()), x, y)
+        self.V.show()
 
     def doPlot1D(self,x,y,label='Plot'):
         if not hasattr(self,'V'):
