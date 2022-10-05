@@ -13,9 +13,10 @@ from file_manager import FileManager as FM
 from calibration_toolbox import CalibrationToolBox
 from analysis_functions import AnalysisFunctions as af
 import numpy as np
-from usefulclass import Filter
+from usefulclass import Filter, FourierTransform
 from convertinator_class import Convertinator as C
 from viewer1D_widget import Viewer1DWidget
+from viewer2D_widget import Viewer2DWidget
 import matplotlib.pyplot as plt
 from variable_panel import VariablePanel
 
@@ -170,6 +171,7 @@ class MainPanel(Ui_main_panel,QWidget):
 
     def loadScan(self, scan):
         self.signal = FM(self.filename, 'SE10').readScan(scan)
+        self.isDataLoaded = True
         self.showData()
 
         self.HWP_Slider.setMaximum(len(self.signal['angle_HWP'])-1)
@@ -325,7 +327,11 @@ class MainPanel(Ui_main_panel,QWidget):
             if self.customUnwrapPhase_checkBox.isChecked():
                 data = wrap2pmpi(data)
 
-            self.doPlot1D(y_axis,data,label=f'\u03C9={oscillation_frequency}PHz')
+            x=self.signal['angle_HWP']
+            y=self.signal['t_vol']
+            z = self.doFT_allHWP(self.signal['delay'], self.signal['signal'], oscillation_frequency)
+            print(np.shape(z))
+            self.doPlot2D(x, y, z)
 
         else:
             print('No data has been loaded')            
@@ -335,6 +341,30 @@ class MainPanel(Ui_main_panel,QWidget):
             self.V = Viewer1DWidget()            
         self.V.addPlot(name=label,x=x,y=y,)
         self.V.show()
+
+    def doPlot2D(self,x,y,z,label='Plot'):
+        if not hasattr(self,'V'):
+            self.V = Viewer2DWidget()            
+        self.V.updateViewerWidget(z, x, y)
+        self.V.show()
+
+    def doFT_allHWP(self, time, data, oscill):
+
+        arr = []
+
+        for angle_idx in range(len(self.signal['angle_HWP'])):
+
+            freq, TF = FourierTransform.do_Fourier(time[angle_idx], data[angle_idx], N=len(time[angle_idx]), axis=0)
+            print(np.shape(time[angle_idx]))
+            print(np.shape(TF))
+            print(oscill)
+            line = np.angle(TF[10])
+
+            print(freq)
+
+            arr.append(line)
+
+        return np.array(arr).T
 
 def wrap2pmpi(phasedata):
     """It wraps phase from -pi, pi"""
