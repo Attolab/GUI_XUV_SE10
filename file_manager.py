@@ -234,8 +234,11 @@ class FileManager:
 
         delay_stage = delay_stage.reshape(np.shape(data[:,:,0]))
         indexing = np.argsort(delay_stage, axis=1)
-        delay = 2 * np.array([delay_stage[i][indexing[i]] for i in range(len(indexing))]) / ( 0.299792458)   #delay in fs
-        signal = np.array([data[i][indexing[i]] for i in range(len(indexing))])
+        # delay = 2 * delay_stage[indexing] / ( 0.299792458)   #delay in fs
+        delay = 2 * np.take_along_axis(delay_stage, indexing, axis=1) / ( 0.299792458)   #delay in fs
+        # signal = np.array([data[i][indexing[i]] for i in range(len(indexing))])
+        # print(np.multiply.outer(indexing, np.ones(len(tof))))
+        signal = np.take_along_axis(data, np.multiply.outer(indexing, np.ones(len(tof))).astype(int), axis=1)
         signal_params = {'signal':signal,
                     't_vol':tof,
                     'delay':delay,
