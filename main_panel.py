@@ -62,7 +62,7 @@ class MainPanel(Ui_main_panel,QWidget):
         self.dressingOff_radioButton.toggled.connect(self.loadCurrentItem)
         self.folderBase_lineEdit.editingFinished.connect(self.updateBaseFolder)
         self.forderSelection_toolButton.pressed.connect(self.press_selectFolder_function)
-        self.fileSelection_listWidget.itemDoubleClicked.connect(self.loadDatafromItem)
+        self.fileSelection_listWidget.itemDoubleClicked.connect(self.loadScanFromItem)
         self.normalizeSpectrum_checkbox.stateChanged.connect(self.loadCurrentItem)
         self.energyMax_lineEdit.editingFinished.connect(self.updateEnergyAxis)
         self.energyMin_lineEdit.editingFinished.connect(self.updateEnergyAxis)
@@ -137,7 +137,7 @@ class MainPanel(Ui_main_panel,QWidget):
     def loadCurrentItem(self):
         self.updateGUI()        
         if self.isDataLoaded:
-            self.loadDatafromItem(self.fileSelection_listWidget.item(self.returnCurrentRow()))
+            self.loadScanFromItem(self.fileSelection_listWidget.item(self.returnCurrentRow()))
     def returnCurrentRow(self):
         currentRow = self.fileSelection_listWidget.currentRow()
         if currentRow == -1:
@@ -168,10 +168,14 @@ class MainPanel(Ui_main_panel,QWidget):
         self.scanList = FM(filename, 'SE10').makeScanList()
         print(self.scanList)
 
-    def loadScan(self, filename, scan):
-        signal = FM(filename, 'SE10').readScan(scan)
+    def loadScan(self, scan):
+        signal = FM(self.filename, 'SE10').readScan(scan)
         self.showData(signal)
 
+    def loadScanFromItem(self, item):
+        if item:
+            self.loadScan(item.text())
+    
     def loadData(self,filename):
         signal = FM(filename,'SE10').readFile()
         self.isDataLoaded = True
@@ -183,9 +187,10 @@ class MainPanel(Ui_main_panel,QWidget):
         signal = data['signal']
         t_vol = data['t_vol']
         delay = data['delay']
+        angle_HWP = data['angle_HWP']
         signal = signal[self.getDataType()] 
         if self.normalizeSpectrum_checkbox.isChecked():
-            signal = signal/np.sum(data['signal']['signal_statOff'],axis=0)
+            signal = signal/np.sum(signal,axis=0)
             
         if len(delay) < 2: # hack when there is only one point
             delay = np.append(delay,-delay)
@@ -263,6 +268,7 @@ class MainPanel(Ui_main_panel,QWidget):
         print(self.path_filename)
         self.path = self.path_filename[0]
         print(self.path)
+        self.filename = self.path
         try:
             self.loadScanList(self.path)
             print(self.scanList)

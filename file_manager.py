@@ -56,6 +56,9 @@ class FileManager:
         elif self.format == 'SE10':
             return(self.Read_h5_SE10())
 
+    def readScan(self, scan):
+        return(self.Read_h5_SE10(scan))
+
     def makeParameter(self):
         folder,filename_withext = os.path.split(self.filename)
         filename,ext = os.path.splitext(filename_withext)
@@ -164,6 +167,7 @@ class FileManager:
     #         data = self.get_values(file,[self.data_key[index]])            
     #     return data.T
 
+
     def Read_h5(self):
         with h5py.File(self.filename, 'r') as file:
             keys = self.get_dataset_keys(file)
@@ -224,39 +228,22 @@ class FileManager:
         with h5py.File(self.filename, 'r') as file:
 
             data = np.array(file['Raw_datas'][scan]['Detector000']['Data1D']['Ch000']['Data'])
-            delay_stage = file['Raw_datas'][scan]['Scan_y_axis']
-            angle_HWP = file['Raw_datas'][scan]['Scan_x_axis']
+            delay_stage = np.array(file['Raw_datas'][scan]['Scan_y_axis'])
+            angle_HWP = np.array(file['Raw_datas'][scan]['Scan_x_axis'])
+            tof = np.array(file['Raw_datas'][scan]['Detector000']['Data1D']['Ch000']['X_axis'])
 
+        print(np.shape(delay_stage))
+        delay_stage = delay_stage.reshape(np.shape(data[:,:,0]))
+        print(np.shape(delay_stage))
+        indexing = np.argsort(delay_stage, axis=1)
+        delay = 2 * delay_stage[:,indexing] / ( 0.299792458)   #delay in fs
+        data = data[:,indexing,:]
 
-            keys = self.get_dataset_keys(file)
-            keys = self.convertInput(keys)
-            position = self.get_values(file, get_key_position(keys))[0]
-            parameters = self.get_values(file, get_key_parameters(keys))
-            data_transient = self.get_values(file, get_key_data(keys,"Data/Y_axis/Averaged_data")).T            
-            try:
-                data_statOn = self.get_values(file,get_key_data(keys,"Static spectra/Averaged_on")).T
-                data_statOff = self.get_values(file,get_key_data(keys,"Static spectra/Averaged_off")).T
-            except:
-                data_statOn = np.zeros_like(data_transient)
-                data_statOff = np.zeros_like(data_transient)
-            data = npaa([data_transient,data_statOn,data_statOff])
-        
-
-        delay = 2 * delay_stage / ( 0.299792458)   #delay in fs
-        t_vol = parameters[-2] * 1e9 * np.arange(data[0].shape[0])
-        indexing = np.argsort(delay)
-        delay = delay[indexing]
-        data_statOn = data_statOn[:,indexing]
-        data_statOff = data_statOff[:,indexing]
-        data_transient = data_transient[:,indexing]   
-
-        signal_params = {'signal':{
-                    'signal_transient':data_transient ,'signal_statOn': data_statOn,'signal_statOff': data_statOff,
-                    },
-                    't_vol':t_vol,
+        signal_params = {'signal':data ,
+                    't_vol':tof,
                     'delay':delay,
-                    'HWP':angle_HWP
-                    }                                        
+                    'angle_HWP':angle_HWP
+                    }
         return signal_params
 
     def convert_h5(self,data,position,parameters):
