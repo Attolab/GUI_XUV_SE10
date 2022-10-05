@@ -54,6 +54,7 @@ class MainPanel(Ui_main_panel,QWidget):
         self.loadSpectrum_pushButton.pressed.connect(self.press_loadScans_function)
         self.makeCalibration_pushButton.pressed.connect(self.press_makeCalibrationButton_function)
         self.loadCalibration_pushButton.pressed.connect(self.press_loadCalibrationButton_function)
+        self.HWP_Slider.valueChanged.connect(self.HWPSlider_function)
         self.energy_radioButton.toggled.connect(self.loadCurrentItem)
         self.time_radioButton.toggled.connect(self.loadCurrentItem)
         self.transient_radioButton.toggled.connect(self.loadCurrentItem)
@@ -165,6 +166,7 @@ class MainPanel(Ui_main_panel,QWidget):
     def loadScanList(self, filename):
         print('loading')
         self.scanList = FM(filename, 'SE10').makeScanList()
+        print(self.scanList)
 
     def loadScan(self, filename, scan):
         signal = FM(filename, 'SE10').readScan(scan)
@@ -250,6 +252,10 @@ class MainPanel(Ui_main_panel,QWidget):
             self.fileSelection_listWidget.setCurrentRow(self.fileSelection_listWidget.count())      
         except:
             print('Error loading file')
+
+    def HWPSlider_function(self):    
+        print('moved')
+        #self.HWP_Value.setText(signal['HWP_angles'][self.HWP_Slider.setValue()])
 
     def press_loadScans_function(self):
         print('Ouverture')

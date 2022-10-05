@@ -17,7 +17,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComboBox,
     QGridLayout, QHBoxLayout, QLabel, QLineEdit,
-    QListWidget, QListWidgetItem, QPushButton, QRadioButton,
+    QListWidget, QListWidgetItem, QPushButton, QRadioButton, QSlider,
     QSizePolicy, QSpacerItem, QToolBox, QToolButton,
     QVBoxLayout, QWidget)
 
@@ -87,7 +87,23 @@ class Ui_main_panel(object):
         self.loadSpectrum_pushButton = QPushButton(self.page_5)
         self.loadSpectrum_pushButton.setObjectName(u"loadSpectrum_pushButton")
 
+        # Slider for choosing the HWP angle
+        self.HWP_Slider = QSlider(self.page_5, Orientation=Qt.Horizontal)
+        self.HWP_Slider.setMinimum(0)
+        self.HWP_Slider.setMaximum(1) # 1 by default before opening any file
+        self.HWP_Slider.setSingleStep(1)
+        self.HWP_Slider.setPageStep(1)
+        self.HWP_Slider.setObjectName(u"HWP_Slider")
+
+        # Label for showing the current HWP angle
+        self.HWP_Value = QLabel(self.page_5)
+        self.HWP_Value.setObjectName(u"HWP_Value")
+        sizePolicy1.setHeightForWidth(self.HWP_Value.sizePolicy().hasHeightForWidth())
+        self.HWP_Value.setSizePolicy(sizePolicy1)
+
         self.horizontalLayout_5.addWidget(self.loadSpectrum_pushButton)
+        self.horizontalLayout_5.addWidget(self.HWP_Value)
+        self.horizontalLayout_5.addWidget(self.HWP_Slider)
 
         self.verticalLayout_4 = QVBoxLayout()
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
@@ -389,6 +405,7 @@ class Ui_main_panel(object):
         self.fileSelection_listWidget.setToolTip(QCoreApplication.translate("main_panel", u"<html><head/><body><p>List of selected files:</p><p>- double click on a file to load it</p><p>- right click to remove selected files or clear list</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.loadSpectrum_pushButton.setText(QCoreApplication.translate("main_panel", u"Load Spectrum", None))
+        self.HWP_Value.setText(QCoreApplication.translate("main_panel", u"HWP angle:", None))
         self.transient_radioButton.setText(QCoreApplication.translate("main_panel", u"Transient", None))
         self.dressingOn_radioButton.setText(QCoreApplication.translate("main_panel", u"Dressing On", None))
         self.dressingOff_radioButton.setText(QCoreApplication.translate("main_panel", u"Dressing off", None))
