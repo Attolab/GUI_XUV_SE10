@@ -170,7 +170,7 @@ class MainPanel(Ui_main_panel,QWidget):
 
     def loadScan(self, scan):
         signal = FM(self.filename, 'SE10').readScan(scan)
-        self.showData(signal)
+        self.showData()
 
     def loadScanFromItem(self, item):
         if item:
@@ -179,7 +179,7 @@ class MainPanel(Ui_main_panel,QWidget):
     def loadData(self,filename):
         self.signal = FM(filename,'SE10').readFile()
         self.isDataLoaded = True
-        self.showData(self.signal)
+        self.showData()
         self.Update_HWPSlider()
 
     def showData(self):
@@ -261,7 +261,7 @@ class MainPanel(Ui_main_panel,QWidget):
     def HWPSlider_function(self):    
         print('moved')
         self.Update_HWPSlider()
-        self.showData(self.signal)
+        self.showData()
 
     def Update_HWPSlider(self):
     #    self.HWP_Slider.setMaximum(len(signal['angle_HWP'])-1)
