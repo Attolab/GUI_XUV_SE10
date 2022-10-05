@@ -26,22 +26,35 @@ class FileManager:
         self.filename = filename
         self.format = format
         self.dataset_list= []
-        if not self.format:
-            filename,self.format = os.path.splitext(self.filename)
-        self.makeKeyList()
-   
-    def makeKeyList(self):
+        if format == 'SE10':
+            self.makeScanList()
+        else:
+            if not self.format:
+                filename,self.format = os.path.splitext(self.filename)
+            self.makeKeyList()
+
+    def makeScanList(self):
         with h5py.File(self.filename, 'r') as file:
-            # keys = self.get_dataset_keys(file)
-            # keys = self.convertInput(keys)
-            # self.parameter_key = get_key_parameters(keys)
-            self.position_key = ['StagePosition/Position_um']
-            self.data_key = [f"Data/Y_axis/Averaged_data_{index}" for index in np.arange(len(self.get_values(file,self.position_key)[0]))]
+            self.scanKeys = ['Scan{0:0>3}'.format(n) for n in range(len(file['Raw_datas'].keys())-1)]
+            print(self.scanKeys)
+            return(self.scanKeys)
+            
+
+
+    # def makeKeyList(self):
+    #     with h5py.File(self.filename, 'r') as file:
+    #         # keys = self.get_dataset_keys(file)
+    #         # keys = self.convertInput(keys)
+    #         # self.parameter_key = get_key_parameters(keys)
+    #         self.position_key = ['StagePosition/Position_um']
+    #         self.data_key = [f"Data/Y_axis/Averaged_data_{index}" for index in np.arange(len(self.get_values(file,self.position_key)[0]))]
     def readFile(self):
         if self.format == 'MBES':
             return self.Read_h5()
-        elif self.format == 'VMI':
-            return self.ReadCamera_h5()
+        # elif self.format == 'VMI':
+        #     return self.ReadCamera_h5()
+        elif self.format == 'SE10':
+            return(self.Read_h5_SE10())
 
     def makeParameter(self):
         folder,filename_withext = os.path.split(self.filename)
@@ -131,13 +144,13 @@ class FileManager:
         return [input.decode('ISO-8859-1)') if input[0] == 80 else input for input in inputs]
 
 
-    def ReadCamera_h5(self):
-        with h5py.File(self.filename, 'r') as file:
-            keys = self.get_dataset_keys(file)
-            keys = self.convertInput(keys)
-            parameters = self.get_values(file, get_key_parameters(keys))
-            position = self.get_values(file, get_key_position(keys))[0]
-            data = npa(self.get_values(file, get_key_data(keys,"Data/Y_axis/Averaged_data"))).T        
+    # def ReadCamera_h5(self):
+    #     with h5py.File(self.filename, 'r') as file:
+    #         keys = self.get_dataset_keys(file)
+    #         keys = self.convertInput(keys)
+    #         parameters = self.get_values(file, get_key_parameters(keys))
+    #         position = self.get_values(file, get_key_position(keys))[0]
+    #         data = npa(self.get_values(file, get_key_data(keys,"Data/Y_axis/Averaged_data"))).T        
     def ExtractMetaData_h5(self):
         with h5py.File(self.filename, 'r') as file:
             keys = self.get_dataset_keys(file)
@@ -146,10 +159,10 @@ class FileManager:
             # parameters = self.get_values(file, get_key_parameters(keys))
             position = self.get_values(file, get_key_position(keys))[0]    
         return position
-    def readVMIData_h5(self,index):
-        with h5py.File(self.filename, 'r') as file:
-            data = self.get_values(file,[self.data_key[index]])            
-        return data.T
+    # def readVMIData_h5(self,index):
+    #     with h5py.File(self.filename, 'r') as file:
+    #         data = self.get_values(file,[self.data_key[index]])            
+    #     return data.T
 
     def Read_h5(self):
         with h5py.File(self.filename, 'r') as file:
@@ -205,6 +218,45 @@ class FileManager:
         # P = Parameter.create(name='Data',type='group',children = [P_sig,P_vol,P_delay])
         # return self.convert_h5(data,position,parameters)
         # return self.convert_h5(data,position,parameters)
+        return signal_params
+
+    def Read_h5_SE10(self, scan):
+        with h5py.File(self.filename, 'r') as file:
+
+            data = np.array(file['Raw_datas'][scan]['Detector000']['Data1D']['Ch000']['Data'])
+            delay_stage = file['Raw_datas'][scan]['Scan_y_axis']
+            angle_HWP = file['Raw_datas'][scan]['Scan_x_axis']
+
+
+            keys = self.get_dataset_keys(file)
+            keys = self.convertInput(keys)
+            position = self.get_values(file, get_key_position(keys))[0]
+            parameters = self.get_values(file, get_key_parameters(keys))
+            data_transient = self.get_values(file, get_key_data(keys,"Data/Y_axis/Averaged_data")).T            
+            try:
+                data_statOn = self.get_values(file,get_key_data(keys,"Static spectra/Averaged_on")).T
+                data_statOff = self.get_values(file,get_key_data(keys,"Static spectra/Averaged_off")).T
+            except:
+                data_statOn = np.zeros_like(data_transient)
+                data_statOff = np.zeros_like(data_transient)
+            data = npaa([data_transient,data_statOn,data_statOff])
+        
+
+        delay = 2 * delay_stage / ( 0.299792458)   #delay in fs
+        t_vol = parameters[-2] * 1e9 * np.arange(data[0].shape[0])
+        indexing = np.argsort(delay)
+        delay = delay[indexing]
+        data_statOn = data_statOn[:,indexing]
+        data_statOff = data_statOff[:,indexing]
+        data_transient = data_transient[:,indexing]   
+
+        signal_params = {'signal':{
+                    'signal_transient':data_transient ,'signal_statOn': data_statOn,'signal_statOff': data_statOff,
+                    },
+                    't_vol':t_vol,
+                    'delay':delay,
+                    'HWP':angle_HWP
+                    }                                        
         return signal_params
 
     def convert_h5(self,data,position,parameters):

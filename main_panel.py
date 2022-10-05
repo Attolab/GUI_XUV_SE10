@@ -51,7 +51,7 @@ class MainPanel(Ui_main_panel,QWidget):
     def connectSignals(self):
         self.fileSelection_listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.fileSelection_listWidget.connect(self.fileSelection_listWidget,SIGNAL("customContextMenuRequested(QPoint)" ), self.listItemRightClicked)                
-        self.loadSpectrum_pushButton.pressed.connect(self.press_loadButton_function)
+        self.loadSpectrum_pushButton.pressed.connect(self.press_loadScans_function)
         self.makeCalibration_pushButton.pressed.connect(self.press_makeCalibrationButton_function)
         self.loadCalibration_pushButton.pressed.connect(self.press_loadCalibrationButton_function)
         self.energy_radioButton.toggled.connect(self.loadCurrentItem)
@@ -162,9 +162,17 @@ class MainPanel(Ui_main_panel,QWidget):
         else:
             return 'signal_transient'
 
+    def loadScanList(self, filename):
+        print('loading')
+        self.scanList = FM(filename, 'SE10').makeScanList()
+
+    def loadScan(self, filename, scan):
+        signal = FM(filename, 'SE10').readScan(scan)
+        self.showData(signal)
+
     def loadData(self,filename):
-        signal = FM(filename,'MBES').readFile()     
-        self.isDataLoaded = True  
+        signal = FM(filename,'SE10').readFile()
+        self.isDataLoaded = True
         self.showData(signal)
 
     def showData(self,data):         
@@ -243,8 +251,30 @@ class MainPanel(Ui_main_panel,QWidget):
         except:
             print('Error loading file')
 
+    def press_loadScans_function(self):
+        print('Ouverture')
+        self.path_filename = QFileDialog.getOpenFileNames(self, 'Choose file',self.path_folder)[0]   
+        print(self.path_filename)
+        self.path = self.path_filename[0]
+        print(self.path)
+        try:
+            self.loadScanList(self.path)
+            print(self.scanList)
+            # [self.addFileToList(filename= path) for path in self.path_filenames if path]
+            self.updateScanList(self.scanList)
+            self.fileSelection_listWidget.setCurrentRow(self.fileSelection_listWidget.count())
+        except:
+            print('Error loading file')
+
+
     def addFileToList(self,filename):
         self.fileSelection_listWidget.addItem(QListWidgetItem(filename))
+
+    def updateScanList(self,scanList):
+        self.fileSelection_listWidget.clear()
+        for scan in scanList:
+            self.fileSelection_listWidget.addItem(QListWidgetItem(scan))
+
 
 
 
