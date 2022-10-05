@@ -232,6 +232,8 @@ class FileManager:
             angle_HWP = np.array(file['Raw_datas'][scan]['Scan_x_axis'])
             tof = np.array(file['Raw_datas'][scan]['Detector000']['Data1D']['Ch000']['X_axis'])
 
+            print(angle_HWP)
+
         delay_stage = delay_stage.reshape(np.shape(data[:,:,0]))
         indexing = np.argsort(delay_stage, axis=1)
         # delay = 2 * delay_stage[indexing] / ( 0.299792458)   #delay in fs

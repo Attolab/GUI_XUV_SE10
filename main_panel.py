@@ -171,8 +171,9 @@ class MainPanel(Ui_main_panel,QWidget):
     def loadScan(self, scan):
         self.signal = FM(self.filename, 'SE10').readScan(scan)
         self.showData()
-        
+
         self.HWP_Slider.setMaximum(len(self.signal['angle_HWP'])-1)
+        print(len(self.signal['angle_HWP'])-1)
         self.Update_HWPSlider()
 
     def loadScanFromItem(self, item):
