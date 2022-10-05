@@ -173,6 +173,7 @@ class MainPanel(Ui_main_panel,QWidget):
         self.showData()
 
         self.HWP_Slider.setMaximum(len(self.signal['angle_HWP'])-1)
+        self.HWP_Slider.setValue(0)
         print(len(self.signal['angle_HWP'])-1)
         self.Update_HWPSlider()
 
