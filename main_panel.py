@@ -177,13 +177,13 @@ class MainPanel(Ui_main_panel,QWidget):
             self.loadScan(item.text())
     
     def loadData(self,filename):
-        signal = FM(filename,'SE10').readFile()
+        self.signal = FM(filename,'SE10').readFile()
         self.isDataLoaded = True
-        self.showData(signal)
+        self.showData()
 
-    def showData(self,data):         
+    def showData(self):
         if len(data) == 1:
-            data = data[0]           
+            data = data[0]
         signal = data['signal']
         t_vol = data['t_vol']
         delay = data['delay']
