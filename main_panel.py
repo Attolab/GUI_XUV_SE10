@@ -329,8 +329,8 @@ class MainPanel(Ui_main_panel,QWidget):
             y = self.signal['t_vol']
             delay = self.signal['delay'][0]
 
-            freqs, TF_signal = self.doFourierTransform(delay, self.signal['signal'], windowchoice=0, axis=1)
-            self.doPlot2D(TF_signal[:,(np.abs(freqs-oscillation_frequency)).argmin()], x, y)
+            freqs, TF_signal = self.doFourierTransform(delay, self.signal['signal'],N=101, windowchoice=0, axis=1)
+            self.doPlot2D(TF_signal[:,10], x, y)
 
         else:
             print('No data has been loaded')            
@@ -352,11 +352,11 @@ class MainPanel(Ui_main_panel,QWidget):
         self.V.addPlot(name=label,x=x,y=y,)
         self.V.show()
 
-    def doPlot2D(self,x,y,z,label='Plot'):
-        if not hasattr(self,'V'):
-            self.V = Viewer2DWidget()            
-        self.V.updateViewerWidget(z, x, y)
-        self.V.show()
+    #def doPlot2D(self,x,y,z,label='Plot'):
+    #    if not hasattr(self,'V'):
+    #        self.V = Viewer2DWidget()            
+    #   self.V.updateViewerWidget(z, x, y)
+    #   self.V.show()
 
     def doFT_allHWP(self, time, data, oscill):
 
