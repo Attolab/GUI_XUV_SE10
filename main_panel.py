@@ -173,16 +173,17 @@ class MainPanel(Ui_main_panel,QWidget):
         self.showData(signal)
 
     def loadData(self,filename):
-        signal = FM(filename,'SE10').readFile()
+        self.signal = FM(filename,'SE10').readFile()
         self.isDataLoaded = True
-        self.showData(signal)
+        self.showData(self.signal)
+        self.Update_HWPSlider()
 
     def showData(self,data):         
         if len(data) == 1:
             data = data[0]           
-        signal = data['signal']
+        signal = data['signal']#[self.HWP_Slider.value()]
         t_vol = data['t_vol']
-        delay = data['delay']
+        delay = data['delay']#[self.HWP_Slider.value()]
         signal = signal[self.getDataType()] 
         if self.normalizeSpectrum_checkbox.isChecked():
             signal = signal/np.sum(data['signal']['signal_statOff'],axis=0)
@@ -255,7 +256,13 @@ class MainPanel(Ui_main_panel,QWidget):
 
     def HWPSlider_function(self):    
         print('moved')
-        #self.HWP_Value.setText(signal['HWP_angles'][self.HWP_Slider.setValue()])
+        self.Update_HWPSlider()
+        self.showData(self.signal)
+
+    def Update_HWPSlider(self):
+    #    self.HWP_Slider.setMaximum(len(signal['angle_HWP'])-1)
+    #    self.HWP_Value.setText('HWP angle: '/+signal['angle_HWP'][self.HWP_Slider.value()]+'°')
+        print('updated')
 
     def press_loadScans_function(self):
         print('Ouverture')
