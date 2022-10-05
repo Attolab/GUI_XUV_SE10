@@ -169,7 +169,7 @@ class MainPanel(Ui_main_panel,QWidget):
         print(self.scanList)
 
     def loadScan(self, scan):
-        signal = FM(self.filename, 'SE10').readScan(scan)
+        self.signal = FM(self.filename, 'SE10').readScan(scan)
         self.showData()
 
     def loadScanFromItem(self, item):
@@ -183,12 +183,10 @@ class MainPanel(Ui_main_panel,QWidget):
         self.Update_HWPSlider()
 
     def showData(self):
-        if len(data) == 1:
-            data = data[0]           
-        signal = data['signal']#[self.HWP_Slider.value()]
-        t_vol = data['t_vol']
-        delay = data['delay']#[self.HWP_Slider.value()]
-        signal = signal[self.getDataType()] 
+        signal = self.signal['signal'][self.HWP_Slider.value()].transpose()
+        t_vol = self.signal['t_vol']
+        delay = self.signal['delay'][self.HWP_Slider.value()]
+
         if self.normalizeSpectrum_checkbox.isChecked():
             signal = signal/np.sum(signal,axis=0)
             
@@ -264,8 +262,8 @@ class MainPanel(Ui_main_panel,QWidget):
         self.showData()
 
     def Update_HWPSlider(self):
-    #    self.HWP_Slider.setMaximum(len(signal['angle_HWP'])-1)
-    #    self.HWP_Value.setText('HWP angle: '/+signal['angle_HWP'][self.HWP_Slider.value()]+'°')
+        self.HWP_Slider.setMaximum(len(signal['angle_HWP'])-1)
+        self.HWP_Value.setText('HWP angle: '/+signal['angle_HWP'][self.HWP_Slider.value()]+'°')
         print('updated')
 
     def press_loadScans_function(self):
