@@ -326,7 +326,7 @@ class MainPanel(Ui_main_panel,QWidget):
             x = self.signal['angle_HWP']
             y = self.signal['t_vol']
             delay = self.signal['delay'][0]
-            freqs, TF_signal = self.doFourierTransform(delay, self.signal['signal'], N=len(delay), windowchoice=0, axis=1)
+            freqs, TF_signal = self.doFourierTransform(delay, self.signal['signal'], N=2048, windowchoice=0, axis=1)
             phase = np.angle(TF_signal[:,np.argmin(np.abs(freqs-oscillation_frequency))])
             ampl = np.sum(np.abs(TF_signal), axis=1)
 
@@ -340,11 +340,11 @@ class MainPanel(Ui_main_panel,QWidget):
 
                 y = y[crop_min:crop_max]
                 phase = phase[:, crop_min:crop_max]
-                ampl = ampl[:, crop_min:crop_max]
+                ampl = np.sum(np.abs(TF_signal)[:, :, crop_min:crop_max], axis=2)
 
 
             self.doPlot2D(phase.transpose(), x, y, cmap='twilight_shifted')
-            self.doPlot2D(ampl.transpose(), x, y, cmap='inferno')
+            self.doPlot2D(ampl.transpose(), x, freqs)
         else:
             print('No data has been loaded')            
 
