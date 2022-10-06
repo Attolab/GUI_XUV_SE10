@@ -346,7 +346,9 @@ class MainPanel(Ui_main_panel,QWidget):
             print(np.shape(freqs))
             print(np.shape(ampl))
             self.doPlot2D(phase.transpose(), x, y, cmap='twilight_shifted', phase=1)
-            self.doPlot2D(ampl.transpose(), x, freqs, cmap='inferno', phase=0)
+
+
+            self.doPlot2D(np.log(ampl.transpose()), x, freqs, cmap='inferno', phase=0)
         else:
             print('No data has been loaded')            
 
