@@ -328,19 +328,23 @@ class MainPanel(Ui_main_panel,QWidget):
             delay = self.signal['delay'][0]
             freqs, TF_signal = self.doFourierTransform(delay, self.signal['signal'], N=len(delay), windowchoice=0, axis=1)
             phase = np.angle(TF_signal[:,np.argmin(np.abs(freqs-oscillation_frequency))])
-            ampl = np.sum(np.abs(TF_signal), axis=1)
 
             t_vol_for_offset = C.str2float(self.tvol_value_lineEdit.text())
             phase = self.offset_phases(phase, y, t_vol_for_offset)
 
+            crop_max = -1
+            crop_min = 0
             if self.plotPreview_panel.outputMagnViewerWidget.ROI:
                 crop_ROI = np.array(self.plotPreview_panel.outputMagnViewerWidget.ROI[-1].getRegion()) # bounds of the last ROI
                 crop_min = np.argmin(np.abs(y-crop_ROI[0]))
                 crop_max = np.argmin(np.abs(y-crop_ROI[1]))
-                phase = phase[:, crop_min:crop_max]
-
-            self.doPlot2D(phase.transpose(), x, y, cmap='twilight_shifted')
-            self.doPlot2D(ampl.transpose(), x, y, cmap='inferno')
+            phase = phase[:, crop_min:crop_max]
+            ampl = np.sum(np.abs(TF_signal[:,:, crop_min:crop_max]), axis=2)
+            print(np.shape(x))
+            print(np.shape(freqs))
+            print(np.shape(ampl))
+            self.doPlot2D(phase.transpose(), x, y, cmap='twilight_shifted', phase=1)
+            self.doPlot2D(ampl.transpose(), x, freqs, cmap='inferno', phase=0)
         else:
             print('No data has been loaded')            
 
@@ -355,13 +359,15 @@ class MainPanel(Ui_main_panel,QWidget):
         return (data-offsets)%(2*np.pi)-np.pi
 
 
-    def doPlot2D(self, data, x, y, cmap='inferno'):
-        if not hasattr(self,'V'):
-            self.V = Viewer2DWidget(cmap=cmap)
+    def doPlot2D(self, data, x, y, phase=1, cmap='inferno'):
+        if phase:
+            if not hasattr(self,'V'):
+                self.V = Viewer2DWidget(cmap=cmap)
             self.V.updateViewerWidget(data, x, y)
             self.V.show()
-        elif not hasattr(self, 'W'):
-            self.W = Viewer2DWidget(cmap=cmap)
+        else:
+            if not hasattr(self, 'W'):
+                self.W = Viewer2DWidget(cmap=cmap)
             self.W.updateViewerWidget(data, x, y)
             self.W.show()
 
