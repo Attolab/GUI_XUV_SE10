@@ -328,10 +328,11 @@ class MainPanel(Ui_main_panel,QWidget):
             x = self.signal['angle_HWP']
             y = self.signal['t_vol']
             delay = self.signal['delay'][0]
-
+            print(self.signal['delay'])
             freqs, TF_signal = self.doFourierTransform(delay, self.signal['signal'], N=len(delay), windowchoice=0, axis=1)
-            phase = np.angle(TF_signal[:,np.argmin(np.abs(freqs-oscillation_frequency))].transpose())
-            self.doPlot2D(phase, x, y)
+            phase = np.angle(TF_signal[:,np.argmin(np.abs(freqs-oscillation_frequency))])
+            phase = self.offset_phases(phase, y, 970)
+            self.doPlot2D(phase.transpose(), x, y)
 
         else:
             print('No data has been loaded')            
@@ -340,6 +341,12 @@ class MainPanel(Ui_main_panel,QWidget):
         # window = FourierTransform.do_Window(len(x),windowchoice)
         # y = np.swapaxes(np.swapaxes(y, axis, -1) * window, -1, axis)
         return FourierTransform.do_Fourier(x,y,N, axis=axis) #Windowed Signal,N = npad) #Fourier transform of Signal  
+
+    def offset_phases(self, data, t_vol, t_vol_value):
+        offsets = data[:, np.argmin(np.abs(t_vol-t_vol_value))]
+        offsets = np.repeat(offsets[:, np.newaxis], len(t_vol), axis=-1)
+        return (data-offsets)%(2*np.pi)-np.pi
+
 
     def doPlot2D(self, data, x, y):
         if not hasattr(self,'V'):
