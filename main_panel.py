@@ -333,6 +333,13 @@ class MainPanel(Ui_main_panel,QWidget):
 
             t_vol_for_offset = C.str2float(self.tvol_value_lineEdit.text())
             phase = self.offset_phases(phase, y, t_vol_for_offset)
+
+            if self.plotPreview_panel.outputMagnViewerWidget.ROI:
+                crop_ROI = np.array(self.plotPreview_panel.outputMagnViewerWidget.ROI[-1].getRegion()) # bounds of the last ROI
+                crop_min = np.argmin(np.abs(y-crop_ROI[0]))
+                crop_max = np.argmin(np.abs(y-crop_ROI[1]))
+                phase = phase[:, crop_min:crop_max]
+
             self.doPlot2D(phase.transpose(), x, y)
 
         else:
