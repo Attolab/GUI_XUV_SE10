@@ -323,7 +323,7 @@ class Ui_main_panel(object):
         sizePolicy3.setHeightForWidth(self.showPhase_pushButton.sizePolicy().hasHeightForWidth())
         self.showPhase_pushButton.setSizePolicy(sizePolicy3)
 
-        self.gridLayout_3.addWidget(self.showPhase_pushButton, 2, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.showPhase_pushButton, 4, 0, 1, 1)
 
         self.label_9 = QLabel(self.page_7)
         self.label_9.setObjectName(u"label_9")
@@ -350,6 +350,17 @@ class Ui_main_panel(object):
         self.oscillationFrequency_lineEdit.setSizePolicy(sizePolicy2)
 
         self.gridLayout_3.addWidget(self.oscillationFrequency_lineEdit, 1, 0, 1, 1)
+
+        self.label_10 = QLabel(self.page_7)
+        self.label_10.setObjectName(u"label_10")
+
+        self.tvol_value_lineEdit = QLineEdit(self.page_7)
+        self.tvol_value_lineEdit.setObjectName(u"tvol_value_lineEdit")
+        sizePolicy2.setHeightForWidth(self.tvol_value_lineEdit.sizePolicy().hasHeightForWidth())
+        self.tvol_value_lineEdit.setSizePolicy(sizePolicy2)
+
+        self.gridLayout_3.addWidget(self.label_10, 2, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.tvol_value_lineEdit, 3, 0, 1, 1)
 
         self.customUnwrapPhase_checkBox = QCheckBox(self.page_7)
         self.customUnwrapPhase_checkBox.setObjectName(u"customUnwrapPhase_checkBox")
@@ -461,6 +472,7 @@ class Ui_main_panel(object):
         self.toolBox.setItemText(self.toolBox.indexOf(self.page_6), QCoreApplication.translate("main_panel", u"Calibration", None))
         self.showPhase_pushButton.setText(QCoreApplication.translate("main_panel", u"Show phase", None))
         self.label_9.setText(QCoreApplication.translate("main_panel", u"Oscillation frequency", None))
+        self.label_10.setText(QCoreApplication.translate("main_panel", u"t_vol value for phase offset", None))
         self.oscillationUnits_comboBox.setItemText(0, QCoreApplication.translate("main_panel", u"Wavelength (nm)", None))
         self.oscillationUnits_comboBox.setItemText(1, QCoreApplication.translate("main_panel", u"Energy (eV)", None))
         self.oscillationUnits_comboBox.setItemText(2, QCoreApplication.translate("main_panel", u"Frequency (THz)", None))
@@ -468,6 +480,7 @@ class Ui_main_panel(object):
 
         self.unwrapPhase_checkBox.setText(QCoreApplication.translate("main_panel", u"Unwrapped", None))
         self.oscillationFrequency_lineEdit.setText(QCoreApplication.translate("main_panel", u"4.7", None))
+        self.tvol_value_lineEdit.setText(QCoreApplication.translate("main_panel", u"970", None))
         self.customUnwrapPhase_checkBox.setText(QCoreApplication.translate("main_panel", u"CustomUnwrapped", None))
         self.toolBox.setItemText(self.toolBox.indexOf(self.page_7), QCoreApplication.translate("main_panel", u"RABBIT", None))
     # retranslateUi

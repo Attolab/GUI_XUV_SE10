@@ -236,7 +236,7 @@ class FileManager:
         angle_HWP = angle_HWP.reshape(np.shape(data[:,:,0])).transpose()[0]
         indexing = np.argsort(delay_stage, axis=1)
         delay = 2 * np.take_along_axis(delay_stage, indexing, axis=1) / ( 0.299792458)   #delay in fs
-        signal = np.take_along_axis(data, np.multiply.outer(indexing, np.ones(len(tof))).astype(int), axis=1)
+        signal = data #np.take_along_axis(data, np.multiply.outer(indexing, np.ones(len(tof))).astype(int), axis=1)
         signal_params = {'signal':signal,
                     't_vol':tof,
                     'delay':delay,

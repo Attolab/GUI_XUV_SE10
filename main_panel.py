@@ -331,7 +331,9 @@ class MainPanel(Ui_main_panel,QWidget):
             print(self.signal['delay'])
             freqs, TF_signal = self.doFourierTransform(delay, self.signal['signal'], N=len(delay), windowchoice=0, axis=1)
             phase = np.angle(TF_signal[:,np.argmin(np.abs(freqs-oscillation_frequency))])
-            phase = self.offset_phases(phase, y, 970)
+
+            t_vol_for_offset = C.str2float(self.tvol_value_lineEdit.text())
+            phase = self.offset_phases(phase, y, t_vol_for_offset)
             self.doPlot2D(phase.transpose(), x, y)
 
         else:
