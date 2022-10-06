@@ -328,7 +328,6 @@ class MainPanel(Ui_main_panel,QWidget):
             x = self.signal['angle_HWP']
             y = self.signal['t_vol']
             delay = self.signal['delay'][0]
-            print(self.signal['delay'])
             freqs, TF_signal = self.doFourierTransform(delay, self.signal['signal'], N=len(delay), windowchoice=0, axis=1)
             phase = np.angle(TF_signal[:,np.argmin(np.abs(freqs-oscillation_frequency))])
             phase = self.offset_phases(phase, y, 970)
@@ -350,7 +349,7 @@ class MainPanel(Ui_main_panel,QWidget):
 
     def doPlot2D(self, data, x, y):
         if not hasattr(self,'V'):
-            self.V = Viewer2DWidget()
+            self.V = Viewer2DWidget(cmap='twilight_shifted')
         self.V.updateViewerWidget(data, x, y)
         self.V.show()
 

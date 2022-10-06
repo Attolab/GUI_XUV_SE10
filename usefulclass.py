@@ -48,7 +48,7 @@ class FourierTransform:
         x = fft.fftfreq(N,f[1]-f[0]) * 2 * np.pi #frequency axis     
         S = fft.ifftn(F,s = N,axes = axis) #fourier transform
         x = np.roll(x,N//2)
-        S = np.roll(S,N//2)
+        S = np.roll(S,N//2, axis=axis)
         return x,S
     
 

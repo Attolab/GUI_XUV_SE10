@@ -237,13 +237,8 @@ class FileManager:
         indexing = np.argsort(delay_stage, axis=1)
         delay = 2 * np.take_along_axis(delay_stage, indexing, axis=1) / ( 0.299792458)   #delay in fs
         # signal = np.take_along_axis(data, np.multiply.outer(indexing, np.ones(len(tof))).astype(int), axis=1)
-        signal = [data[i,::(-1)**i] for i in range(len(delay))]
-        import matplotlib.pyplot as plt
-        f, ax = plt.subplots(1,1)
-        ax.plot(signal[0,:,0])
-        ax.plot(signal[1,:,0])
-        ax.plot(signal[2,:,0])
-        plt.show()
+        # signal = [data[i,::(-1)**i] for i in range(len(delay))]
+        signal = data
 
         signal_params = {'signal':signal,
                     't_vol':tof,

@@ -39,7 +39,7 @@ from viewer1D_widget import Viewer1DWidget
 class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
     signal_importCurrentData = Signal()
     signal_importCustomData = Signal()
-    def __init__(self,parent=None,name = 'Viewer2D'):
+    def __init__(self,parent=None,name = 'Viewer2D',cmap='hot'):
         super(Viewer2DWidget, self).__init__(parent)
         # Set up the user interface from Designer.
         self.setupUi(self)
@@ -47,7 +47,7 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         self.viewer_GraphicsLayoutWidget.addItem(self.label)
         self.plot_2D,self.view_2D,self.imageItem = self.setupImageWidget(self.viewer_GraphicsLayoutWidget,title=name,row = 0, col = 0)
         self.proxy = pg.SignalProxy(self.view_2D.scene().sigMouseMoved, rateLimit=60, slot=self.mouseMoved)     
-        self.histLUT_2D = self.setupHistItem(self.viewer_GraphicsLayoutWidget,self.imageItem,row=0,col=1)
+        self.histLUT_2D = self.setupHistItem(self.viewer_GraphicsLayoutWidget,self.imageItem,row=0,col=1,cmap=cmap)
         #Obsolete for now
         self.data = self.imageItem.image
         self.data_shape = self.data.shape
@@ -113,9 +113,9 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         plot.addItem(img)     
         return plot,view,img
 
-    def setupHistItem(self,layout,image,row = None, col = None):
+    def setupHistItem(self,layout,image,row = None, col = None, cmap='hot'):
         hist = pg.HistogramLUTItem(gradientPosition="left")
-        hist.gradient.setColorMap(pg.colormap.get('hot', source='matplotlib'))
+        hist.gradient.setColorMap(pg.colormap.get(cmap, source='matplotlib'))
         layout.addItem(hist,row = row, col = col)
         hist.setImageItem(image)   
         hist.autoHistogramRange()
