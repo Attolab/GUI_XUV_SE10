@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 from variable_panel import VariablePanel
 from viewer2D_widget import Viewer2DWidget
 from usefulclass import FourierTransform
+from phase_panel import phase_panel
 
 class MainPanel(Ui_main_panel,QWidget):
     def __init__(self,parent=None):
@@ -342,13 +343,15 @@ class MainPanel(Ui_main_panel,QWidget):
             phase = phase[:, crop_min:crop_max]
             ampl = np.sum(np.abs(TF_signal[:,:, crop_min:crop_max]), axis=2)
             y = y[crop_min:crop_max]
-            print(np.shape(x))
-            print(np.shape(freqs))
-            print(np.shape(ampl))
-            self.doPlot2D(phase.transpose(), x, y, cmap='twilight_shifted', phase=1)
+
+            self.windowPhase = phase_panel()
+            self.windowPhase.doPlot2D(self.windowPhase.PhaseViewerWidget, phase.transpose(), x, y)
+            self.windowPhase.doPlot2D(self.windowPhase.AmplViewerWidget, ampl.transpose(), x, freqs)
+            self.windowPhase.show()
+            # self.doPlot2D(phase.transpose(), x, y, cmap='twilight_shifted', phase=1)
 
 
-            self.doPlot2D(np.log(ampl.transpose()), x, freqs, cmap='inferno', phase=0)
+            # self.doPlot2D(np.log(ampl.transpose()), x, freqs, cmap='inferno', phase=0)
         else:
             print('No data has been loaded')            
 
