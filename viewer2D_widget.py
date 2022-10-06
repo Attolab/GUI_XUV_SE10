@@ -39,9 +39,10 @@ from viewer1D_widget import Viewer1DWidget
 class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
     signal_importCurrentData = Signal()
     signal_importCustomData = Signal()
-    def __init__(self,parent=None,name = 'Viewer2D',cmap='hot'):
+    def __init__(self,parent=None,name = 'Viewer2D',cmap='hot',labels={'bottom': ('x'), 'left': ('y') }):
         super(Viewer2DWidget, self).__init__(parent)
         # Set up the user interface from Designer.
+        self.labels=labels
         self.setupUi(self)
         self.label = pg.LabelItem(justify = "left")
         self.viewer_GraphicsLayoutWidget.addItem(self.label)
@@ -101,7 +102,10 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
 ##################################### IMAGE VIEW/ITEM ########################################
 
     def setupImageWidget(self,layout,title = '', row = None, col = None):
-        plot = layout.addPlot(title=title,labels={'bottom': ('x axis title'), 'left': ('y axis title')},row = row, col = col)
+        if self.labels:
+            plot = layout.addPlot(title=title,labels=self.labels,row = row, col = col)
+        else:
+            plot = layout.addPlot(title=title,labels={'bottom': ('x axis title'), 'left': ('y axis title')},row = row, col = col)
         plot.ctrlMenu = None
         view = plot.getViewBox()
         img = pg.ImageItem()              

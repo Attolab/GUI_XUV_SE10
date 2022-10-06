@@ -366,12 +366,12 @@ class MainPanel(Ui_main_panel,QWidget):
     def doPlot2D(self, data, x, y, phase=1, cmap='inferno'):
         if phase:
             if not hasattr(self,'V'):
-                self.V = Viewer2DWidget(cmap=cmap)
+                self.V = Viewer2DWidget(cmap=cmap, labels={'bottom': ('HWP angle'), 'left': ('t_vol') })
             self.V.updateViewerWidget(data, x, y)
             self.V.show()
         else:
             if not hasattr(self, 'W'):
-                self.W = Viewer2DWidget(cmap=cmap)
+                self.W = Viewer2DWidget(cmap=cmap, labels={'bottom': ('HWP angle'), 'left': ('frequency') })
             self.W.updateViewerWidget(data, x, y)
             self.W.show()
 
