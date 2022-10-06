@@ -85,10 +85,10 @@ class PreviewPlot_Panel(Ui_previewPlot_Panel,QWidget):
         self.signal_sendData.emit(output)
         
     def setupPlotWidget(self):        
-        self.inputViewerWidget = Viewer2DWidget(name = 'Signal')
+        self.inputViewerWidget = Viewer2DWidget(name = 'Signal', labels={'bottom': ('delay'), 'left': ('t_vol') })
         self.signalInput_groupBox.layout().addWidget(self.inputViewerWidget)
-        self.outputMagnViewerWidget = Viewer2DWidget(name = 'FT magnitude')
-        self.outputPhaseViewerWidget = Viewer2DWidget(name = 'FT phase')
+        self.outputMagnViewerWidget = Viewer2DWidget(name = 'FT magnitude', labels={'bottom': ('frequency'), 'left': ('t_vol') })
+        self.outputPhaseViewerWidget = Viewer2DWidget(name = 'FT phase', labels={'bottom': ('frequency'), 'left': ('t_vol') })
         self.signalOutput_groupBox.layout().addWidget(self.outputMagnViewerWidget)
         self.signalOutput_groupBox.layout().addWidget(self.outputPhaseViewerWidget)
         self.outputMagnViewerWidget.view_2D.setYLink(self.outputPhaseViewerWidget.view_2D)
