@@ -36,8 +36,8 @@ class FourierTransform:
 
         f = fft.fftfreq(N,x[1]-x[0]) * 2 * np.pi #frequency axis     
         F = fft.fftn(signal,s = N, axes = axis) #fourier transform
-        f = np.roll(f,N//2)
-        F = np.roll(F,N//2)
+        f = np.roll(f,N//2) # = fftshift
+        F = np.roll(F,N//2, axis=axis)
         return f,F
 
     def do_inverse_Fourier(f,F, N = 0,axis=1):

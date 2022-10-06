@@ -329,8 +329,9 @@ class MainPanel(Ui_main_panel,QWidget):
             y = self.signal['t_vol']
             delay = self.signal['delay'][0]
 
-            freqs, TF_signal = self.doFourierTransform(delay, self.signal['signal'],N=101, windowchoice=0, axis=1)
-            self.doPlot2D(TF_signal[:,10], x, y)
+            freqs, TF_signal = self.doFourierTransform(delay, self.signal['signal'], N=len(delay), windowchoice=0, axis=1)
+            phase = np.angle(TF_signal[:,np.argmin(np.abs(freqs-oscillation_frequency))].transpose())
+            self.doPlot2D(phase, x, y)
 
         else:
             print('No data has been loaded')            
@@ -343,7 +344,7 @@ class MainPanel(Ui_main_panel,QWidget):
     def doPlot2D(self, data, x, y):
         if not hasattr(self,'V'):
             self.V = Viewer2DWidget()
-        self.V.updateViewerWidget(np.angle(data.transpose()), x, y)
+        self.V.updateViewerWidget(data, x, y)
         self.V.show()
 
     def doPlot1D(self,x,y,label='Plot'):
@@ -351,30 +352,6 @@ class MainPanel(Ui_main_panel,QWidget):
             self.V = Viewer1DWidget()            
         self.V.addPlot(name=label,x=x,y=y,)
         self.V.show()
-
-    #def doPlot2D(self,x,y,z,label='Plot'):
-    #    if not hasattr(self,'V'):
-    #        self.V = Viewer2DWidget()            
-    #   self.V.updateViewerWidget(z, x, y)
-    #   self.V.show()
-
-    def doFT_allHWP(self, time, data, oscill):
-
-        arr = []
-
-        for angle_idx in range(len(self.signal['angle_HWP'])):
-
-            freq, TF = FourierTransform.do_Fourier(time[angle_idx], data[angle_idx], N=len(time[angle_idx]), axis=0)
-            print(np.shape(time[angle_idx]))
-            print(np.shape(TF))
-            print(oscill)
-            line = np.angle(TF[10])
-
-            print(freq)
-
-            arr.append(line)
-
-        return np.array(arr).T
 
 def wrap2pmpi(phasedata):
     """It wraps phase from -pi, pi"""
