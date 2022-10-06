@@ -337,8 +337,8 @@ class MainPanel(Ui_main_panel,QWidget):
             print('No data has been loaded')            
 
     def doFourierTransform(self,x,y,N=None,windowchoice = 0, axis=-1) -> np.array:    
-        # window = FourierTransform.do_Window(len(x),windowchoice)
-        # y = np.swapaxes(np.swapaxes(y, axis, -1) * window, -1, axis)
+        window = FourierTransform.do_Window(len(x),windowchoice)
+        y = np.swapaxes(np.swapaxes(y, axis, -1) * window, -1, axis)
         return FourierTransform.do_Fourier(x,y,N, axis=axis) #Windowed Signal,N = npad) #Fourier transform of Signal  
 
     def doPlot2D(self, data, x, y):
