@@ -265,7 +265,7 @@ class MainPanel(Ui_main_panel,QWidget):
             print('Error loading file')
 
     def HWPSlider_function(self):    
-        print('moved')
+        # print('moved')
         self.Update_HWPSlider()
         self.showData()
 
