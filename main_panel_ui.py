@@ -25,7 +25,7 @@ class Ui_main_panel(object):
     def setupUi(self, main_panel):
         if not main_panel.objectName():
             main_panel.setObjectName(u"main_panel")
-        main_panel.resize(602, 767)
+        main_panel.resize(1920, 1080)
         sizePolicy = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
