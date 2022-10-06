@@ -337,7 +337,11 @@ class MainPanel(Ui_main_panel,QWidget):
                 crop_ROI = np.array(self.plotPreview_panel.outputMagnViewerWidget.ROI[-1].getRegion()) # bounds of the last ROI
                 crop_min = np.argmin(np.abs(y-crop_ROI[0]))
                 crop_max = np.argmin(np.abs(y-crop_ROI[1]))
+
+                y = y[crop_min:crop_max]
                 phase = phase[:, crop_min:crop_max]
+                ampl = ampl[:, crop_min:crop_max]
+
 
             self.doPlot2D(phase.transpose(), x, y, cmap='twilight_shifted')
             self.doPlot2D(ampl.transpose(), x, y, cmap='inferno')
