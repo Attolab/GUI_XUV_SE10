@@ -1,3 +1,4 @@
+from curses import delay_output
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,SIGNAL,QSize, QTime, QUrl, Qt)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
@@ -326,7 +327,7 @@ class MainPanel(Ui_main_panel,QWidget):
             x = self.signal['angle_HWP']
             y = self.signal['t_vol']
             delay = self.signal['delay'][0]
-            freqs, TF_signal = self.doFourierTransform(delay, self.signal['signal'], N=2048, windowchoice=0, axis=1)
+            freqs, TF_signal = self.doFourierTransform(delay, self.signal['signal'], N=len(delay), windowchoice=0, axis=1)
             phase = np.angle(TF_signal[:,np.argmin(np.abs(freqs-oscillation_frequency))])
 
             t_vol_for_offset = C.str2float(self.tvol_value_lineEdit.text())
@@ -340,6 +341,7 @@ class MainPanel(Ui_main_panel,QWidget):
                 crop_max = np.argmin(np.abs(y-crop_ROI[1]))
             phase = phase[:, crop_min:crop_max]
             ampl = np.sum(np.abs(TF_signal[:,:, crop_min:crop_max]), axis=2)
+            y = y[crop_min:crop_max]
             print(np.shape(x))
             print(np.shape(freqs))
             print(np.shape(ampl))
