@@ -275,9 +275,7 @@ class MainPanel(Ui_main_panel,QWidget):
     def press_loadScans_function(self):
         print('Ouverture')
         self.path_filename = QFileDialog.getOpenFileNames(self, 'Choose file',self.path_folder)[0]   
-        print(self.path_filename)
         self.path = self.path_filename[0]
-        print(self.path)
         self.filename = self.path
         try:
             self.loadScanList(self.path)
@@ -330,6 +328,7 @@ class MainPanel(Ui_main_panel,QWidget):
             delay = self.signal['delay'][0]
             freqs, TF_signal = self.doFourierTransform(delay, self.signal['signal'], N=len(delay), windowchoice=0, axis=1)
             phase = np.angle(TF_signal[:,np.argmin(np.abs(freqs-oscillation_frequency))])
+            ampl = np.sum(np.abs(TF_signal), axis=1)
 
             t_vol_for_offset = C.str2float(self.tvol_value_lineEdit.text())
             phase = self.offset_phases(phase, y, t_vol_for_offset)
@@ -340,8 +339,8 @@ class MainPanel(Ui_main_panel,QWidget):
                 crop_max = np.argmin(np.abs(y-crop_ROI[1]))
                 phase = phase[:, crop_min:crop_max]
 
-            self.doPlot2D(phase.transpose(), x, y)
-
+            self.doPlot2D(phase.transpose(), x, y, cmap='twilight_shifted')
+            self.doPlot2D(ampl.transpose(), x, y, cmap='inferno')
         else:
             print('No data has been loaded')            
 
@@ -356,11 +355,15 @@ class MainPanel(Ui_main_panel,QWidget):
         return (data-offsets)%(2*np.pi)-np.pi
 
 
-    def doPlot2D(self, data, x, y):
+    def doPlot2D(self, data, x, y, cmap='inferno'):
         if not hasattr(self,'V'):
-            self.V = Viewer2DWidget(cmap='twilight_shifted')
-        self.V.updateViewerWidget(data, x, y)
-        self.V.show()
+            self.V = Viewer2DWidget(cmap=cmap)
+            self.V.updateViewerWidget(data, x, y)
+            self.V.show()
+        elif not hasattr(self, 'W'):
+            self.W = Viewer2DWidget(cmap=cmap)
+            self.W.updateViewerWidget(data, x, y)
+            self.W.show()
 
     def doPlot1D(self,x,y,label='Plot'):
         if not hasattr(self,'V'):
