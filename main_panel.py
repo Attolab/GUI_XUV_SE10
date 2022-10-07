@@ -149,13 +149,6 @@ class MainPanel(Ui_main_panel,QWidget):
             currentRow = 0  
         return currentRow
 
-    def getData_energySpace(self,axis1,signal):    
-        signal-=np.mean(signal[0])
-        axis1,signal = Filter.ApplyFilter(axis1,signal,start = self.calibration[2]) # Remove unphysical counts
-        axis1,signal = af.goFromTimeToEnergy(axis1,signal,self.calibration[0],self.calibration[1],self.calibration[2]) # Convert from time to energy
-        axis1,signal = Filter.ApplyFilter(axis1,signal,start = float(self.energyMin_lineEdit.text()), end = float(self.energyMax_lineEdit.text())) # Select energy subset
-        axis1,signal = af.linearizeData(axis1,signal,C.str2float(self.energyMin_lineEdit.text()),C.str2float(self.energyMax_lineEdit.text()),C.str2float(self.energySteps_lineEdit.text())) # Linearize energy space       
-        return axis1,signal
 
 
     def loadScanList(self, filename):
@@ -197,6 +190,14 @@ class MainPanel(Ui_main_panel,QWidget):
         else:
             KE,data = self.getData_energySpace(t_vol,signal)
             self.plotPreview_panel.setData(axis_0=delay,axis_1=KE, data=data)   
+
+    def getData_energySpace(self,axis1,signal):
+        signal-=np.mean(signal[0])
+        axis1,signal = Filter.ApplyFilter(axis1,signal,start = self.calibration[2]) # Remove unphysical counts
+        axis1,signal = af.goFromTimeToEnergy(axis1,signal,self.calibration[0],self.calibration[1],self.calibration[2]) # Convert from time to energy
+        axis1,signal = Filter.ApplyFilter(axis1,signal,start = float(self.energyMin_lineEdit.text()), end = float(self.energyMax_lineEdit.text())) # Select energy subset
+        axis1,signal = af.linearizeData(axis1,signal,C.str2float(self.energyMin_lineEdit.text()),C.str2float(self.energyMax_lineEdit.text()),C.str2float(self.energySteps_lineEdit.text())) # Linearize energy space       
+        return axis1,signal
 
     ################################################## List widget functions ##########################################    
 
