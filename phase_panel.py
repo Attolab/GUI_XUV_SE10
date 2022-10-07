@@ -20,8 +20,8 @@ class phase_panel(QWidget):
         # self.doPlot2D(self.AmplViewerWidget, np.array([[1, 0, 0, 1],[1, 1, 0, 0]]))
 
     def setupPlots(self):
-        self.AmplViewerWidget = Viewer2DWidget(name = 'FT Ampl', cmap='inferno')
-        self.PhaseViewerWidget = Viewer2DWidget(name = 'FT Phase', cmap='twilight_shifted')
+        self.AmplViewerWidget = Viewer2DWidget(name = 'FT Ampl', cmap='inferno', labels={'bottom': ('HWP angle'), 'left': ('frequency') })
+        self.PhaseViewerWidget = Viewer2DWidget(name = 'FT Phase', cmap='twilight_shifted', labels={'bottom': ('HWP angle'), 'left': ('t_vol') })
         self.layout = QHBoxLayout()
         # self.layout.addWidget(QPushButton("Push for Window"))
         self.layout.addWidget(self.AmplViewerWidget)
