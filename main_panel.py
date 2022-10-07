@@ -307,19 +307,24 @@ class MainPanel(Ui_main_panel,QWidget):
             elif oscillation_units == 3:                
                 oscillation_frequency = oscillation_frequency
 
-            data = self.plotPreview_panel.outputPhaseViewerWidget.getImageData()
-            data = data[np.argmin(np.abs(frequency_axis - oscillation_frequency)),:]
+            #data = self.plotPreview_panel.outputPhaseViewerWidget.getImageData()
+            #data = data[np.argmin(np.abs(frequency_axis - oscillation_frequency)),:]
 
-            if self.unwrapPhase_checkBox.isChecked():
-                data = np.unwrap(data)
-            if self.customUnwrapPhase_checkBox.isChecked():
-                data = wrap2pmpi(data)
+            #if self.unwrapPhase_checkBox.isChecked():
+            #    data = np.unwrap(data)
+            #if self.customUnwrapPhase_checkBox.isChecked():
+            #    data = wrap2pmpi(data)
 
             # self.doPlot1D(y_axis,data,label=f'\u03C9={oscillation_frequency}PHz')
+
             x = self.signal['angle_HWP']
             y = self.signal['t_vol']
             delay = self.signal['delay'][0]
-            freqs, TF_signal = self.doFourierTransform(delay, self.signal['signal'], N=len(delay), windowchoice=0, axis=1)
+            freqs, TF_signal = self.doFourierTransform(delay, self.signal['signal'], N=2048, windowchoice=2, axis=1)
+
+            if not self.time_radioButton.isChecked():
+                y, TF_signal = self.getData_energySpace(y, TF_signal[0].T)[0], np.array([self.getData_energySpace(y, TF_signal[i].T)[1].T for i in range(len(TF_signal))])
+                
             phase = np.angle(TF_signal[:,np.argmin(np.abs(freqs-oscillation_frequency))])
 
             t_vol_for_offset = C.str2float(self.tvol_value_lineEdit.text())
@@ -336,6 +341,7 @@ class MainPanel(Ui_main_panel,QWidget):
             y = y[crop_min:crop_max]
 
             self.windowPhase = phase_panel()
+
             self.windowPhase.doPlot2D(self.windowPhase.PhaseViewerWidget, phase.transpose(), x, y)
             self.windowPhase.doPlot2D(self.windowPhase.AmplViewerWidget, np.log(ampl.transpose()), x, freqs)
             self.windowPhase.show()
