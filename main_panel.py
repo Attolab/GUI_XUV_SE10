@@ -346,7 +346,7 @@ class MainPanel(Ui_main_panel,QWidget):
 
             self.windowPhase = phase_panel()
             self.windowPhase.doPlot2D(self.windowPhase.PhaseViewerWidget, phase.transpose(), x, y)
-            self.windowPhase.doPlot2D(self.windowPhase.AmplViewerWidget, ampl.transpose(), x, freqs)
+            self.windowPhase.doPlot2D(self.windowPhase.AmplViewerWidget, np.log(ampl.transpose()), x, freqs)
             self.windowPhase.show()
             # self.doPlot2D(phase.transpose(), x, y, cmap='twilight_shifted', phase=1)
 
