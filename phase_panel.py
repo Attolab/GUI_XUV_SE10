@@ -26,8 +26,6 @@ class phase_panel(QWidget):
         # self.layout.addWidget(QPushButton("Push for Window"))
         self.layout.addWidget(self.AmplViewerWidget)
         self.layout.addWidget(self.PhaseViewerWidget)
-        self.AmplViewerWidget.view_2D.setYLink(self.PhaseViewerWidget.view_2D)
-        self.AmplViewerWidget.view_2D.setXLink(self.PhaseViewerWidget.view_2D)
 
 
     def doPlot2D(self, item, data, x=None, y=None):
