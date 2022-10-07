@@ -62,9 +62,9 @@ class MainPanel(Ui_main_panel,QWidget):
         self.HWP_Slider.valueChanged.connect(self.HWPSlider_function)
         self.energy_radioButton.toggled.connect(self.loadCurrentItem)
         self.time_radioButton.toggled.connect(self.loadCurrentItem)
-        self.transient_radioButton.toggled.connect(self.loadCurrentItem)
-        self.dressingOn_radioButton.toggled.connect(self.loadCurrentItem)
-        self.dressingOff_radioButton.toggled.connect(self.loadCurrentItem)
+        # self.transient_radioButton.toggled.connect(self.loadCurrentItem)
+        # self.dressingOn_radioButton.toggled.connect(self.loadCurrentItem)
+        # self.dressingOff_radioButton.toggled.connect(self.loadCurrentItem)
         self.folderBase_lineEdit.editingFinished.connect(self.updateBaseFolder)
         self.forderSelection_toolButton.pressed.connect(self.press_selectFolder_function)
         self.fileSelection_listWidget.itemDoubleClicked.connect(self.loadScanFromItem)
@@ -157,16 +157,6 @@ class MainPanel(Ui_main_panel,QWidget):
         axis1,signal = af.linearizeData(axis1,signal,C.str2float(self.energyMin_lineEdit.text()),C.str2float(self.energyMax_lineEdit.text()),C.str2float(self.energySteps_lineEdit.text())) # Linearize energy space       
         return axis1,signal
 
-
-    def getDataType(self):
-        if self.transient_radioButton.isChecked():
-            return 'signal_transient'
-        elif self.dressingOn_radioButton.isChecked():
-            return 'signal_statOn'
-        elif self.dressingOff_radioButton.isChecked():
-            return 'signal_statOff'
-        else:
-            return 'signal_transient'
 
     def loadScanList(self, filename):
         print('Loading scans')
@@ -348,10 +338,6 @@ class MainPanel(Ui_main_panel,QWidget):
             self.windowPhase.doPlot2D(self.windowPhase.PhaseViewerWidget, phase.transpose(), x, y)
             self.windowPhase.doPlot2D(self.windowPhase.AmplViewerWidget, np.log(ampl.transpose()), x, freqs)
             self.windowPhase.show()
-            # self.doPlot2D(phase.transpose(), x, y, cmap='twilight_shifted', phase=1)
-
-
-            # self.doPlot2D(np.log(ampl.transpose()), x, freqs, cmap='inferno', phase=0)
         else:
             print('No data has been loaded')            
 
@@ -364,19 +350,6 @@ class MainPanel(Ui_main_panel,QWidget):
         offsets = data[:, np.argmin(np.abs(t_vol-t_vol_value))]
         offsets = np.repeat(offsets[:, np.newaxis], len(t_vol), axis=-1)
         return (data-offsets)%(2*np.pi)-np.pi
-
-
-    def doPlot2D(self, data, x, y, phase=1, cmap='inferno'):
-        if phase:
-            if not hasattr(self,'V'):
-                self.V = Viewer2DWidget(cmap=cmap, labels={'bottom': ('HWP angle'), 'left': ('t_vol') })
-            self.V.updateViewerWidget(data, x, y)
-            self.V.show()
-        else:
-            if not hasattr(self, 'W'):
-                self.W = Viewer2DWidget(cmap=cmap, labels={'bottom': ('HWP angle'), 'left': ('frequency') })
-            self.W.updateViewerWidget(data, x, y)
-            self.W.show()
 
     def doPlot1D(self,x,y,label='Plot'):
         if not hasattr(self,'V'):

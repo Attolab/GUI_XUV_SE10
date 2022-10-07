@@ -105,26 +105,26 @@ class Ui_main_panel(object):
         self.horizontalLayout_5.addWidget(self.HWP_Value)
         self.horizontalLayout_5.addWidget(self.HWP_Slider)
 
-        self.verticalLayout_4 = QVBoxLayout()
-        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
-        self.transient_radioButton = QRadioButton(self.page_5)
-        self.transient_radioButton.setObjectName(u"transient_radioButton")
-        self.transient_radioButton.setChecked(True)
+        # self.verticalLayout_4 = QVBoxLayout()
+        # self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        # self.transient_radioButton = QRadioButton(self.page_5)
+        # self.transient_radioButton.setObjectName(u"transient_radioButton")
+        # self.transient_radioButton.setChecked(True)
 
-        self.verticalLayout_4.addWidget(self.transient_radioButton)
+        # self.verticalLayout_4.addWidget(self.transient_radioButton)
 
-        self.dressingOn_radioButton = QRadioButton(self.page_5)
-        self.dressingOn_radioButton.setObjectName(u"dressingOn_radioButton")
+        # self.dressingOn_radioButton = QRadioButton(self.page_5)
+        # self.dressingOn_radioButton.setObjectName(u"dressingOn_radioButton")
 
-        self.verticalLayout_4.addWidget(self.dressingOn_radioButton)
+        # self.verticalLayout_4.addWidget(self.dressingOn_radioButton)
 
-        self.dressingOff_radioButton = QRadioButton(self.page_5)
-        self.dressingOff_radioButton.setObjectName(u"dressingOff_radioButton")
+        # self.dressingOff_radioButton = QRadioButton(self.page_5)
+        # self.dressingOff_radioButton.setObjectName(u"dressingOff_radioButton")
 
-        self.verticalLayout_4.addWidget(self.dressingOff_radioButton)
+        # self.verticalLayout_4.addWidget(self.dressingOff_radioButton)
 
 
-        self.horizontalLayout_5.addLayout(self.verticalLayout_4)
+        # self.horizontalLayout_5.addLayout(self.verticalLayout_4)
 
         self.normalizeSpectrum_checkbox = QCheckBox(self.page_5)
         self.normalizeSpectrum_checkbox.setObjectName(u"normalizeSpectrum_checkbox")
@@ -417,9 +417,9 @@ class Ui_main_panel(object):
 #endif // QT_CONFIG(tooltip)
         self.loadSpectrum_pushButton.setText(QCoreApplication.translate("main_panel", u"Load Spectrum", None))
         self.HWP_Value.setText(QCoreApplication.translate("main_panel", u"HWP angle:", None))
-        self.transient_radioButton.setText(QCoreApplication.translate("main_panel", u"Transient", None))
-        self.dressingOn_radioButton.setText(QCoreApplication.translate("main_panel", u"Dressing On", None))
-        self.dressingOff_radioButton.setText(QCoreApplication.translate("main_panel", u"Dressing off", None))
+        # self.transient_radioButton.setText(QCoreApplication.translate("main_panel", u"Transient", None))
+        # self.dressingOn_radioButton.setText(QCoreApplication.translate("main_panel", u"Dressing On", None))
+        # self.dressingOff_radioButton.setText(QCoreApplication.translate("main_panel", u"Dressing off", None))
         self.normalizeSpectrum_checkbox.setText(QCoreApplication.translate("main_panel", u"Normalize spectrum", None))
         self.toolBox.setItemText(self.toolBox.indexOf(self.page_5), QCoreApplication.translate("main_panel", u"File selection", None))
 #if QT_CONFIG(tooltip)
