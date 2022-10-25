@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 from variable_panel import VariablePanel
 from viewer2D_widget import Viewer2DWidget
 from usefulclass import FourierTransform
-from phase_panel import phase_panel
+from orders_panel import orders_panel
 
 class MainPanel(Ui_main_panel,QWidget):
     def __init__(self,parent=None):
@@ -72,7 +72,7 @@ class MainPanel(Ui_main_panel,QWidget):
         self.energyMax_lineEdit.editingFinished.connect(self.updateEnergyAxis)
         self.energyMin_lineEdit.editingFinished.connect(self.updateEnergyAxis)
         self.energySteps_lineEdit.editingFinished.connect(self.updateEnergyAxis)        
-        self.showPhase_pushButton.pressed.connect(self.plotRabbitPhase)
+        self.showPhase_pushButton.pressed.connect(self.plotOrders)
     def connectSignals_widgets(self):
         self.calibration_toolbox.signal_requestInput.connect(self.plotPreview_panel.getData)
         self.calibration_toolbox.signal_applyCalibration.connect(self.updateCalibration)
@@ -293,7 +293,7 @@ class MainPanel(Ui_main_panel,QWidget):
 
     ################################################## RABBIT functions ##########################################    
 
-    def plotRabbitPhase(self):
+    def plotOrders(self):
         if self.isDataLoaded:
 
             x = self.signal['angle_HWP']
@@ -311,7 +311,7 @@ class MainPanel(Ui_main_panel,QWidget):
 
             intensity = np.sum(intensity, axis=2)
 
-            self.windowPhase = phase_panel()
+            self.windowPhase = orders_panel()
             self.windowPhase.doPlot2D(self.windowPhase.PhaseViewerWidget, np.flip(intensity.T, axis=0), x, y)
             self.windowPhase.show()
         else:
