@@ -85,7 +85,7 @@ class PreviewPlot_Panel(Ui_previewPlot_Panel,QWidget):
         self.signal_sendData.emit(output)
         
     def setupPlotWidget(self):        
-        self.inputViewerWidget = Viewer2DWidget(name = 'Signal', labels={'bottom': ('delay'), 'left': ('t_vol') })
+        self.inputViewerWidget = Viewer2DWidget(name = 'Photon spectrum', cmap='magma', labels={'bottom': ('pixels'), 'left': ('pixels') })
         self.signalInput_groupBox.layout().addWidget(self.inputViewerWidget)
         self.outputMagnViewerWidget = Viewer2DWidget(name = 'FT magnitude', labels={'bottom': ('frequency'), 'left': ('t_vol') })
         self.outputPhaseViewerWidget = Viewer2DWidget(name = 'FT phase', labels={'bottom': ('frequency'), 'left': ('t_vol') })

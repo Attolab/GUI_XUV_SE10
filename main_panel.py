@@ -175,21 +175,21 @@ class MainPanel(Ui_main_panel,QWidget):
         self.showData()
 
     def showData(self):
-        signal = self.signal['signal'][self.HWP_Slider.value()].transpose()
-        t_vol = self.signal['t_vol']
-        delay = self.signal['delay'][self.HWP_Slider.value()]
+        signal = np.flip(self.signal['signal'][self.HWP_Slider.value()], axis=0)
+
+        self.plotPreview_panel.setData(axis_0='', axis_1='', data=signal) 
     
-        if self.normalizeSpectrum_checkbox.isChecked():
-            signal = signal/np.sum(signal,axis=0)
+        # if self.normalizeSpectrum_checkbox.isChecked():
+        #     signal = signal/np.sum(signal,axis=0)
             
-        if len(delay) < 2: # hack when there is only one point
-            delay = np.append(delay,-delay)
-            signal = np.append(signal,signal,axis = 1)        
-        if self.time_radioButton.isChecked():
-            self.plotPreview_panel.setData(axis_0=delay,axis_1=t_vol, data=signal)    
-        else:
-            KE,data = self.getData_energySpace(t_vol,signal)
-            self.plotPreview_panel.setData(axis_0=delay,axis_1=KE, data=data)   
+        # if len(delay) < 2: # hack when there is only one point
+        #     delay = np.append(delay,-delay)
+        #     signal = np.append(signal,signal,axis = 1)        
+        # if self.time_radioButton.isChecked():
+        #     self.plotPreview_panel.setData(axis_0=delay,axis_1=t_vol, data=signal)    
+        # else:
+        #     KE,data = self.getData_energySpace(t_vol,signal)
+        #     self.plotPreview_panel.setData(axis_0=delay,axis_1=KE, data=data)   
 
     def getData_energySpace(self,axis1,signal):
         signal-=np.mean(signal[0])
@@ -295,55 +295,24 @@ class MainPanel(Ui_main_panel,QWidget):
 
     def plotRabbitPhase(self):
         if self.isDataLoaded:
-            frequency_axis,y_axis = self.plotPreview_panel.outputPhaseViewerWidget.getAxis()
-            oscillation_frequency = C.str2float(self.oscillationFrequency_lineEdit.text())
-            oscillation_units = self.oscillationUnits_comboBox.currentIndex()
-            if oscillation_units == 0:
-                oscillation_frequency = C.wavelength2omega(oscillation_frequency)
-            elif oscillation_units == 1:
-                oscillation_frequency = C.energy2omega(oscillation_frequency)
-            elif oscillation_units == 2:
-                oscillation_frequency = 2*np.pi*(oscillation_frequency)
-            elif oscillation_units == 3:                
-                oscillation_frequency = oscillation_frequency
-
-            #data = self.plotPreview_panel.outputPhaseViewerWidget.getImageData()
-            #data = data[np.argmin(np.abs(frequency_axis - oscillation_frequency)),:]
-
-            #if self.unwrapPhase_checkBox.isChecked():
-            #    data = np.unwrap(data)
-            #if self.customUnwrapPhase_checkBox.isChecked():
-            #    data = wrap2pmpi(data)
-
-            # self.doPlot1D(y_axis,data,label=f'\u03C9={oscillation_frequency}PHz')
 
             x = self.signal['angle_HWP']
-            y = self.signal['t_vol']
-            delay = self.signal['delay'][0]
-            freqs, TF_signal = self.doFourierTransform(delay, self.signal['signal'], N=2048, windowchoice=2, axis=1)
-
-            if not self.time_radioButton.isChecked():
-                y, TF_signal = self.getData_energySpace(y, TF_signal[0].T)[0], np.array([self.getData_energySpace(y, TF_signal[i].T)[1].T for i in range(len(TF_signal))])
-                
-            phase = np.angle(TF_signal[:,np.argmin(np.abs(freqs-oscillation_frequency))])
-
-            t_vol_for_offset = C.str2float(self.tvol_value_lineEdit.text())
-            phase = self.offset_phases(phase, y, t_vol_for_offset)
+            y = np.arange(np.shape(self.signal['signal'])[1])
+            intensity = self.signal['signal']
 
             crop_max = -1
             crop_min = 0
-            if self.plotPreview_panel.outputMagnViewerWidget.ROI:
-                crop_ROI = np.array(self.plotPreview_panel.outputMagnViewerWidget.ROI[-1].getRegion()) # bounds of the last ROI
+            if self.plotPreview_panel.inputViewerWidget.ROI:
+                crop_ROI = np.array(self.plotPreview_panel.inputViewerWidget.ROI[-1].getRegion()) # bounds of the last ROI
                 crop_min = np.argmin(np.abs(y-crop_ROI[0]))
                 crop_max = np.argmin(np.abs(y-crop_ROI[1]))
-            phase = phase[:, crop_min:crop_max]
-            ampl = np.sum(np.abs(TF_signal[:,:, crop_min:crop_max]), axis=2)
+            intensity = intensity[:, :, crop_min:crop_max]
             y = y[crop_min:crop_max]
 
-            self.windowPhase = phase_panel()
+            intensity = np.sum(intensity, axis=2)
 
-            self.windowPhase.doPlot2D(self.windowPhase.PhaseViewerWidget, phase.transpose(), x, y)
-            self.windowPhase.doPlot2D(self.windowPhase.AmplViewerWidget, np.log(ampl.transpose()), x, freqs)
+            self.windowPhase = phase_panel()
+            self.windowPhase.doPlot2D(self.windowPhase.PhaseViewerWidget, np.flip(intensity.T, axis=0), x, y)
             self.windowPhase.show()
         else:
             print('No data has been loaded')            

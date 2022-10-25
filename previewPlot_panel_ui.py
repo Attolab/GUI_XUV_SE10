@@ -58,7 +58,7 @@ class Ui_previewPlot_Panel(object):
 
         self.FT_magn_checkBox = QCheckBox(previewPlot_Panel)
         self.FT_magn_checkBox.setObjectName(u"FT_magn_checkBox")
-        self.FT_magn_checkBox.setChecked(True)
+        self.FT_magn_checkBox.setChecked(False)
 
         self.horizontalLayout.addWidget(self.FT_magn_checkBox)
 

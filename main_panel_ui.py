@@ -308,7 +308,7 @@ class Ui_main_panel(object):
 
         self.verticalLayout.addItem(self.verticalSpacer_2)
 
-        self.toolBox.addItem(self.page_6, u"Calibration")
+        #self.toolBox.addItem(self.page_6, u"Outdated")
         self.page_7 = QWidget()
         self.page_7.setObjectName(u"page_7")
         self.page_7.setGeometry(QRect(0, 0, 582, 360))
@@ -318,6 +318,7 @@ class Ui_main_panel(object):
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.gridLayout_3 = QGridLayout()
         self.gridLayout_3.setObjectName(u"gridLayout_3")
+
         self.showPhase_pushButton = QPushButton(self.page_7)
         self.showPhase_pushButton.setObjectName(u"showPhase_pushButton")
         sizePolicy3.setHeightForWidth(self.showPhase_pushButton.sizePolicy().hasHeightForWidth())
@@ -330,42 +331,42 @@ class Ui_main_panel(object):
 
         self.gridLayout_3.addWidget(self.label_9, 0, 0, 1, 1)
 
-        self.oscillationUnits_comboBox = QComboBox(self.page_7)
-        self.oscillationUnits_comboBox.addItem("")
-        self.oscillationUnits_comboBox.addItem("")
-        self.oscillationUnits_comboBox.addItem("")
-        self.oscillationUnits_comboBox.addItem("")
-        self.oscillationUnits_comboBox.setObjectName(u"oscillationUnits_comboBox")
+        #self.oscillationUnits_comboBox = QComboBox(self.page_7)
+        # self.oscillationUnits_comboBox.addItem("")
+        # self.oscillationUnits_comboBox.addItem("")
+        # self.oscillationUnits_comboBox.addItem("")
+        # self.oscillationUnits_comboBox.addItem("")
+        # self.oscillationUnits_comboBox.setObjectName(u"oscillationUnits_comboBox")
 
-        self.gridLayout_3.addWidget(self.oscillationUnits_comboBox, 1, 1, 1, 1)
+        # self.gridLayout_3.addWidget(self.oscillationUnits_comboBox, 1, 1, 1, 1)
 
-        self.unwrapPhase_checkBox = QCheckBox(self.page_7)
-        self.unwrapPhase_checkBox.setObjectName(u"unwrapPhase_checkBox")
+        # self.unwrapPhase_checkBox = QCheckBox(self.page_7)
+        # self.unwrapPhase_checkBox.setObjectName(u"unwrapPhase_checkBox")
 
-        self.gridLayout_3.addWidget(self.unwrapPhase_checkBox, 2, 1, 1, 1)
+        # self.gridLayout_3.addWidget(self.unwrapPhase_checkBox, 2, 1, 1, 1)
 
-        self.oscillationFrequency_lineEdit = QLineEdit(self.page_7)
-        self.oscillationFrequency_lineEdit.setObjectName(u"oscillationFrequency_lineEdit")
-        sizePolicy2.setHeightForWidth(self.oscillationFrequency_lineEdit.sizePolicy().hasHeightForWidth())
-        self.oscillationFrequency_lineEdit.setSizePolicy(sizePolicy2)
+        # self.oscillationFrequency_lineEdit = QLineEdit(self.page_7)
+        # self.oscillationFrequency_lineEdit.setObjectName(u"oscillationFrequency_lineEdit")
+        # sizePolicy2.setHeightForWidth(self.oscillationFrequency_lineEdit.sizePolicy().hasHeightForWidth())
+        # self.oscillationFrequency_lineEdit.setSizePolicy(sizePolicy2)
 
-        self.gridLayout_3.addWidget(self.oscillationFrequency_lineEdit, 1, 0, 1, 1)
+        # self.gridLayout_3.addWidget(self.oscillationFrequency_lineEdit, 1, 0, 1, 1)
 
         self.label_10 = QLabel(self.page_7)
         self.label_10.setObjectName(u"label_10")
 
-        self.tvol_value_lineEdit = QLineEdit(self.page_7)
-        self.tvol_value_lineEdit.setObjectName(u"tvol_value_lineEdit")
-        sizePolicy2.setHeightForWidth(self.tvol_value_lineEdit.sizePolicy().hasHeightForWidth())
-        self.tvol_value_lineEdit.setSizePolicy(sizePolicy2)
+        # self.tvol_value_lineEdit = QLineEdit(self.page_7)
+        # self.tvol_value_lineEdit.setObjectName(u"tvol_value_lineEdit")
+        # sizePolicy2.setHeightForWidth(self.tvol_value_lineEdit.sizePolicy().hasHeightForWidth())
+        # self.tvol_value_lineEdit.setSizePolicy(sizePolicy2)
 
-        self.gridLayout_3.addWidget(self.label_10, 2, 0, 1, 1)
-        self.gridLayout_3.addWidget(self.tvol_value_lineEdit, 3, 0, 1, 1)
+        # self.gridLayout_3.addWidget(self.label_10, 2, 0, 1, 1)
+        # self.gridLayout_3.addWidget(self.tvol_value_lineEdit, 3, 0, 1, 1)
 
-        self.customUnwrapPhase_checkBox = QCheckBox(self.page_7)
-        self.customUnwrapPhase_checkBox.setObjectName(u"customUnwrapPhase_checkBox")
+        # self.customUnwrapPhase_checkBox = QCheckBox(self.page_7)
+        # self.customUnwrapPhase_checkBox.setObjectName(u"customUnwrapPhase_checkBox")
 
-        self.gridLayout_3.addWidget(self.customUnwrapPhase_checkBox, 3, 1, 1, 1)
+        # self.gridLayout_3.addWidget(self.customUnwrapPhase_checkBox, 3, 1, 1, 1)
 
 
         self.verticalLayout_3.addLayout(self.gridLayout_3)
@@ -374,7 +375,7 @@ class Ui_main_panel(object):
 
         self.verticalLayout_3.addItem(self.verticalSpacer_4)
 
-        self.toolBox.addItem(self.page_7, u"RABBIT")
+        self.toolBox.addItem(self.page_7, u"Plot orders")
 
         self.v_optionLayout.addWidget(self.toolBox)
 
@@ -399,7 +400,7 @@ class Ui_main_panel(object):
         self.retranslateUi(main_panel)
 
         self.toolBox.setCurrentIndex(0)
-        self.oscillationUnits_comboBox.setCurrentIndex(3)
+        #self.oscillationUnits_comboBox.setCurrentIndex(3)
 
 
         QMetaObject.connectSlotsByName(main_panel)
@@ -470,18 +471,18 @@ class Ui_main_panel(object):
 #endif // QT_CONFIG(tooltip)
         self.label_4.setText(QCoreApplication.translate("main_panel", u"dE", None))
         self.toolBox.setItemText(self.toolBox.indexOf(self.page_6), QCoreApplication.translate("main_panel", u"Calibration", None))
-        self.showPhase_pushButton.setText(QCoreApplication.translate("main_panel", u"Show phase", None))
-        self.label_9.setText(QCoreApplication.translate("main_panel", u"Oscillation frequency", None))
-        self.label_10.setText(QCoreApplication.translate("main_panel", u"t_vol value for phase offset", None))
-        self.oscillationUnits_comboBox.setItemText(0, QCoreApplication.translate("main_panel", u"Wavelength (nm)", None))
-        self.oscillationUnits_comboBox.setItemText(1, QCoreApplication.translate("main_panel", u"Energy (eV)", None))
-        self.oscillationUnits_comboBox.setItemText(2, QCoreApplication.translate("main_panel", u"Frequency (THz)", None))
-        self.oscillationUnits_comboBox.setItemText(3, QCoreApplication.translate("main_panel", u"Angular frequency (PHz)", None))
+        self.showPhase_pushButton.setText(QCoreApplication.translate("main_panel", u"Plot orders", None))
+        # self.label_9.setText(QCoreApplication.translate("main_panel", u"Oscillation frequency", None))
+        # self.label_10.setText(QCoreApplication.translate("main_panel", u"t_vol value for phase offset", None))
+        # self.oscillationUnits_comboBox.setItemText(0, QCoreApplication.translate("main_panel", u"Wavelength (nm)", None))
+        # self.oscillationUnits_comboBox.setItemText(1, QCoreApplication.translate("main_panel", u"Energy (eV)", None))
+        # self.oscillationUnits_comboBox.setItemText(2, QCoreApplication.translate("main_panel", u"Frequency (THz)", None))
+        # self.oscillationUnits_comboBox.setItemText(3, QCoreApplication.translate("main_panel", u"Angular frequency (PHz)", None))
 
-        self.unwrapPhase_checkBox.setText(QCoreApplication.translate("main_panel", u"Unwrapped", None))
-        self.oscillationFrequency_lineEdit.setText(QCoreApplication.translate("main_panel", u"4.7", None))
-        self.tvol_value_lineEdit.setText(QCoreApplication.translate("main_panel", u"970", None))
-        self.customUnwrapPhase_checkBox.setText(QCoreApplication.translate("main_panel", u"CustomUnwrapped", None))
-        self.toolBox.setItemText(self.toolBox.indexOf(self.page_7), QCoreApplication.translate("main_panel", u"RABBIT", None))
+        # self.unwrapPhase_checkBox.setText(QCoreApplication.translate("main_panel", u"Unwrapped", None))
+        # self.oscillationFrequency_lineEdit.setText(QCoreApplication.translate("main_panel", u"4.7", None))
+        # self.tvol_value_lineEdit.setText(QCoreApplication.translate("main_panel", u"970", None))
+        # self.customUnwrapPhase_checkBox.setText(QCoreApplication.translate("main_panel", u"CustomUnwrapped", None))
+        self.toolBox.setItemText(self.toolBox.indexOf(self.page_7), QCoreApplication.translate("main_panel", u"Plot orders", None))
     # retranslateUi
 

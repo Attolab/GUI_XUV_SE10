@@ -228,19 +228,11 @@ class FileManager:
     def Read_h5_SE10(self, scan):
         with h5py.File(self.filename, 'r') as file:
 
-            data = np.array(file['Raw_datas'][scan]['Detector000']['Data1D']['Ch000']['Data'])
-            delay_stage = np.array(file['Raw_datas'][scan]['Scan_y_axis'])
+            data = np.array(file['Raw_datas'][scan]['Detector000']['Data2D']['Ch000']['Data'])
             angle_HWP = np.array(file['Raw_datas'][scan]['Scan_x_axis'])
-            tof = np.array(file['Raw_datas'][scan]['Detector000']['Data1D']['Ch000']['X_axis'])
-
-        delay_stage = delay_stage.reshape(np.shape(data[:,:,0]))
-        angle_HWP = angle_HWP.reshape(np.shape(data[:,:,0])).transpose()[0]
-        indexing = np.argsort(delay_stage, axis=1)
-        delay = 2 * np.take_along_axis(delay_stage, indexing, axis=1) / ( 0.299792458)   #delay in fs
-        signal = data #np.take_along_axis(data, np.multiply.outer(indexing, np.ones(len(tof))).astype(int), axis=1)
+            
+        signal = data
         signal_params = {'signal':signal,
-                    't_vol':tof,
-                    'delay':delay,
                     'angle_HWP':angle_HWP
                     }
         return signal_params
