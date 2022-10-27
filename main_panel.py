@@ -297,7 +297,7 @@ class MainPanel(Ui_main_panel,QWidget):
         if self.isDataLoaded:
 
             x = self.signal['angle_HWP']
-            y = np.arange(np.shape(self.signal['signal'])[1])
+            y = np.arange(np.shape(self.signal['signal'])[2])
             intensity = self.signal['signal']
 
             crop_max = -1
@@ -307,12 +307,13 @@ class MainPanel(Ui_main_panel,QWidget):
                 crop_min = np.argmin(np.abs(y-crop_ROI[0]))
                 crop_max = np.argmin(np.abs(y-crop_ROI[1]))
             intensity = intensity[:, :, crop_min:crop_max]
+            print(x, y)
             y = y[crop_min:crop_max]
 
             intensity = np.sum(intensity, axis=2)
 
             self.windowPhase = orders_panel()
-            self.windowPhase.doPlot2D(self.windowPhase.PhaseViewerWidget, np.flip(intensity.T, axis=0), x, y)
+            self.windowPhase.doPlot2D(self.windowPhase.AngleViewerWidget, np.flip(intensity.T, axis=0), x, y)
             self.windowPhase.show()
         else:
             print('No data has been loaded')            
